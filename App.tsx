@@ -3,6 +3,7 @@ import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import TourCard from './components/TourCard';
 import TourDetail from './components/TourDetail';
+import AIPlanner from './components/AIPlanner';
 
 import CompanyProfile from './components/CompanyProfile';
 import Footer from './components/Footer';
@@ -116,6 +117,10 @@ const App: React.FC = () => {
                 </div>
             </section>
 
+            {/* AI Planner Section rebranded as Private Trip */}
+            <section id="private-trip" className="scroll-mt-20">
+                <AIPlanner />
+            </section>
 
             {/* About Us / Company Profile Section */}
             <section id="about" className="scroll-mt-20">

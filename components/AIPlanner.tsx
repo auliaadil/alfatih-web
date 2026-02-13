@@ -1,0 +1,324 @@
+import React, { useState } from 'react';
+import ReactMarkdown from 'react-markdown';
+import { Plane, Users, Calendar, Sparkles, MapPin, Send, RotateCcw, Loader2, ChevronDown } from 'lucide-react';
+import { generateItinerary } from '../services/geminiService';
+import { AIPlannerInput } from '../types';
+import { INTERESTS_LIST, DESTINATION_OPTIONS, CONTACT_INFO } from '../constants';
+
+type TravelerType = 'Solo' | 'Pasangan' | 'Keluarga' | 'Rombongan';
+
+const TRAVELER_OPTIONS: { value: TravelerType; label: string; icon: string }[] = [
+    { value: 'Solo', label: 'Solo', icon: '🧑' },
+    { value: 'Pasangan', label: 'Pasangan', icon: '💑' },
+    { value: 'Keluarga', label: 'Keluarga', icon: '👨‍👩‍👧‍👦' },
+    { value: 'Rombongan', label: 'Rombongan', icon: '👥' },
+];
+
+const AIPlanner: React.FC = () => {
+    const [destination, setDestination] = useState('');
+    const [days, setDays] = useState(5);
+    const [travelers, setTravelers] = useState<TravelerType>('Keluarga');
+    const [interests, setInterests] = useState<string[]>([]);
+    const [itinerary, setItinerary] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+
+    const filteredSuggestions = DESTINATION_OPTIONS.filter((opt) =>
+        opt.toLowerCase().includes(destination.toLowerCase()) && destination.length > 0
+    );
+
+    const toggleInterest = (interest: string) => {
+        setInterests((prev) =>
+            prev.includes(interest)
+                ? prev.filter((i) => i !== interest)
+                : [...prev, interest]
+        );
+    };
+
+    const handleGenerate = async () => {
+        if (!destination.trim() || interests.length === 0) return;
+        setIsLoading(true);
+        setItinerary(null);
+
+        const input: AIPlannerInput = {
+            destination: destination.trim(),
+            days,
+            travelers,
+            interests,
+        };
+
+        const result = await generateItinerary(input);
+        setItinerary(result);
+        setIsLoading(false);
+    };
+
+    const handleReset = () => {
+        setItinerary(null);
+        setDestination('');
+        setDays(5);
+        setTravelers('Keluarga');
+        setInterests([]);
+    };
+
+    const handleWhatsApp = () => {
+        const message = encodeURIComponent(
+            `Assalamualaikum Alfatih Dunia Wisata! 👋\n\nSaya baru saja membuat draft itinerary *Private Trip* ke *${destination}* selama *${days} hari* untuk *${travelers}*.\n\nSaya ingin konsultasi lebih lanjut dan cek harga resmi. Terima kasih! 🙏`
+        );
+        window.open(`https://wa.me/${CONTACT_INFO.whatsapp}?text=${message}`, '_blank');
+    };
+
+    const isFormValid = destination.trim().length > 0 && interests.length > 0;
+
+    // ─── Result View ───
+    if (itinerary) {
+        return (
+            <div className="bg-gray-50">
+                {/* Result Header */}
+                <div className="relative py-16 bg-gradient-to-br from-primary via-accent to-primary overflow-hidden">
+                    <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+                    <div className="absolute -top-24 -right-24 w-96 h-96 bg-white/10 rounded-full blur-[120px]"></div>
+                    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+                        <div className="inline-flex items-center gap-2 px-4 py-2 bg-secondary text-white rounded-full text-xs font-black uppercase tracking-widest mb-4 shadow-xl">
+                            <Sparkles className="w-3.5 h-3.5" /> Draft Itinerary
+                        </div>
+                        <h2 className="text-3xl md:text-4xl font-black text-white mb-2">
+                            Private Trip ke {destination}
+                        </h2>
+                        <p className="text-white/80">
+                            {days} Hari • {travelers} • {interests.length} Minat
+                        </p>
+                    </div>
+                </div>
+
+                {/* Itinerary Content */}
+                <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-20 pb-20">
+                    <div className="bg-white rounded-3xl shadow-2xl shadow-primary/10 border border-gray-100 p-8 md:p-12">
+                        <div className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-headings:font-black prose-p:text-gray-600 prose-strong:text-gray-800 prose-ul:text-gray-600 prose-li:marker:text-primary">
+                            <ReactMarkdown>{itinerary}</ReactMarkdown>
+                        </div>
+                    </div>
+
+                    {/* CTA Buttons */}
+                    <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+                        <button
+                            onClick={handleWhatsApp}
+                            className="flex items-center justify-center gap-3 bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-8 rounded-full shadow-lg shadow-green-500/30 transition-all hover:-translate-y-1 hover:shadow-xl"
+                        >
+                            <Send className="w-5 h-5" />
+                            Cek Harga & Konsultasi
+                        </button>
+                        <button
+                            onClick={handleReset}
+                            className="flex items-center justify-center gap-3 bg-white hover:bg-gray-50 text-gray-700 font-bold py-4 px-8 rounded-full shadow-lg border border-gray-200 transition-all hover:-translate-y-1"
+                        >
+                            <RotateCcw className="w-5 h-5" />
+                            Buat Ulang
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // ─── Loading View ───
+    if (isLoading) {
+        return (
+            <div className="bg-gray-50 py-20">
+                <div className="max-w-3xl mx-auto px-4 text-center">
+                    <div className="bg-white rounded-3xl shadow-2xl p-12 md:p-16 border border-gray-100">
+                        <div className="relative mx-auto mb-8 w-24 h-24">
+                            <div className="absolute inset-0 bg-primary/20 rounded-full animate-ping"></div>
+                            <div className="relative w-24 h-24 bg-primary rounded-full flex items-center justify-center shadow-lg shadow-primary/30">
+                                <Loader2 className="w-10 h-10 text-white animate-spin" />
+                            </div>
+                        </div>
+                        <h3 className="text-2xl font-black text-gray-900 mb-3">Sedang Membuat Itinerary</h3>
+                        <p className="text-gray-500 mb-10 max-w-md mx-auto">
+                            AI kami sedang merancang rencana perjalanan terbaik ke <strong className="text-primary">{destination}</strong> selama <strong>{days} hari</strong>...
+                        </p>
+                        {/* Skeleton */}
+                        <div className="space-y-4 max-w-lg mx-auto">
+                            <div className="h-5 bg-gray-200 rounded-full animate-pulse w-3/4"></div>
+                            <div className="h-4 bg-gray-100 rounded-full animate-pulse w-full"></div>
+                            <div className="h-4 bg-gray-100 rounded-full animate-pulse w-5/6"></div>
+                            <div className="h-4 bg-gray-100 rounded-full animate-pulse w-2/3"></div>
+                            <div className="h-5 bg-gray-200 rounded-full animate-pulse w-1/2 mt-6"></div>
+                            <div className="h-4 bg-gray-100 rounded-full animate-pulse w-full"></div>
+                            <div className="h-4 bg-gray-100 rounded-full animate-pulse w-4/5"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // ─── Form View ───
+    return (
+        <div className="bg-gray-50">
+            {/* Section Header */}
+            <div className="relative py-20 md:py-28 bg-gradient-to-br from-primary via-accent to-primary overflow-hidden">
+                <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+                <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-secondary/20 rounded-full blur-[120px]"></div>
+                <div className="absolute -top-20 -right-20 w-80 h-80 bg-white/10 rounded-full blur-[100px]"></div>
+                <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-secondary text-white rounded-full text-xs font-black uppercase tracking-widest mb-6 shadow-xl">
+                        <Sparkles className="w-3.5 h-3.5" /> AI-Powered
+                    </div>
+                    <h2 className="text-4xl md:text-5xl font-black text-white mb-4">
+                        Private Trip Planner
+                    </h2>
+                    <p className="text-xl text-white/90 max-w-2xl mx-auto font-medium leading-relaxed">
+                        Buat draft rencana perjalanan impian Anda dalam hitungan detik dengan kecerdasan buatan.
+                    </p>
+                </div>
+            </div>
+
+            {/* Form Card */}
+            <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 -mt-12 relative z-20 pb-20">
+                <div className="bg-white rounded-[2rem] shadow-2xl shadow-primary/10 border border-gray-100 p-8 md:p-12">
+
+                    {/* Destination */}
+                    <div className="mb-8">
+                        <label className="flex items-center gap-2 text-sm font-bold text-gray-900 uppercase tracking-wider mb-3">
+                            <MapPin className="w-4 h-4 text-primary" /> Destinasi
+                        </label>
+                        <div className="relative">
+                            <input
+                                type="text"
+                                value={destination}
+                                onChange={(e) => {
+                                    setDestination(e.target.value);
+                                    setShowSuggestions(true);
+                                }}
+                                onFocus={() => setShowSuggestions(true)}
+                                onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                                placeholder="Ketik destinasi, misal: Turki, Jepang, Swiss..."
+                                className="w-full px-6 py-4 bg-gray-50 border border-gray-200 rounded-2xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all text-lg"
+                            />
+                            {showSuggestions && filteredSuggestions.length > 0 && (
+                                <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-2xl shadow-xl z-50 overflow-hidden">
+                                    {filteredSuggestions.map((opt) => (
+                                        <button
+                                            key={opt}
+                                            onMouseDown={() => {
+                                                setDestination(opt);
+                                                setShowSuggestions(false);
+                                            }}
+                                            className="w-full text-left px-6 py-3 hover:bg-primary/5 text-gray-700 transition-colors flex items-center gap-3"
+                                        >
+                                            <MapPin className="w-4 h-4 text-primary/50" /> {opt}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                        {/* Quick chips */}
+                        <div className="flex flex-wrap gap-2 mt-3">
+                            {DESTINATION_OPTIONS.slice(0, 5).map((opt) => (
+                                <button
+                                    key={opt}
+                                    onClick={() => setDestination(opt)}
+                                    className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${destination === opt
+                                            ? 'bg-primary text-white shadow-md'
+                                            : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                                        }`}
+                                >
+                                    {opt}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Duration & Travelers Row */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+                        {/* Duration */}
+                        <div>
+                            <label className="flex items-center gap-2 text-sm font-bold text-gray-900 uppercase tracking-wider mb-3">
+                                <Calendar className="w-4 h-4 text-primary" /> Durasi (Hari)
+                            </label>
+                            <div className="flex items-center gap-4 bg-gray-50 border border-gray-200 rounded-2xl px-6 py-3">
+                                <button
+                                    onClick={() => setDays(Math.max(1, days - 1))}
+                                    className="w-10 h-10 rounded-xl bg-white border border-gray-200 flex items-center justify-center text-lg font-bold text-gray-600 hover:bg-primary hover:text-white hover:border-primary transition-all"
+                                >
+                                    −
+                                </button>
+                                <span className="text-2xl font-black text-gray-900 flex-grow text-center">{days}</span>
+                                <button
+                                    onClick={() => setDays(Math.min(30, days + 1))}
+                                    className="w-10 h-10 rounded-xl bg-white border border-gray-200 flex items-center justify-center text-lg font-bold text-gray-600 hover:bg-primary hover:text-white hover:border-primary transition-all"
+                                >
+                                    +
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Travelers */}
+                        <div>
+                            <label className="flex items-center gap-2 text-sm font-bold text-gray-900 uppercase tracking-wider mb-3">
+                                <Users className="w-4 h-4 text-primary" /> Tipe Traveler
+                            </label>
+                            <div className="relative">
+                                <select
+                                    value={travelers}
+                                    onChange={(e) => setTravelers(e.target.value as TravelerType)}
+                                    className="w-full appearance-none px-6 py-4 bg-gray-50 border border-gray-200 rounded-2xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all text-lg cursor-pointer"
+                                >
+                                    {TRAVELER_OPTIONS.map((opt) => (
+                                        <option key={opt.value} value={opt.value}>
+                                            {opt.icon} {opt.label}
+                                        </option>
+                                    ))}
+                                </select>
+                                <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Interests */}
+                    <div className="mb-10">
+                        <label className="flex items-center gap-2 text-sm font-bold text-gray-900 uppercase tracking-wider mb-3">
+                            <Sparkles className="w-4 h-4 text-primary" /> Minat Perjalanan
+                        </label>
+                        <div className="flex flex-wrap gap-3">
+                            {INTERESTS_LIST.map((interest) => (
+                                <button
+                                    key={interest}
+                                    onClick={() => toggleInterest(interest)}
+                                    className={`px-5 py-2.5 rounded-full font-semibold text-sm transition-all duration-300 ${interests.includes(interest)
+                                            ? 'bg-primary text-white shadow-lg shadow-primary/30 scale-105'
+                                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:scale-105'
+                                        }`}
+                                >
+                                    {interest}
+                                </button>
+                            ))}
+                        </div>
+                        {interests.length === 0 && (
+                            <p className="text-xs text-gray-400 mt-2">Pilih minimal 1 minat untuk melanjutkan</p>
+                        )}
+                    </div>
+
+                    {/* Submit */}
+                    <button
+                        onClick={handleGenerate}
+                        disabled={!isFormValid}
+                        className={`w-full flex items-center justify-center gap-3 py-5 rounded-2xl text-lg font-black uppercase tracking-wider transition-all duration-300 ${isFormValid
+                                ? 'bg-primary text-white shadow-xl shadow-primary/30 hover:-translate-y-1 hover:shadow-2xl cursor-pointer'
+                                : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                            }`}
+                    >
+                        <Plane className="w-5 h-5" />
+                        Buat Draft Rencana
+                    </button>
+
+                    <p className="text-center text-xs text-gray-400 mt-4">
+                        Powered by Google Gemini AI • Hasil berupa draft referensi, bukan paket resmi.
+                    </p>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default AIPlanner;
