@@ -8,41 +8,51 @@ export enum TourCategory {
 export interface DayItinerary {
   day: number;
   title: string;
-  activities: string[];
+  activities?: string[];
+  description?: string;
+  location?: string;
+  meals?: string[];
 }
 
-export interface PriceTiers {
-  double: string;
-  triple: string;
-  quad: string;
+export interface RoomOption {
+  name: string;
+  capacity: number;
+  price: number;
+  original_price?: number;
 }
 
 export interface TourPackage {
   id: string;
+  slug?: string;
   title: string;
-  category: TourCategory;
+  category: TourCategory | string;
   duration: string;
-  priceTiers: PriceTiers; // Pricing for different room types
-  image: string;
-  rating: number;
+  room_options: RoomOption[];
+  image_url: string;
+  brochure_url?: string;
   features: string[];
   description: string;
-  isPopular?: boolean;
+  is_popular?: boolean;
+  quotas?: number;
+  initial_quotas?: number;
+  available_rooms?: number;
+  initial_rooms?: number;
 
   // Detailed fields
-  departureDate: string;
-  airplane: {
-    airline: string;
-    details: string;
-  };
-  hotels: {
+  departure_date: string;
+  flight_details?: string;
+  airlines?: {
+    name: string;
+    logo_url?: string;
+  }[];
+  hotels?: {
     name: string;
     location: string;
     stars: number;
   }[];
-  itinerary: DayItinerary[];
-  included: string[];
-  notIncluded: string[];
+  itinerary?: DayItinerary[];
+  included?: string[];
+  not_included?: string[];
 }
 
 export interface AIPlannerInput {

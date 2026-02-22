@@ -1,7 +1,10 @@
 import React from 'react';
 import { ArrowRight, Star } from 'lucide-react';
+import { useLanguage } from '../src/contexts/LanguageContext';
 
 const Hero: React.FC = () => {
+  const { t } = useLanguage();
+
   return (
     <div className="relative bg-dark overflow-hidden">
       {/* Background Image with Pattern */}
@@ -22,12 +25,12 @@ const Hero: React.FC = () => {
           </div>
 
           <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-white tracking-tight leading-[1] mb-8">
-            Journey with <br />
-            <span className="text-primary">AlFatih</span>
+            <span className="text-primary">AlFatih</span><br />
+            {t('hero_title')}
           </h1>
 
           <p className="mt-4 text-xl text-gray-400 max-w-2xl mb-12 leading-relaxed font-medium">
-            Layanan Umrah premium dan wisata mancanegara ramah Muslim. Menghadirkan solusi perjalanan spiritual yang inspiratif, edukatif, dan berkelas dunia.
+            {t('hero_subtitle')}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-6">
@@ -35,14 +38,14 @@ const Hero: React.FC = () => {
               href="#tours"
               className="px-12 py-5 bg-primary hover:bg-accent text-white font-black rounded-2xl transition-all shadow-2xl shadow-primary/20 flex items-center justify-center gap-3 transform hover:-translate-y-1"
             >
-              Lihat Paket Pilihan
+              {t('hero_cta')}
               <ArrowRight className="w-5 h-5" />
             </a>
             <a
               href="#private-trip"
               className="px-12 py-5 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white font-black rounded-2xl transition-all flex items-center justify-center transform hover:-translate-y-1"
             >
-              Rancang Private Trip
+              {t('hero_secondary')}
             </a>
           </div>
         </div>

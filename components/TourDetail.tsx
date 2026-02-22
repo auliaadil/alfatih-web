@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CONTACT_INFO } from '../constants';
+import { useSiteSettings } from '../src/contexts/SiteSettingsContext';
 import {
   ArrowLeft,
   Calendar,
@@ -11,10 +11,11 @@ import {
   Clock,
   MessageCircle,
   Star,
-  ChevronRight,
   User,
+  Users,
   Share2,
-  Info
+  Info,
+  FileText
 } from 'lucide-react';
 import { TourPackage } from '../types';
 
@@ -24,29 +25,34 @@ interface TourDetailProps {
 }
 
 const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
+  const settings = useSiteSettings();
   const [activeTab, setActiveTab] = useState<'itinerary' | 'logistics' | 'inclusions'>('itinerary');
-  const [selectedRoomType, setSelectedRoomType] = useState<'quad' | 'triple' | 'double'>('quad');
+  const [selectedRoomIndex, setSelectedRoomIndex] = useState(0);
 
   const getPrice = () => {
-    return tour.priceTiers[selectedRoomType];
+    const room = tour.room_options?.[selectedRoomIndex];
+    if (!room) return 'TBA';
+    return `Rp ${(room.price / 1000000).toLocaleString('id-ID', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} JT`;
   };
 
   const handleWhatsAppBooking = () => {
     const message = encodeURIComponent(
-      `Assalamualaikum Alfatih Dunia Wisata, saya tertarik dengan paket "${tour.title}" untuk keberangkatan ${tour.departureDate}. Tipe kamar: ${selectedRoomType.toUpperCase()}. Mohon info detailnya.`
+      `Assalamualaikum Alfatih Dunia Wisata, saya tertarik dengan paket "${tour.title}" untuk keberangkatan ${tour.departure_date}. Tipe kamar: ${tour.room_options?.[selectedRoomIndex]?.name || 'TBA'}. Mohon info detailnya.`
     );
-    window.open(`https://wa.me/${CONTACT_INFO.whatsapp}?text=${message}`, '_blank');
+    window.open(`https://wa.me/${settings.whatsapp}?text=${message}`, '_blank');
   };
 
   return (
     <div className="bg-white min-h-screen">
       {/* Premium Hero Section */}
-      <div className="relative h-[50vh] min-h-[400px] md:h-[60vh] overflow-hidden">
-        <img
-          src={tour.image}
-          alt={tour.title}
-          className="w-full h-full object-cover"
-        />
+      <div className="relative h-[50vh] min-h-[400px] md:h-[60vh] overflow-hidden bg-gray-900 w-full">
+        {tour.image_url && (
+          <img
+            src={tour.image_url}
+            alt={tour.title}
+            className="w-full h-full object-cover"
+          />
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/40 to-transparent"></div>
 
         {/* Navigation Overlays */}
@@ -70,10 +76,6 @@ const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
                 <span className="bg-secondary text-gray-900 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest shadow-lg">
                   {tour.category}
                 </span>
-                <div className="flex items-center gap-1 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-white text-xs font-bold border border-white/30">
-                  <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
-                  <span>{tour.rating} Rating</span>
-                </div>
               </div>
               <h1 className="text-3xl md:text-5xl font-extrabold text-white mb-4 leading-tight drop-shadow-lg">
                 {tour.title}
@@ -83,13 +85,19 @@ const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
                   <div className="bg-primary p-1.5 rounded-lg shadow-inner">
                     <Calendar className="w-4 h-4 text-white" />
                   </div>
-                  <span className="font-medium">{tour.departureDate}</span>
+                  <span className="font-medium">{tour.departure_date}</span>
                 </div>
                 <div className="flex items-center gap-2.5">
                   <div className="bg-primary p-1.5 rounded-lg shadow-inner">
                     <Clock className="w-4 h-4 text-white" />
                   </div>
                   <span className="font-medium">{tour.duration}</span>
+                </div>
+                <div className="flex items-center gap-2.5">
+                  <div className="bg-primary p-1.5 rounded-lg shadow-inner">
+                    <Users className="w-4 h-4 text-white" />
+                  </div>
+                  <span className="font-medium">Sisa Kuota: {tour.quotas} / {tour.initial_quotas || tour.quotas} Pax</span>
                 </div>
               </div>
             </div>
@@ -132,7 +140,7 @@ const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
             <div className="min-h-[400px]">
               {activeTab === 'itinerary' && (
                 <div className="space-y-10">
-                  {tour.itinerary.map((day, idx) => (
+                  {tour.itinerary?.map((day, idx) => (
                     <div key={day.day} className="relative pl-12 group">
                       {/* Timeline Line */}
                       {idx !== tour.itinerary.length - 1 && (
@@ -146,15 +154,29 @@ const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
                         <h3 className="text-xl font-bold text-gray-900 mb-4 group-hover:text-primary transition-colors">
                           {day.title}
                         </h3>
-                        <div className="bg-gray-50/50 rounded-2xl p-6 border border-gray-100">
-                          <ul className="grid gap-3">
-                            {day.activities.map((activity, i) => (
-                              <li key={i} className="flex items-start gap-3 text-gray-600 text-sm leading-relaxed">
-                                <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0"></div>
-                                <span>{activity}</span>
-                              </li>
-                            ))}
-                          </ul>
+                        <div className="bg-gray-50/50 rounded-2xl p-6 border border-gray-100 space-y-4">
+                          {day.description && (
+                            <p className="text-gray-600 text-sm leading-relaxed">{day.description}</p>
+                          )}
+                          {day.activities && day.activities.length > 0 && (
+                            <ul className="grid gap-3">
+                              {day.activities.map((activity: string, i: number) => (
+                                <li key={i} className="flex items-start gap-3 text-gray-600 text-sm leading-relaxed">
+                                  <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0"></div>
+                                  <span>{activity}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                          {day.meals && day.meals.length > 0 && (
+                            <div className="flex gap-2 mt-4 pt-4 border-t border-gray-100">
+                              {day.meals.map((meal: string, idx: number) => (
+                                <span key={idx} className="bg-white px-3 py-1 rounded-full text-xs font-bold text-primary shadow-sm border border-primary/10">
+                                  {meal}
+                                </span>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -173,16 +195,22 @@ const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
                     </div>
                     <div className="bg-gradient-to-br from-gray-50 to-white rounded-3xl p-8 border border-gray-100 flex flex-col md:flex-row items-center gap-8 shadow-sm">
                       <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-50 w-24 h-24 flex items-center justify-center">
-                        <Plane className="w-12 h-12 text-primary opacity-20 absolute" />
-                        <span className="text-xl font-black text-primary text-center leading-none">
-                          {tour.airplane.airline.split(' ')[0]}
-                        </span>
+                        {tour.airlines?.[0]?.logo_url ? (
+                          <img src={tour.airlines[0].logo_url} alt={tour.airlines[0].name} className="max-w-[70px] max-h-[70px] object-contain" />
+                        ) : (
+                          <>
+                            <Plane className="w-12 h-12 text-primary opacity-20 absolute" />
+                            <span className="text-xl font-black text-primary text-center leading-none">
+                              {tour.airlines?.[0]?.name.split(' ')[0] || 'TBA'}
+                            </span>
+                          </>
+                        )}
                       </div>
                       <div className="text-center md:text-left">
-                        <p className="text-2xl font-bold text-gray-900 mb-2">{tour.airplane.airline}</p>
+                        <p className="text-2xl font-bold text-gray-900 mb-2">{tour.airlines?.[0]?.name || 'Airline TBA'}</p>
                         <p className="text-gray-500 flex items-center justify-center md:justify-start gap-2">
                           <MapPin className="w-4 h-4" />
-                          {tour.airplane.details}
+                          {tour.flight_details || 'Flight Details TBA'}
                         </p>
                       </div>
                     </div>
@@ -196,7 +224,7 @@ const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
                       <h3 className="text-2xl font-bold text-gray-900">Akomodasi Hotel</h3>
                     </div>
                     <div className="grid md:grid-cols-2 gap-6">
-                      {tour.hotels.map((hotel, i) => (
+                      {tour.hotels?.map((hotel, i) => (
                         <div key={i} className="group relative bg-white rounded-3xl p-6 border-2 border-gray-100 hover:border-primary/30 transition-all hover:shadow-xl overflow-hidden">
                           <div className="flex justify-between items-start mb-6">
                             <div className="bg-emerald-50 p-3 rounded-2xl group-hover:bg-primary group-hover:text-white transition-colors">
@@ -231,7 +259,7 @@ const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
                       <h3 className="text-xl font-bold text-gray-900">Harga Termasuk</h3>
                     </div>
                     <ul className="space-y-4">
-                      {tour.included.map((item, i) => (
+                      {tour.included?.map((item, i) => (
                         <li key={i} className="flex items-start gap-4 group">
                           <div className="mt-1 w-5 h-5 rounded-full bg-white border border-primary/20 flex items-center justify-center flex-shrink-0 group-hover:bg-primary transition-colors">
                             <CheckCircle2 className="w-3 h-3 text-primary group-hover:text-white" />
@@ -249,7 +277,7 @@ const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
                       <h3 className="text-xl font-bold text-gray-900">Tidak Termasuk</h3>
                     </div>
                     <ul className="space-y-4">
-                      {tour.notIncluded.map((item, i) => (
+                      {tour.not_included?.map((item, i) => (
                         <li key={i} className="flex items-start gap-4 group">
                           <div className="mt-1 w-5 h-5 rounded-full bg-white border border-red-200 flex items-center justify-center flex-shrink-0 group-hover:bg-red-500 transition-colors">
                             <XCircle className="w-3 h-3 text-red-400 group-hover:text-white" />
@@ -277,47 +305,57 @@ const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
 
                 {/* Room Selector Grid */}
                 <div className="space-y-4 mb-10 relative z-10">
-                  {(['quad', 'triple', 'double'] as const).map((type) => (
+                  {tour.room_options?.map((room, idx) => (
                     <button
-                      key={type}
-                      onClick={() => setSelectedRoomType(type)}
-                      className={`w-full flex items-center justify-between p-5 rounded-3xl border-2 transition-all duration-300 ${selectedRoomType === type
+                      key={idx}
+                      onClick={() => setSelectedRoomIndex(idx)}
+                      className={`w-full flex items-center justify-between p-5 rounded-3xl border-2 transition-all duration-300 ${selectedRoomIndex === idx
                         ? 'border-primary bg-primary/10 shadow-[0_0_20px_rgba(4,120,87,0.3)]'
                         : 'border-white/5 bg-white/5 hover:bg-white/10'
                         }`}
                     >
                       <div className="flex items-center gap-4">
-                        <div className={`p-3 rounded-2xl ${selectedRoomType === type ? 'bg-primary text-white' : 'bg-white/10 text-gray-400'}`}>
+                        <div className={`p-3 rounded-2xl ${selectedRoomIndex === idx ? 'bg-primary text-white' : 'bg-white/10 text-gray-400'}`}>
                           <div className="flex gap-0.5">
-                            {Array.from({ length: type === 'quad' ? 4 : type === 'triple' ? 3 : 2 }).map((_, i) => (
+                            {Array.from({ length: Math.min(room.capacity, 4) }).map((_, i) => (
                               <User key={i} className="w-3.5 h-3.5" />
                             ))}
                           </div>
                         </div>
                         <div className="text-left">
-                          <p className={`font-bold capitalize ${selectedRoomType === type ? 'text-white' : 'text-gray-300'}`}>
-                            Kamar {type}
+                          <p className={`font-bold capitalize ${selectedRoomIndex === idx ? 'text-white' : 'text-gray-300'}`}>
+                            Kamar {room.name}
                           </p>
                           <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">
-                            {type === 'quad' ? 'Berempat' : type === 'triple' ? 'Bertiga' : 'Berdua'}
+                            Untuk {room.capacity} Orang
                           </p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className={`text-lg font-black ${selectedRoomType === type ? 'text-primary' : 'text-white'}`}>
-                          {tour.priceTiers[type].split(' ')[1]}
+                        <p className={`text-lg font-black ${selectedRoomIndex === idx ? 'text-primary' : 'text-white'}`}>
+                          {(room.price / 1000000).toLocaleString('id-ID', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
                         </p>
                         <p className="text-[10px] text-gray-500 font-bold">JT / PAX</p>
                       </div>
                     </button>
                   ))}
+                  {(!tour.room_options || tour.room_options.length === 0) && (
+                    <div className="p-4 bg-white/5 rounded-2xl text-sm text-gray-400 text-center italic border border-white/5">
+                      Tipe kamar belum dikonfigurasi.
+                    </div>
+                  )}
                 </div>
 
                 {/* Final Price Summary */}
                 <div className="p-6 rounded-[2rem] bg-white/5 border border-white/10 mb-8 relative z-10">
                   <p className="text-gray-400 text-xs font-bold uppercase tracking-widest mb-2">Total Harga per Orang</p>
-                  <div className="flex items-baseline gap-2">
+                  <div className="flex flex-col gap-1">
                     <span className="text-4xl font-black text-white">{getPrice()}</span>
+                    {tour.room_options?.[selectedRoomIndex]?.original_price && tour.room_options[selectedRoomIndex].original_price > tour.room_options[selectedRoomIndex].price && (
+                      <span className="text-sm font-bold text-gray-500 line-through">
+                        Rp {(tour.room_options[selectedRoomIndex].original_price / 1000000).toLocaleString('id-ID', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} JT
+                      </span>
+                    )}
                   </div>
                   <div className="mt-4 flex items-center gap-2 text-[10px] text-gray-500 font-bold uppercase">
                     <Info className="w-3 h-3" />
@@ -333,10 +371,15 @@ const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
                     <MessageCircle className="w-6 h-6" />
                     Booking via WhatsApp
                   </button>
-                  <button className="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold py-5 rounded-[1.5rem] transition-all flex items-center justify-center gap-2">
-                    <Clock className="w-5 h-5 text-secondary" />
-                    Brosur Lengkap (PDF)
-                  </button>
+                  {tour.brochure_url && (
+                    <button
+                      onClick={() => window.open(tour.brochure_url, '_blank')}
+                      className="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold py-5 rounded-[1.5rem] transition-all flex items-center justify-center gap-2"
+                    >
+                      <FileText className="w-5 h-5 text-secondary" />
+                      Brosur Lengkap (PDF)
+                    </button>
+                  )}
                 </div>
 
                 <p className="text-center text-[10px] text-gray-600 mt-8 font-medium">
@@ -352,14 +395,14 @@ const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
                 <div>
                   <h4 className="font-bold text-gray-900 mb-1">Butuh Bantuan?</h4>
                   <p className="text-sm text-gray-600 mb-3 leading-relaxed">Tim konsultan kami siap membantu Anda 24/7 untuk perencanaan ibadah Anda.</p>
-                  <a href="#" className="text-primary font-bold text-sm hover:underline">Hubungi Konsultan Kami →</a>
+                  <a href={`https://wa.me/${settings.whatsapp}`} target="_blank" rel="noopener noreferrer" className="text-primary font-bold text-sm hover:underline">Hubungi Konsultan Kami →</a>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 };
 

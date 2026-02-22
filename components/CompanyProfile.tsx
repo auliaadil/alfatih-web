@@ -16,8 +16,10 @@ import {
   Compass,
   ArrowRight
 } from 'lucide-react';
+import { useLanguage } from '../src/contexts/LanguageContext';
 
 const CompanyProfile: React.FC = () => {
+  const { t } = useLanguage();
   const stats = [
     { label: 'Jamaah Terlayani', value: '10.000+', icon: <Users className="w-6 h-6" /> },
     { label: 'Tahun Pengalaman', value: '12+', icon: <Award className="w-6 h-6" /> },
@@ -52,11 +54,11 @@ const CompanyProfile: React.FC = () => {
         <div className="absolute -top-24 -right-24 w-96 h-96 bg-white/10 rounded-full blur-[120px]"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-secondary text-white rounded-full text-xs font-black uppercase tracking-widest mb-6 shadow-xl">
-            Tentang Alfatih Dunia Wisata
+            {t('about_badge')}
           </div>
-          <h1 className="text-4xl md:text-6xl font-black text-white mb-6">Profil Perusahaan</h1>
+          <h1 className="text-4xl md:text-6xl font-black text-white mb-6">{t('about_title')}</h1>
           <p className="text-xl text-white/90 max-w-2xl mx-auto font-medium leading-relaxed">
-            Menghadirkan layanan yang amanah, profesional, dan sesuai nilai-nilai Islam sejak tahun 2012.
+            {t('about_desc')}
           </p>
         </div>
       </section>
@@ -71,27 +73,25 @@ const CompanyProfile: React.FC = () => {
                 <div className="text-center">
                   <BadgeCheck className="w-24 h-24 text-secondary mx-auto mb-6" />
                   <div className="text-5xl font-black text-secondary">2026</div>
-                  <div className="text-xs font-black text-secondary/60 uppercase tracking-widest mt-2">Target Izin PIHK</div>
+                  <div className="text-xs font-black text-secondary/60 uppercase tracking-widest mt-2">{t('pihk_badge')}</div>
                 </div>
               </div>
             </div>
             <div className="space-y-6">
-              <h2 className="text-3xl md:text-4xl font-black text-gray-900 leading-tight">Izin PIHK pada <span className="text-secondary">tahun 2026</span></h2>
-              <p className="text-gray-600 text-lg leading-relaxed">
-                Alfatih Dunia Wisata memiliki target besar untuk bisa memiliki izin <strong>Penyelenggara Ibadah Haji Khusus (PIHK)</strong> pada tahun 2026.
-              </p>
+              <h2 className="text-3xl md:text-4xl font-black text-gray-900 leading-tight">{t('pihk_title_1')}<span className="text-secondary">{t('pihk_title_2')}</span></h2>
+              <p className="text-gray-600 text-lg leading-relaxed" dangerouslySetInnerHTML={{ __html: t('pihk_desc_1') }} />
               <p className="text-gray-600 leading-relaxed">
-                Target ini dicanangkan agar jamaah yang ingin beribadah haji dapat dilayani sepenuhnya secara eksklusif oleh manajemen Alfatih, memberikan kepastian dan kenyamanan ibadah yang lebih personal.
+                {t('pihk_desc_2')}
               </p>
               <div className="flex items-center gap-4 pt-4">
                 <div className="bg-gray-50 px-6 py-4 rounded-2xl border border-gray-100">
                   <div className="text-primary font-black text-2xl">PPIU</div>
-                  <div className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Izin Saat Ini</div>
+                  <div className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{t('pihk_current')}</div>
                 </div>
                 <ArrowRight className="w-6 h-6 text-gray-300" />
                 <div className="bg-primary px-6 py-4 rounded-2xl shadow-lg shadow-primary/20">
                   <div className="text-white font-black text-2xl">PIHK</div>
-                  <div className="text-[10px] text-white/60 font-bold uppercase tracking-widest">Target 2026</div>
+                  <div className="text-[10px] text-white/60 font-bold uppercase tracking-widest">{t('pihk_target')}</div>
                 </div>
               </div>
             </div>
@@ -103,7 +103,7 @@ const CompanyProfile: React.FC = () => {
       <section className="py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">VISI & MISI</h2>
+            <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">{t('vision_mission_title')}</h2>
             <div className="w-24 h-1.5 bg-secondary mx-auto rounded-full"></div>
           </div>
 
@@ -114,9 +114,9 @@ const CompanyProfile: React.FC = () => {
               <div className="w-16 h-16 bg-primary text-white rounded-2xl flex items-center justify-center mb-8 shadow-lg shadow-primary/20">
                 <Lightbulb className="w-8 h-8" />
               </div>
-              <h3 className="text-3xl font-black text-gray-900 mb-6 uppercase tracking-tight">Visi</h3>
+              <h3 className="text-3xl font-black text-gray-900 mb-6 uppercase tracking-tight">{t('vision_title')}</h3>
               <p className="text-xl text-gray-600 leading-relaxed font-medium">
-                "Menjadi perusahaan perjalanan Umroh dan wisata halal terdepan yang menginspirasi umat Muslim untuk meraih pengalaman spiritual, edukatif, dan berkelas dunia, dengan layanan yang amanah, profesional, dan sesuai nilai-nilai Islam."
+                {t('vision_desc')}
               </p>
             </div>
 
@@ -126,9 +126,9 @@ const CompanyProfile: React.FC = () => {
               <div className="w-16 h-16 bg-white text-primary rounded-2xl flex items-center justify-center mb-8 shadow-lg">
                 <Compass className="w-8 h-8" />
               </div>
-              <h3 className="text-3xl font-black text-white mb-6 uppercase tracking-tight">Misi</h3>
+              <h3 className="text-3xl font-black text-white mb-6 uppercase tracking-tight">{t('mission_title')}</h3>
               <p className="text-xl text-white/90 leading-relaxed font-medium">
-                "Memberikan layanan profesional, amanah, dan sesuai syariah, serta menghadirkan solusi perjalanan halal yang mudah dan berkualitas untuk semua kalangan."
+                {t('mission_desc')}
               </p>
             </div>
           </div>
@@ -139,8 +139,8 @@ const CompanyProfile: React.FC = () => {
       <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4 uppercase tracking-tight">KEUNGGULAN ALFATIH</h2>
-            <p className="text-gray-500 font-medium">Nilai yang kami bawa dalam setiap perjalanan Anda.</p>
+            <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4 uppercase tracking-tight">{t('advantages_title')}</h2>
+            <p className="text-gray-500 font-medium">{t('advantages_subtitle')}</p>
           </div>
           <div className="grid md:grid-cols-3 gap-10">
             {values.map((val, i) => (

@@ -1,11 +1,35 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Facebook, Instagram, Twitter, Mail, Phone, MapPin } from 'lucide-react';
-import { CONTACT_INFO } from '../constants';
+import { supabase } from '../src/lib/supabase';
+import { TourPackage } from '../types';
+import { useSiteSettings } from '../src/contexts/SiteSettingsContext';
+import { useLanguage } from '../src/contexts/LanguageContext';
 
 interface FooterProps { }
 
 
 const Footer: React.FC<FooterProps> = () => {
+  const settings = useSiteSettings();
+  const { t } = useLanguage();
+  const [popularPackages, setPopularPackages] = useState<TourPackage[]>([]);
+
+  useEffect(() => {
+    const fetchPopular = async () => {
+      const { data } = await supabase
+        .from('packages')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(5);
+
+      if (data) {
+        setPopularPackages(data as TourPackage[]);
+      }
+    };
+
+    fetchPopular();
+  }, []);
+
   return (
     <footer className="bg-gray-900 text-white pt-16 pb-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -21,10 +45,10 @@ const Footer: React.FC<FooterProps> = () => {
               />
             </div>
             <p className="text-gray-400 text-sm leading-relaxed">
-              Mitra terpercaya Anda untuk perjalanan Umrah dan wisata internasional ramah Muslim. Kami membuat perjalanan spiritual dan santai Anda tak terlupakan.
+              {t('footer_desc')}
             </p>
             <div className="flex space-x-4 pt-2">
-              <a href={CONTACT_INFO.socials.tiktok} target="_blank" rel="noopener noreferrer" className="bg-white/5 p-2 rounded-lg text-gray-400 hover:text-primary hover:bg-white/10 transition-all">
+              <a href={settings.tiktok} target="_blank" rel="noopener noreferrer" className="bg-white/5 p-2 rounded-lg text-gray-400 hover:text-primary hover:bg-white/10 transition-all">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="20"
@@ -40,8 +64,8 @@ const Footer: React.FC<FooterProps> = () => {
                   <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
                 </svg>
               </a>
-              <a href={CONTACT_INFO.socials.instagram} target="_blank" rel="noopener noreferrer" className="bg-white/5 p-2 rounded-lg text-gray-400 hover:text-primary hover:bg-white/10 transition-all"><Instagram className="w-5 h-5" /></a>
-              {/* <a href="#" className="bg-white/5 p-2 rounded-lg text-gray-400 hover:text-primary hover:bg-white/10 transition-all"><Twitter className="w-5 h-5" /></a> */}
+              <a href={settings.instagram} target="_blank" rel="noopener noreferrer" className="bg-white/5 p-2 rounded-lg text-gray-400 hover:text-primary hover:bg-white/10 transition-all"><Instagram className="w-5 h-5" /></a>
+              <a href={settings.facebook} target="_blank" rel="noopener noreferrer" className="bg-white/5 p-2 rounded-lg text-gray-400 hover:text-primary hover:bg-white/10 transition-all"><Facebook className="w-5 h-5" /></a>
             </div>
           </div>
 
@@ -49,14 +73,13 @@ const Footer: React.FC<FooterProps> = () => {
           <div>
             <h3 className="text-lg font-bold mb-6 text-white flex items-center gap-2">
               <span className="w-1.5 h-6 bg-primary rounded-full"></span>
-              Quick Links
+              {t('footer_quick_links')}
             </h3>
             <ul className="space-y-3 text-sm text-gray-400">
               <li><button onClick={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="hover:text-primary transition-colors font-medium">Home</button></li>
               <li><a href="#tours" className="hover:text-primary transition-colors font-medium">Tour Packages</a></li>
               <li><a href="#private-trip" className="hover:text-primary transition-colors font-medium">Private Trip</a></li>
               <li><a href="#about" className="hover:text-primary transition-colors font-medium">About Us</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors font-medium">Blog</a></li>
             </ul>
           </div>
 
@@ -64,14 +87,20 @@ const Footer: React.FC<FooterProps> = () => {
           <div>
             <h3 className="text-lg font-bold mb-6 text-white flex items-center gap-2">
               <span className="w-1.5 h-6 bg-secondary rounded-full"></span>
-              Popular Packages
+              {t('footer_popular')}
             </h3>
             <ul className="space-y-3 text-sm text-gray-400">
-              <li><a href="#" className="hover:text-primary transition-colors font-medium">Umrah Premium (9 Days)</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors font-medium">Turkey Historical Tour</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors font-medium">Japan Halal Trip</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors font-medium">West Europe Tour</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors font-medium">Badal Umrah</a></li>
+              {popularPackages.length > 0 ? (
+                popularPackages.map((pkg) => (
+                  <li key={pkg.id}>
+                    <Link to={`/package/${pkg.slug || pkg.id}`} onClick={() => window.scrollTo(0, 0)} className="hover:text-primary transition-colors font-medium">
+                      {pkg.title}
+                    </Link>
+                  </li>
+                ))
+              ) : (
+                <li className="text-gray-500 italic">No packages available.</li>
+              )}
             </ul>
           </div>
 
@@ -79,26 +108,26 @@ const Footer: React.FC<FooterProps> = () => {
           <div>
             <h3 className="text-lg font-bold mb-6 text-white flex items-center gap-2">
               <span className="w-1.5 h-6 bg-primary rounded-full"></span>
-              Contact Us
+              {t('footer_contact')}
             </h3>
             <ul className="space-y-4 text-sm text-gray-400">
               <li className="flex items-start gap-3 group">
                 <div className="bg-white/5 p-2 rounded-lg group-hover:bg-primary/20 transition-colors">
                   <MapPin className="w-4 h-4 text-primary flex-shrink-0" />
                 </div>
-                <span>{CONTACT_INFO.address}</span>
+                <span>{settings.address}</span>
               </li>
               <li className="flex items-center gap-3 group">
                 <div className="bg-white/5 p-2 rounded-lg group-hover:bg-primary/20 transition-colors">
                   <Phone className="w-4 h-4 text-primary flex-shrink-0" />
                 </div>
-                <span>{CONTACT_INFO.phone}</span>
+                <span>{settings.phone}</span>
               </li>
               <li className="flex items-center gap-3 group">
                 <div className="bg-white/5 p-2 rounded-lg group-hover:bg-primary/20 transition-colors">
                   <Mail className="w-4 h-4 text-primary flex-shrink-0" />
                 </div>
-                <span>{CONTACT_INFO.email}</span>
+                <span>{settings.email}</span>
               </li>
             </ul>
           </div>
