@@ -10,6 +10,7 @@ interface SiteSettings {
     address: string;
     instagram: string;
     tiktok: string;
+    facebook: string;
 }
 
 const SiteSettings: React.FC = () => {
@@ -45,6 +46,7 @@ const SiteSettings: React.FC = () => {
             address: settings.address,
             instagram: settings.instagram,
             tiktok: settings.tiktok,
+            facebook: settings.facebook,
             updated_at: new Date().toISOString()
         }).eq('id', 1);
 
@@ -120,7 +122,17 @@ const SiteSettings: React.FC = () => {
                     />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4 border-t">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Facebook URL</label>
+                        <input
+                            type="url"
+                            className="w-full px-4 py-2 border rounded-md focus:ring-primary focus:border-primary"
+                            value={settings?.facebook || ''}
+                            onChange={(e) => setSettings(s => s ? { ...s, facebook: e.target.value } : null)}
+                        />
+                    </div>
+
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Instagram URL</label>
                         <input

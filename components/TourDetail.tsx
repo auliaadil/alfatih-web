@@ -69,18 +69,18 @@ const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
           </button>
         </div>
 
-        <div className="absolute bottom-12 left-0 right-0 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+        <div className="absolute bottom-6 md:bottom-12 left-0 right-0 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 md:gap-8">
             <div className="flex-1">
               <div className="flex flex-wrap items-center gap-2 mb-4">
                 <span className="bg-secondary text-gray-900 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest shadow-lg">
                   {tour.category}
                 </span>
               </div>
-              <h1 className="text-3xl md:text-5xl font-extrabold text-white mb-4 leading-tight drop-shadow-lg">
+              <h1 className="text-2xl md:text-5xl font-extrabold text-white mb-4 leading-tight drop-shadow-lg">
                 {tour.title}
               </h1>
-              <div className="flex flex-wrap items-center gap-6 text-gray-200">
+              <div className="flex flex-wrap items-center gap-3 md:gap-6 text-gray-200 text-sm md:text-base">
                 <div className="flex items-center gap-2.5">
                   <div className="bg-primary p-1.5 rounded-lg shadow-inner">
                     <Calendar className="w-4 h-4 text-white" />
@@ -110,9 +110,9 @@ const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
         <div className="grid lg:grid-cols-12 gap-10">
 
           {/* Left Column: Details */}
-          <div className="lg:col-span-8 bg-white rounded-3xl shadow-2xl shadow-gray-200/50 p-6 md:p-10 mb-10">
+          <div className="lg:col-span-8 bg-white rounded-3xl shadow-2xl shadow-gray-200/50 p-4 sm:p-6 md:p-10 mb-10 overflow-hidden">
             {/* Custom Tab Navigation */}
-            <div className="flex border-b border-gray-100 mb-10 overflow-x-auto no-scrollbar scroll-smooth">
+            <div className="flex border-b border-gray-100 mb-8 md:mb-10 overflow-x-auto no-scrollbar scroll-smooth">
               <button
                 onClick={() => setActiveTab('itinerary')}
                 className={`flex items-center gap-2 px-6 py-4 font-bold text-sm uppercase tracking-widest border-b-4 transition-all whitespace-nowrap ${activeTab === 'itinerary' ? 'border-primary text-primary' : 'border-transparent text-gray-400 hover:text-gray-600'
@@ -151,10 +151,10 @@ const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
                         {day.day}
                       </div>
                       <div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-4 group-hover:text-primary transition-colors">
+                        <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-4 group-hover:text-primary transition-colors">
                           {day.title}
                         </h3>
-                        <div className="bg-gray-50/50 rounded-2xl p-6 border border-gray-100 space-y-4">
+                        <div className="bg-gray-50/50 rounded-2xl p-4 md:p-6 border border-gray-100 space-y-4">
                           {day.description && (
                             <p className="text-gray-600 text-sm leading-relaxed">{day.description}</p>
                           )}
@@ -191,9 +191,9 @@ const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
                       <div className="bg-primary/10 p-2 rounded-xl">
                         <Plane className="w-6 h-6 text-primary" />
                       </div>
-                      <h3 className="text-2xl font-bold text-gray-900">Maskapai Penerbangan</h3>
+                      <h3 className="text-xl md:text-2xl font-bold text-gray-900">Maskapai Penerbangan</h3>
                     </div>
-                    <div className="bg-gradient-to-br from-gray-50 to-white rounded-3xl p-8 border border-gray-100 flex flex-col md:flex-row items-center gap-8 shadow-sm">
+                    <div className="bg-gradient-to-br from-gray-50 to-white rounded-3xl p-5 md:p-8 border border-gray-100 flex flex-col md:flex-row items-center gap-6 md:gap-8 shadow-sm">
                       <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-50 w-24 h-24 flex items-center justify-center">
                         {tour.airlines?.[0]?.logo_url ? (
                           <img src={tour.airlines[0].logo_url} alt={tour.airlines[0].name} className="max-w-[70px] max-h-[70px] object-contain" />
@@ -250,8 +250,8 @@ const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
               )}
 
               {activeTab === 'inclusions' && (
-                <div className="grid md:grid-cols-2 gap-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                  <section className="bg-emerald-50/30 rounded-3xl p-8 border border-emerald-100">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                  <section className="bg-emerald-50/30 rounded-3xl p-6 md:p-8 border border-emerald-100">
                     <div className="flex items-center gap-3 mb-8">
                       <div className="bg-primary p-2 rounded-xl shadow-lg shadow-primary/20">
                         <CheckCircle2 className="w-6 h-6 text-white" />
@@ -269,7 +269,7 @@ const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
                       ))}
                     </ul>
                   </section>
-                  <section className="bg-red-50/30 rounded-3xl p-8 border border-red-100">
+                  <section className="bg-red-50/30 rounded-3xl p-6 md:p-8 border border-red-100">
                     <div className="flex items-center gap-3 mb-8">
                       <div className="bg-red-500 p-2 rounded-xl shadow-lg shadow-red-500/20">
                         <XCircle className="w-6 h-6 text-white" />
@@ -295,11 +295,11 @@ const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
           {/* Right Column: Dynamic Pricing Card */}
           <div className="lg:col-span-4 lg:relative">
             <div className="sticky top-24 space-y-6">
-              <div className="bg-gray-900 rounded-[2.5rem] shadow-2xl p-8 text-white overflow-hidden relative border border-gray-800">
+              <div className="bg-gray-900 rounded-[2.5rem] shadow-2xl p-6 md:p-8 text-white overflow-hidden relative border border-gray-800">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 blur-[80px] rounded-full"></div>
                 <div className="absolute bottom-0 left-0 w-32 h-32 bg-secondary/10 blur-[80px] rounded-full"></div>
 
-                <h3 className="text-2xl font-black mb-8 relative z-10 flex items-center gap-3">
+                <h3 className="text-xl md:text-2xl font-black mb-6 md:mb-8 relative z-10 flex items-center gap-3">
                   <span className="text-primary">|</span> Pilih Tipe Kamar
                 </h3>
 
@@ -309,7 +309,7 @@ const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
                     <button
                       key={idx}
                       onClick={() => setSelectedRoomIndex(idx)}
-                      className={`w-full flex items-center justify-between p-5 rounded-3xl border-2 transition-all duration-300 ${selectedRoomIndex === idx
+                      className={`w-full flex items-center justify-between p-4 md:p-5 rounded-3xl border-2 transition-all duration-300 ${selectedRoomIndex === idx
                         ? 'border-primary bg-primary/10 shadow-[0_0_20px_rgba(4,120,87,0.3)]'
                         : 'border-white/5 bg-white/5 hover:bg-white/10'
                         }`}
@@ -347,10 +347,10 @@ const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
                 </div>
 
                 {/* Final Price Summary */}
-                <div className="p-6 rounded-[2rem] bg-white/5 border border-white/10 mb-8 relative z-10">
+                <div className="p-5 md:p-6 rounded-[2rem] bg-white/5 border border-white/10 mb-8 relative z-10">
                   <p className="text-gray-400 text-xs font-bold uppercase tracking-widest mb-2">Total Harga per Orang</p>
                   <div className="flex flex-col gap-1">
-                    <span className="text-4xl font-black text-white">{getPrice()}</span>
+                    <span className="text-storage text-3xl md:text-4xl font-black text-white">{getPrice()}</span>
                     {tour.room_options?.[selectedRoomIndex]?.original_price && tour.room_options[selectedRoomIndex].original_price > tour.room_options[selectedRoomIndex].price && (
                       <span className="text-sm font-bold text-gray-500 line-through">
                         Rp {(tour.room_options[selectedRoomIndex].original_price / 1000000).toLocaleString('id-ID', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} JT
