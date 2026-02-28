@@ -60,7 +60,7 @@ const PrivateTrips: React.FC = () => {
 
     return (
         <div>
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
                 <h1 className="text-2xl font-bold text-gray-900">Private Trip Inquiries</h1>
                 <div className="text-sm text-gray-500 bg-white px-4 py-2 rounded-full shadow-sm border border-gray-100">
                     Total Requests: <span className="font-bold text-primary">{requests.length}</span>
@@ -70,7 +70,7 @@ const PrivateTrips: React.FC = () => {
             {loading ? (
                 <div className="text-gray-500">Loading requests...</div>
             ) : (
-                <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-x-auto">
                     <table className="min-w-full divide-y divide-gray-200">
                         <thead className="bg-gray-50">
                             <tr>

@@ -62,7 +62,7 @@ const Hotels: React.FC = () => {
 
     return (
         <div>
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
                 <h1 className="text-2xl font-bold text-gray-900">Hotels Management</h1>
             </div>
 
@@ -112,7 +112,7 @@ const Hotels: React.FC = () => {
             {loading ? (
                 <div className="text-gray-500">Loading hotels...</div>
             ) : (
-                <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-x-auto">
                     <table className="min-w-full divide-y divide-gray-200">
                         <thead className="bg-gray-50">
                             <tr>

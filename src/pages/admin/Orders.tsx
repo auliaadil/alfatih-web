@@ -35,7 +35,7 @@ const Orders: React.FC = () => {
 
     return (
         <div>
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex flex-col sm:flex-row gap-4 sm:justify-between sm:items-center mb-6">
                 <h1 className="text-2xl font-bold text-gray-900">Orders Management</h1>
                 <button
                     onClick={() => {
@@ -52,7 +52,7 @@ const Orders: React.FC = () => {
             {loading ? (
                 <div className="text-gray-500">Loading orders...</div>
             ) : (
-                <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-x-auto">
                     <table className="min-w-full divide-y divide-gray-200">
                         <thead className="bg-gray-50">
                             <tr>

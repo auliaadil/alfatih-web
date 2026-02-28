@@ -58,11 +58,11 @@ const Airlines: React.FC = () => {
 
     return (
         <div>
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
                 <h1 className="text-2xl font-bold text-gray-900">Airlines Management</h1>
             </div>
 
-            <form onSubmit={handleSave} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8 max-w-2xl flex gap-4 items-end">
+            <form onSubmit={handleSave} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8 max-w-2xl flex flex-col sm:flex-row gap-4 sm:items-end">
                 <div className="flex-1">
                     <label className="block text-sm font-medium text-gray-700 mb-1">Airline Name</label>
                     <input
@@ -94,7 +94,7 @@ const Airlines: React.FC = () => {
             {loading ? (
                 <div className="text-gray-500">Loading airlines...</div>
             ) : (
-                <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-x-auto">
                     <table className="min-w-full divide-y divide-gray-200">
                         <thead className="bg-gray-50">
                             <tr>

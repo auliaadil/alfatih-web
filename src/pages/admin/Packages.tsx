@@ -44,14 +44,14 @@ const Packages: React.FC = () => {
 
     return (
         <div>
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex flex-col sm:flex-row gap-4 sm:justify-between sm:items-center mb-6">
                 <h1 className="text-2xl font-bold text-gray-900">Packages Management</h1>
                 <button
                     onClick={() => {
                         setEditingPackage(null);
                         setIsFormOpen(true);
                     }}
-                    className="bg-primary hover:bg-emerald-700 text-white px-4 py-2 rounded-md flex items-center gap-2"
+                    className="bg-primary hover:bg-emerald-700 text-white px-4 py-2 rounded-md flex items-center justify-center gap-2"
                 >
                     <Plus className="w-5 h-5" />
                     New Package

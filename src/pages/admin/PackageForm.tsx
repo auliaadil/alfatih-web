@@ -350,7 +350,7 @@ const PackageForm: React.FC<PackageFormProps> = ({ airlinesData, hotelsData, ini
                                 Inventory & Dynamic Rooms
                             </h3>
 
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Total Rooms (Initial count)</label>
                                     <input type="number" required className="w-full px-4 py-2 border rounded-md" value={initialRooms} onChange={e => {
@@ -393,8 +393,8 @@ const PackageForm: React.FC<PackageFormProps> = ({ airlinesData, hotelsData, ini
 
                                 <div className="space-y-4">
                                     {roomOptions.map((room, index) => (
-                                        <div key={index} className="flex gap-4 items-center bg-white p-4 border rounded-md shadow-sm">
-                                            <div className="flex-1">
+                                        <div key={index} className="flex flex-col sm:flex-row gap-4 sm:items-center bg-white p-4 border rounded-md shadow-sm">
+                                            <div className="flex-1 w-full sm:w-auto">
                                                 <input type="text" placeholder="Name (e.g. Quad)" required className="w-full px-3 py-2 border rounded border-gray-300 text-sm" value={room.name} onChange={e => handleRoomOptionsChange(index, 'name', e.target.value)} />
                                             </div>
                                             <div className="w-24">
@@ -437,18 +437,18 @@ const PackageForm: React.FC<PackageFormProps> = ({ airlinesData, hotelsData, ini
                                 <div className="space-y-4">
                                     {itinerary.map((item, index) => (
                                         <div key={index} className="bg-white p-4 border rounded-md shadow-sm space-y-3">
-                                            <div className="flex gap-4 items-start">
-                                                <div className="w-20">
+                                            <div className="flex flex-col sm:flex-row gap-4 sm:items-start">
+                                                <div className="w-full sm:w-20">
                                                     <input type="number" placeholder="Day" className="w-full px-3 py-2 border rounded border-gray-300 text-sm" value={item.day} onChange={e => handleItineraryChange(index, 'day', Number(e.target.value))} />
                                                 </div>
-                                                <div className="flex-1">
+                                                <div className="flex-1 w-full sm:w-auto">
                                                     <input type="text" placeholder="Title (e.g. Kedatangan di Madinah)" className="w-full px-3 py-2 border rounded border-gray-300 text-sm" value={item.title} onChange={e => handleItineraryChange(index, 'title', e.target.value)} />
                                                 </div>
                                                 <button type="button" onClick={() => setItinerary(itinerary.filter((_, i) => i !== index))} className="text-red-500 hover:text-red-700 mt-2">
                                                     <Trash2 className="w-4 h-4" />
                                                 </button>
                                             </div>
-                                            <div className="pl-24 space-y-2">
+                                            <div className="pl-0 sm:pl-24 space-y-2">
                                                 <label className="block text-xs font-medium text-gray-500">Activities</label>
                                                 {item.activities.map((activity, actIndex) => (
                                                     <div key={actIndex} className="flex gap-2">

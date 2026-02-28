@@ -311,7 +311,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialData, onClose, onSuccess }
 
                                     <div className="space-y-3 mt-4">
                                         {roomBreakdown.map((room, i) => (
-                                            <div key={i} className="flex gap-4 items-center bg-white p-4 rounded-md shadow-sm">
+                                            <div key={i} className="flex flex-col sm:flex-row gap-4 sm:items-center bg-white p-4 rounded-md shadow-sm">
                                                 <div className="w-32 font-medium text-gray-900">{room.room_type}</div>
                                                 <div className="text-gray-500 text-sm">Rp{(room.price_per_pax || 0).toLocaleString()}/pax</div>
                                                 <div className="flex-1 flex justify-end gap-4 items-center">
@@ -364,7 +364,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialData, onClose, onSuccess }
                                 </div>
 
                                 {participants.length > 0 ? (
-                                    <div className="bg-white border rounded-lg overflow-hidden">
+                                    <div className="bg-white border rounded-lg overflow-x-auto">
                                         <table className="min-w-full divide-y divide-gray-200">
                                             <thead className="bg-gray-50">
                                                 <tr>
@@ -426,7 +426,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialData, onClose, onSuccess }
             {/* Inline Participant Modal Overlay */}
             {isParticipantFormOpen && (
                 <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[60] p-4">
-                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden">
+                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-y-auto max-h-[90vh]">
                         <div className="bg-gray-50 px-6 py-4 flex justify-between items-center border-b">
                             <h3 className="text-lg font-bold text-gray-900">{editingParticipantIndex !== null ? 'Edit Participant' : 'Add Participant'}</h3>
                             <button type="button" onClick={() => setIsParticipantFormOpen(false)} className="text-gray-400 hover:text-gray-600">
@@ -438,7 +438,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialData, onClose, onSuccess }
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
                                 <input type="text" className="w-full px-3 py-2 border mb-1 rounded-md" value={pName} onChange={e => setPName(e.target.value)} placeholder="Legal Name" />
                             </div>
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
                                     <input type="text" className="w-full px-3 py-2 border mb-1 rounded-md" value={pPhone} onChange={e => setPPhone(e.target.value)} placeholder="+62..." />
