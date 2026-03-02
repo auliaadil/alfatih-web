@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { supabase } from '../../lib/supabase';
-import { X, Upload, Plus, Trash2 } from 'lucide-react';
+import { X, Upload, Plus, Trash2, Loader2 } from 'lucide-react';
 
 interface RoomOption {
     name: string;
@@ -66,6 +66,10 @@ const PackageForm: React.FC<PackageFormProps> = ({ airlinesData, hotelsData, ini
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [uploadingImage, setUploadingImage] = useState(false);
 
+    // Gallery
+    const [gallery, setGallery] = useState<string[]>(initialData?.gallery || []);
+    const [uploadingGallery, setUploadingGallery] = useState(false);
+
     // Dynamic Room Options
     const [roomOptions, setRoomOptions] = useState<RoomOption[]>(initialData?.room_options || []);
 
@@ -92,18 +96,21 @@ const PackageForm: React.FC<PackageFormProps> = ({ airlinesData, hotelsData, ini
 
     const handleItineraryActivityChange = (itineraryIndex: number, activityIndex: number, value: string) => {
         const updated = [...itinerary];
+        if (!updated[itineraryIndex].activities) updated[itineraryIndex].activities = [];
         updated[itineraryIndex].activities[activityIndex] = value;
         setItinerary(updated);
     };
 
     const addItineraryActivity = (index: number) => {
         const updated = [...itinerary];
+        if (!updated[index].activities) updated[index].activities = [];
         updated[index].activities.push('');
         setItinerary(updated);
     };
 
     const removeItineraryActivity = (itineraryIndex: number, activityIndex: number) => {
         const updated = [...itinerary];
+        if (!updated[itineraryIndex].activities) updated[itineraryIndex].activities = [];
         updated[itineraryIndex].activities = updated[itineraryIndex].activities.filter((_, i) => i !== activityIndex);
         setItinerary(updated);
     };
@@ -194,6 +201,7 @@ const PackageForm: React.FC<PackageFormProps> = ({ airlinesData, hotelsData, ini
             itinerary,
             included,
             not_included: notIncluded,
+            gallery,
             ...(imageUrl && { image_url: imageUrl }),
             ...(brochureUrl && { brochure_url: brochureUrl })
         };
@@ -288,16 +296,24 @@ const PackageForm: React.FC<PackageFormProps> = ({ airlinesData, hotelsData, ini
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Cover Image</label>
-                                    <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md bg-white">
+                                    <div className="mt-1 flex flex-col justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md bg-white">
+
+                                        {/* Show existing image if it exists and no new file selected */}
+                                        {!imageFile && initialData?.image_url && (
+                                            <div className="mb-4 flex justify-center">
+                                                <img src={initialData.image_url} alt="Current Cover" className="w-32 h-auto rounded object-cover shadow-sm border" />
+                                            </div>
+                                        )}
+
                                         <div className="space-y-1 text-center">
                                             <Upload className="mx-auto h-8 w-8 text-gray-400" />
                                             <div className="flex text-sm text-gray-600 justify-center">
                                                 <label className="relative cursor-pointer rounded-md font-medium text-primary hover:text-emerald-700 focus-within:outline-none">
-                                                    <span>Upload image</span>
+                                                    <span>{initialData?.image_url ? 'Change image' : 'Upload image'}</span>
                                                     <input type="file" className="sr-only" accept="image/*" onChange={(e) => setImageFile(e.target.files?.[0] || null)} />
                                                 </label>
                                             </div>
-                                            {imageFile && <p className="text-xs text-gray-500 mt-2 truncate w-32 mx-auto">{imageFile.name}</p>}
+                                            {imageFile && <p className="text-xs text-gray-500 mt-2 truncate max-w-[200px] mx-auto">{imageFile.name}</p>}
                                         </div>
                                     </div>
                                 </div>
@@ -315,6 +331,70 @@ const PackageForm: React.FC<PackageFormProps> = ({ airlinesData, hotelsData, ini
                                             </div>
                                             {brochureFile && <p className="text-xs text-gray-500 mt-2 truncate w-32 mx-auto">{brochureFile.name}</p>}
                                             {!brochureFile && initialData?.brochure_url && <p className="text-xs text-emerald-600 mt-2">Has existing brochure</p>}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Gallery Images Section */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Additional Gallery Images</label>
+                                <div className="mt-1 flex flex-col px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md bg-white">
+                                    {gallery.length > 0 && (
+                                        <div className="flex flex-wrap gap-4 mb-4">
+                                            {gallery.map((url, idx) => (
+                                                <div key={idx} className="relative group">
+                                                    <img src={url} alt={`Gallery ${idx}`} className="h-20 w-20 object-cover rounded shadow-sm border border-gray-200" />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setGallery(gallery.filter((_, i) => i !== idx))}
+                                                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                    >
+                                                        <X className="w-3 h-3" />
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    <div className="space-y-1 text-center">
+                                        <Upload className="mx-auto h-8 w-8 text-gray-400" />
+                                        <div className="flex text-sm text-gray-600 justify-center">
+                                            <label className="relative cursor-pointer rounded-md font-medium text-primary hover:text-emerald-700 focus-within:outline-none flex items-center gap-2">
+                                                {uploadingGallery && <Loader2 className="w-4 h-4 animate-spin inline" />}
+                                                <span>{uploadingGallery ? 'Uploading...' : 'Upload gallery image(s)'}</span>
+                                                <input
+                                                    type="file"
+                                                    className="sr-only"
+                                                    accept="image/*"
+                                                    multiple
+                                                    disabled={uploadingGallery}
+                                                    onChange={async (e) => {
+                                                        const files = e.target.files;
+                                                        if (!files || files.length === 0) return;
+
+                                                        setUploadingGallery(true);
+                                                        const newUrls: string[] = [];
+
+                                                        for (let i = 0; i < files.length; i++) {
+                                                            const file = files[i];
+                                                            const fileExt = file.name.split('.').pop();
+                                                            const fileName = `gallery/${uuidv4()}.${fileExt}`;
+
+                                                            const { error } = await supabase.storage.from('package-images').upload(fileName, file);
+                                                            if (!error) {
+                                                                const { data } = supabase.storage.from('package-images').getPublicUrl(fileName);
+                                                                newUrls.push(data.publicUrl);
+                                                            } else {
+                                                                console.error("Gallery upload error:", error);
+                                                            }
+                                                        }
+
+                                                        setGallery(prev => [...prev, ...newUrls]);
+                                                        setUploadingGallery(false);
+                                                    }}
+                                                />
+                                            </label>
                                         </div>
                                     </div>
                                 </div>
@@ -450,7 +530,7 @@ const PackageForm: React.FC<PackageFormProps> = ({ airlinesData, hotelsData, ini
                                             </div>
                                             <div className="pl-0 sm:pl-24 space-y-2">
                                                 <label className="block text-xs font-medium text-gray-500">Activities</label>
-                                                {item.activities.map((activity, actIndex) => (
+                                                {(item.activities || []).map((activity, actIndex) => (
                                                     <div key={actIndex} className="flex gap-2">
                                                         <input type="text" placeholder={`Activity ${actIndex + 1}`} className="flex-1 px-3 py-1.5 border rounded border-gray-300 text-sm" value={activity} onChange={e => handleItineraryActivityChange(index, actIndex, e.target.value)} />
                                                         <button type="button" onClick={() => removeItineraryActivity(index, actIndex)} className="text-red-400 hover:text-red-600">
@@ -526,8 +606,8 @@ const PackageForm: React.FC<PackageFormProps> = ({ airlinesData, hotelsData, ini
                             <button type="button" onClick={onClose} className="px-6 py-2 border rounded-md text-gray-700 hover:bg-gray-50">
                                 Cancel
                             </button>
-                            <button type="submit" disabled={saving || uploadingImage || uploadingBrochure} className="bg-primary hover:bg-emerald-700 text-white px-8 py-2 rounded-md font-medium shadow-sm disabled:opacity-70">
-                                {saving ? 'Saving...' : (uploadingImage || uploadingBrochure) ? 'Uploading Files...' : (initialData ? 'Update Package' : 'Create Package')}
+                            <button type="submit" disabled={saving || uploadingImage || uploadingBrochure || uploadingGallery} className="bg-primary hover:bg-emerald-700 text-white px-8 py-2 rounded-md font-medium shadow-sm disabled:opacity-70">
+                                {saving ? 'Saving...' : (uploadingImage || uploadingBrochure || uploadingGallery) ? 'Uploading Files...' : (initialData ? 'Update Package' : 'Create Package')}
                             </button>
                         </div>
                     </form>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Package, Map, Plane, Building2, ShoppingCart, Settings, LogOut, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Package, Map, Plane, Building2, ShoppingCart, Settings, LogOut, Menu, X, Image as ImageIcon } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
 const AdminLayout: React.FC = () => {
@@ -20,6 +20,7 @@ const AdminLayout: React.FC = () => {
         { path: '/admin/private-trips', icon: Map, label: 'Private Trips' },
         { path: '/admin/airlines', icon: Plane, label: 'Airlines' },
         { path: '/admin/hotels', icon: Building2, label: 'Hotels' },
+        { path: '/admin/poster-maker', icon: ImageIcon, label: 'Poster Maker' },
         { path: '/admin/settings', icon: Settings, label: 'Site Settings' },
     ];
 

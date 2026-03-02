@@ -11,13 +11,13 @@ interface Translations {
 
 export const translations: Translations = {
     nav_home: { id: 'Beranda', en: 'Home' },
-    nav_tours: { id: 'Paket Umrah', en: 'Tours' },
+    nav_tours: { id: 'Paket Tur', en: 'Tours' },
     nav_private: { id: 'Private Trip', en: 'Private Trip' },
     nav_about: { id: 'Tentang', en: 'About' },
     nav_contact: { id: 'Kontak', en: 'Contact' },
     hero_title: { id: 'Perjalanan Spiritual yang Mengubah Hidup', en: 'A Spiritual Journey that Changes Lives' },
     hero_subtitle: { id: 'Temukan kedamaian dan kekhusyuan dalam ibadah Umrah dan perjalanan wisata halal bersama pembimbing berpengalaman kami.', en: 'Find peace and devotion in Umrah and halal tours with our experienced guides.' },
-    hero_cta: { id: 'Lihat Paket Umrah', en: 'View Packages' },
+    hero_cta: { id: 'Lihat Paket Tur', en: 'View Packages' },
     hero_secondary: { id: 'Rencanakan Private Trip', en: 'Plan Private Trip' },
     search_placeholder: { id: 'Cari paket (cth: Umrah Plus Turkey)...', en: 'Search packages...' },
     all_months: { id: 'Semua Jadwal', en: 'All Dates' },

@@ -12,6 +12,7 @@ import PrivateTrips from './src/pages/admin/PrivateTrips';
 import Airlines from './src/pages/admin/Airlines';
 import Hotels from './src/pages/admin/Hotels';
 import SiteSettings from './src/pages/admin/SiteSettings';
+import PosterMaker from './src/pages/admin/PosterMaker';
 import { SiteSettingsProvider } from './src/contexts/SiteSettingsContext';
 import { LanguageProvider } from './src/contexts/LanguageContext';
 
@@ -36,6 +37,7 @@ const App: React.FC = () => {
                                 <Route path="private-trips" element={<PrivateTrips />} />
                                 <Route path="airlines" element={<Airlines />} />
                                 <Route path="hotels" element={<Hotels />} />
+                                <Route path="poster-maker" element={<PosterMaker />} />
                                 <Route path="settings" element={<SiteSettings />} />
                             </Route>
                         </Route>
