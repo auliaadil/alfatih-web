@@ -1,43 +1,50 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
-
 # Alfatih Dunia Wisata
 
-Welcome to the **Alfatih Dunia Wisata** project repository! This is a modern, responsive web application for a premium travel agency specializing in Umrah and Halal-friendly international tourism.
+Welcome to the **Alfatih Dunia Wisata** project repository! This is a modern, enterprise-grade web application for a premium travel agency specializing in Umrah and Halal-friendly international tourism.
 
-The application features a sleek UI/UX design and integrates Google's Gemini AI to offer personalized travel itinerary planning for users.
+The application features a sleek, responsive UI/UX and integrates **Google Gemini AI** and **Supabase** to offer a full-featured platform including a dynamic public site and a powerful administrative suite.
 
 ## 🚀 Key Features
 
-- **Dynamic Tour Packages**: Browse featured Umrah and international tour packages with filtering capabilities.
-- **AI-Powered Trip Planner**: An intelligent "Private Trip" planner powered by Google Gemini AI that generates personalized itineraries based on destination, duration, travelers, and interests.
-- **Responsive Design**: Fully responsive layout optimized for mobile, tablet, and desktop devices.
-- **Premium UI**: Modern aesthetics with smooth animations, glassmorphism effects, and high-quality imagery.
-- **Interactive Components**: Detailed tour pages, testimonial carousels, and contact forms.
+### 🌐 Public Experience
+- **Dynamic Tour Packages**: Browse and filter premium Umrah and international tour packages with real-time data from Supabase.
+- **AI-Powered Trip Planner**: An intelligent "Private Trip" planner that generates personalized itineraries based on user interests and constraints.
+- **Premium UI/UX**: Modern aesthetics featuring glassmorphism, smooth animations, and a focus on high-quality visuals.
+
+### 🛡️ Administrative Suite
+- **Comprehensive Dashboard**: Manage tour packages, view detailed stats, and handle private trip requests from a unified interface.
+- **Advanced AI Poster Maker**:
+  - **Fabric.js Canvas Editor**: Interactive drag-and-drop editor for creating marketing posters.
+  - **AI Magic Auto-Fill**: Automatically populate poster text and image placeholders with package-specific data using Gemini AI.
+  - **Template System**: 10+ professional starter templates for Instagram Posts and Stories.
+  - **History & Shortcuts**: Native Undo/Redo stack with keyboard shortcuts (Ctrl+Z / Ctrl+Shift+Z).
+  - **Drafts Management**: Save and resume design drafts with auto-generated canvas thumbnails.
+  - **High-Res Export**: Instant PNG export for production-ready social media assets.
 
 ## 🛠 Tech Stack
 
 - **Framework**: [React 19](https://react.dev/) + [Vite](https://vitejs.dev/)
-- **Language**: [TypeScript](https://www.typescriptlang.org/)
-- **Styling**: [Tailwind CSS](https://tailwindcss.com/) (configured via CDN for rapid prototyping)
-- **AI Integration**: [Google Gemini AI SDK](https://ai.google.dev/) (`@google/genai`)
+- **Backend**: [Supabase](https://supabase.com/) (Database, Auth, Storage)
+- **AI Engine**: [Google Gemini AI SDK](https://ai.google.dev/) (`@google/genai`)
+- **Canvas Engine**: [Fabric.js v6](http://fabricjs.com/)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
 - **Icons**: [Lucide React](https://lucide.dev/)
-- **Markdown Rendering**: [React Markdown](https://github.com/remarkjs/react-markdown)
+- **Rendering**: [React Markdown](https://github.com/remarkjs/react-markdown)
 
 ## 📦 Prerequisites
 
-Before you begin, ensure you have met the following requirements:
-- **Node.js**: v18.0.0 or higher
-- **npm**: v9.0.0 or higher
-- **Gemini API Key**: You need a valid API key from [Google AI Studio](https://aistudio.google.com/).
+Before you begin, ensure you have:
+- **Node.js**: v18.0.0+
+- **npm**: v9.0.0+
+- **Supabase Account**: A project setup with the required schema.
+- **Gemini API Key**: From [Google AI Studio](https://aistudio.google.com/).
 
 ## 💻 Installation & Setup
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/your-username/alfatih-dunia-wisata.git
-    cd alfatih-dunia-wisata
+    git clone https://github.com/auliaadil/alfatih-web.git
+    cd alfatih-web
     ```
 
 2.  **Install dependencies:**
@@ -46,46 +53,46 @@ Before you begin, ensure you have met the following requirements:
     ```
 
 3.  **Configure Environment Variables:**
-    Create a `.env.local` file in the root directory and add your Gemini API Key:
+    Create a `.env.local` file:
     ```env
-    gemini_api_key=YOUR_API_KEY_HERE
+    VITE_SUPABASE_URL=your_supabase_url
+    VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+    VITE_GEMINI_API_KEY=your_gemini_api_key
     ```
-    *(Note: The application is configured to read `process.env.API_KEY` or `process.env.GEMINI_API_KEY` via Vite's define plugin.)*
 
 4.  **Run the development server:**
     ```bash
     npm run dev
     ```
 
-5.  **Open your browser:**
-    Navigate to `http://localhost:3000` (or the port shown in your terminal).
-
 ## 📁 Project Structure
 
 ```
-alfatih-dunia-wisata/
-├── components/       # React UI components (Hero, Navbar, TourCard, AIPlanner, etc.)
-├── services/         # API services (geminiService.ts)
-├── App.tsx           # Main application entry point
-├── index.html        # HTML entry point (Tailwind config script is here)
-├── types.ts          # TypeScript type definitions
-├── constants.ts      # Static data (Tours, Testimonials)
-├── vite.config.ts    # Vite configuration
-└── package.json      # Project dependencies and scripts
+alfatih-web/
+├── src/
+│   ├── components/      # Reusable UI components (Public & Admin)
+│   │   ├── admin/       # Specialized admin components (PosterMaker, etc.)
+│   ├── contexts/        # React Contexts (Language, etc.)
+│   ├── lib/             # Third-party configurations (Supabase client)
+│   ├── pages/           # Page components (Home, TourDetails, Admin Dashboard)
+│   ├── services/        # API and AI logic (geminiService.ts, posterAI.ts)
+│   ├── types/           # Global TypeScript definitions
+│   └── data/            # Static assets and local constants
+├── supabase/            # Database migrations and seed data
+└── public/              # Static public assets
 ```
 
 ## 🤝 Contributing
 
-Contributions are always welcome! Please follow these steps:
-1.  Fork the project repository.
-2.  Create a new branch: `git checkout -b feature/awesome-feature`.
-3.  Make your changes and commit them: `git commit -m 'Add some feature'`.
-4.  Push to the original branch: `git push origin feature/awesome-feature`.
-5.  Create a pull request.
+1.  Fork the project.
+2.  Create your feature branch: `git checkout -b feature/amazing-feature`.
+3.  Commit changes: `git commit -m 'Add some amazing feature'`.
+4.  Push: `git push origin feature/amazing-feature`.
+5.  Create a Pull Request.
 
 ## 📄 License
 
-This project is open-source and available under the [MIT License](LICENSE).
+This project is licensed under the MIT License.
 
 ---
-*Built with ❤️ by the Alfatih Dunia Wisata Team.*
+*Built with ❤️ for Alfatih Dunia Wisata.*
