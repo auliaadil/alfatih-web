@@ -68,7 +68,44 @@ export const translations: Translations = {
     footer_desc: { id: 'Mitra terpercaya Anda untuk perjalanan Umrah dan wisata internasional ramah Muslim. Kami membuat perjalanan spiritual dan santai Anda tak terlupakan.', en: 'Your trusted partner for Umrah and Muslim-friendly international tours. We make your spiritual and leisure journeys unforgettable.' },
     footer_quick_links: { id: 'Quick Links', en: 'Quick Links' },
     footer_popular: { id: 'Popular Packages', en: 'Popular Packages' },
-    footer_contact: { id: 'Contact Us', en: 'Contact Us' }
+    footer_contact: { id: 'Contact Us', en: 'Contact Us' },
+
+    // Private Trip Planner – Form
+    planner_subtitle: { id: 'Buat draft rencana perjalanan impian Anda dalam hitungan detik dengan kecerdasan buatan.', en: 'Create a draft travel plan for your dream trip in seconds with artificial intelligence.' },
+    planner_destination_label: { id: 'Destinasi', en: 'Destination' },
+    planner_destination_placeholder: { id: 'Ketik destinasi, misal: Turki, Jepang, Swiss...', en: 'Type a destination, e.g. Turkey, Japan, Switzerland...' },
+    planner_duration_label: { id: 'Durasi (Hari)', en: 'Duration (Days)' },
+    planner_traveler_label: { id: 'Tipe Traveler', en: 'Traveler Type' },
+    planner_interests_label: { id: 'Minat Perjalanan', en: 'Travel Interests' },
+    planner_interests_hint: { id: 'Pilih minimal 1 minat untuk melanjutkan', en: 'Select at least 1 interest to continue' },
+    planner_submit: { id: 'Buat Draft Rencana', en: 'Generate Draft Plan' },
+    planner_powered_by: { id: 'Powered by Google Gemini AI • Hasil berupa draft referensi, bukan paket resmi.', en: 'Powered by Google Gemini AI • Results are draft references, not official packages.' },
+
+    // Private Trip Planner – Contact
+    planner_contact_toggle: { id: 'Ingin kami hubungi? (Opsional)', en: 'Want us to contact you? (Optional)' },
+    planner_contact_name: { id: 'Nama Lengkap', en: 'Full Name' },
+    planner_contact_wa: { id: 'No. WhatsApp', en: 'WhatsApp Number' },
+    planner_contact_email: { id: 'Email', en: 'Email' },
+    planner_contact_optional: { id: 'Opsional', en: 'Optional' },
+
+    // Private Trip Planner – Loading
+    planner_loading_title: { id: 'Sedang Membuat Itinerary', en: 'Creating Your Itinerary' },
+    planner_loading_desc_1: { id: 'AI kami sedang merancang rencana perjalanan terbaik ke', en: 'Our AI is crafting the best travel plan to' },
+    planner_loading_desc_2: { id: 'selama', en: 'for' },
+    planner_loading_desc_3: { id: 'hari...', en: 'days...' },
+
+    // Private Trip Planner – Result
+    planner_result_badge: { id: 'Draft Itinerary', en: 'Draft Itinerary' },
+    planner_result_heading: { id: 'Private Trip ke', en: 'Private Trip to' },
+    planner_result_interests: { id: 'Minat', en: 'Interests' },
+    planner_result_days: { id: 'Hari', en: 'Days' },
+    planner_cta_consult: { id: 'Cek Harga & Konsultasi', en: 'Get Price & Consult' },
+    planner_cta_reset: { id: 'Buat Ulang', en: 'Start Over' },
+    planner_contact_title: { id: 'Tinggalkan Kontak Anda', en: 'Leave Your Contact' },
+    planner_contact_subtitle: { id: 'Tim kami akan segera menghubungi Anda dengan penawaran harga terbaik.', en: 'Our team will reach out to you with the best price offer.' },
+    planner_contact_budget: { id: 'Estimasi Budget', en: 'Budget Estimate' },
+    planner_contact_cancel: { id: 'Batal', en: 'Cancel' },
+    planner_contact_send: { id: 'Kirim & Chat WA', en: 'Send & Chat WA' },
 };
 
 interface LanguageContextProps {
