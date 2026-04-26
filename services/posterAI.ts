@@ -2,133 +2,136 @@ import { GoogleGenAI } from "@google/genai";
 import { TourPackage } from "../types";
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || "" });
+const MODEL = 'gemini-2.5-flash-preview-05-20';
 
-export const generatePromoCopy = async (tour: TourPackage): Promise<{ title: string; hook: string; details: string }> => {
-  const prompt = `
-    You are an expert copywriter for Alfatih Dunia Wisata, an Indonesian premium travel agency.
-    Write a short, punchy, high-converting copy for an Instagram promo poster for this tour package.
-    Data:
-    Tour: ${tour.title}
-    Date: ${tour.departure_date}
-    Duration: ${tour.duration}
+export type TemplateType = 'conversion' | 'aspiration' | 'edu-reminder' | 'social-proof' | 'blank';
 
-    The copy should be in Bahasa Indonesia.
-    Return strict JSON format with exactly these keys:
-    {
-      "title": "Short Main Headline (max 4 words, e.g. HALAL TOUR JEPANG)",
-      "hook": "An exciting sub-headline or urgency hook (max 8 words, e.g. Sisa 5 Seat! Amankan Posisi Anda)",
-      "details": "A summarizing sentence (max 12 words, e.g. Keberangkatan ${tour.departure_date} dengan fasilitas bintang 5)"
+export interface TemplateInputs {
+    templateType: TemplateType;
+    package?: TourPackage;
+    topic?: string;
+    tagline?: string;
+    testimonial?: { quote: string; name: string; batch: string };
+}
+
+const formatPrice = (price?: number) =>
+    price
+        ? new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(price)
+        : 'Hubungi Kami';
+
+export const applyTemplateContent = async (
+    inputs: TemplateInputs,
+    textNodes: { id: string; text: string }[]
+): Promise<{ id: string; text: string }[]> => {
+    if (textNodes.length === 0 || inputs.templateType === 'blank') return textNodes;
+
+    let contextBlock = '';
+    let instructionBlock = '';
+
+    switch (inputs.templateType) {
+        case 'conversion': {
+            const pkg = inputs.package;
+            if (!pkg) return textNodes;
+            const startingPrice = formatPrice(pkg.room_options?.[0]?.price);
+            const tiers = (pkg.room_options || []).slice(0, 3)
+                .map(r => `${r.name}: ${formatPrice(r.price)}`)
+                .join(' | ');
+            const features = (pkg.features || []).slice(0, 6).join(', ');
+
+            contextBlock = `
+Nama Paket: ${pkg.title}
+Tanggal Keberangkatan: ${pkg.departure_date}
+Durasi: ${pkg.duration}
+Kategori: ${pkg.category}
+Harga Mulai: ${startingPrice} per pax
+Tipe Kamar: ${tiers}
+Keunggulan: ${features}
+Deskripsi: ${(pkg.description || '').substring(0, 200)}`;
+
+            instructionBlock = `
+- Ganti headline utama dengan nama paket dan kata kunci unggulan.
+- Ganti tanggal, durasi, harga dengan data aktual dari paket.
+- Ganti baris benefit/keunggulan dengan fitur aktual dari paket (maks 10 kata per baris).
+- Ganti teks kategori/label dengan nama kategori paket.
+- Pertahankan teks singkat seperti label tombol (Daftar Sekarang, Hubungi Kami), social handle, nama brand, dan nomor lisensi PPIU.`;
+            break;
+        }
+
+        case 'edu-reminder': {
+            contextBlock = `Topik: ${inputs.topic || 'Tips Umroh'}`;
+            instructionBlock = `
+- Ganti headline poster dengan judul daftar yang menarik dan sesuai topik (contoh: "5 Barang Wajib Dibawa Saat Umroh").
+- Ganti sub-headline dengan kalimat pengantar singkat.
+- Ganti setiap judul item daftar bernomor dengan tips/langkah yang relevan dengan topik (maks 6 kata).
+- Ganti setiap deskripsi item dengan penjelasan singkat (maks 12 kata).
+- Jangan ubah social handle, nama brand, dan tombol.`;
+            break;
+        }
+
+        case 'aspiration': {
+            contextBlock = `Tagline kustom: ${inputs.tagline?.trim() || '(generate tagline spiritual yang menginspirasi)'}`;
+            instructionBlock = `
+- Ganti teks tagline/kutipan utama dengan tagline spiritual yang menginspirasi (boleh menggunakan kata dari konteks, atau generate sendiri jika kosong).
+- Ganti sub-tagline dengan kalimat undangan yang hangat dan profesional.
+- Pertahankan nama brand, social handle, badge, dan teks pillar seperti "Islami", "Amanah", "Premium".`;
+            break;
+        }
+
+        case 'social-proof': {
+            const t = inputs.testimonial;
+            const hasData = t && (t.quote || t.name || t.batch);
+            contextBlock = hasData
+                ? `Kutipan: "${t!.quote}"\nNama: ${t!.name}\nRombongan: ${t!.batch}`
+                : '(AI akan membuat testimoni jamaah Umroh yang realistis dan positif)';
+            instructionBlock = `
+- Ganti teks kutipan testimoni dengan kutipan yang diberikan (atau generate jika kosong). Pertahankan gaya italic dan panjang yang mirip.
+- Ganti nama jamaah dan info rombongan dengan data yang diberikan (atau generate jika kosong).
+- Pertahankan statistik (1000+ Jamaah, 12 Thn, ★5.0), nama brand, social handle, dan tombol.`;
+            break;
+        }
+
+        default:
+            return textNodes;
     }
-  `;
 
-  try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
-      contents: prompt,
-    });
-    const text = response.text || "{}";
-    const cleaned = text.replace(/```json/gi, '').replace(/```/gi, '').trim();
-    return JSON.parse(cleaned);
-  } catch (error) {
-    console.error("AI Promo Error:", error);
-    return { title: tour.title.substring(0, 20).toUpperCase(), hook: 'Penawaran Spesial', details: `Keberangkatan ${tour.departure_date}` };
-  }
-};
+    const prompt = `
+Kamu adalah copywriter profesional Alfatih Dunia Wisata — travel agent premium Indonesia untuk Umroh dan wisata Halal.
 
-export const generateEducationalCopy = async (topic: string): Promise<{ title: string; points: string[] }> => {
-  const prompt = `
-    You are an expert content creator for Alfatih Dunia Wisata.
-    Create a highly saveable, educational Instagram post based on this topic: "${topic}".
-    Language: Bahasa Indonesia. Tone: Helpful and informative.
-    
-    Return strict JSON format with exactly these keys:
-    {
-      "title": "Catchy short title (max 5 words, e.g. 5 Barang Wajib Saat Umrah)",
-      "points": [
-        "Point 1 (max 10 words)",
-        "Point 2 (max 10 words)",
-        "Point 3 (max 10 words)"
-      ]
+Tipe Template: ${inputs.templateType}
+
+Data Konten:
+${contextBlock}
+
+Text node yang ada di poster saat ini (field teks yang bisa diedit di kanvas):
+${JSON.stringify(textNodes, null, 2)}
+
+Instruksi penggantian:
+${instructionBlock}
+
+ATURAN WAJIB:
+1. Hanya ubah nilai "text" setiap node — "id" TIDAK boleh diubah.
+2. Panjang teks baru harus mirip dengan aslinya agar tata letak poster tidak rusak.
+3. JANGAN ubah: "Alfatih Dunia Wisata", "@alfatih.umroh", "adwisata.com", nomor PPIU, label tombol singkat, dan teks brand statis.
+4. Gunakan Bahasa Indonesia untuk semua konten kecuali teks yang memang aslinya berbahasa Inggris.
+5. Kembalikan HANYA array JSON yang valid — tanpa markdown, tanpa penjelasan.
+
+Format respons:
+[{ "id": "...", "text": "..." }, ...]`;
+
+    try {
+        const response = await ai.models.generateContent({ model: MODEL, contents: prompt });
+        const raw = response.text || "[]";
+        const cleaned = raw.replace(/```json/gi, '').replace(/```/gi, '').trim();
+        return JSON.parse(cleaned);
+    } catch (err) {
+        console.error("applyTemplateContent error:", err);
+        return textNodes;
     }
-  `;
-
-  try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
-      contents: prompt,
-    });
-    const text = response.text || "{}";
-    const cleaned = text.replace(/```json/gi, '').replace(/```/gi, '').trim();
-    return JSON.parse(cleaned);
-  } catch (error) {
-    console.error("AI Educational Error:", error);
-    return { title: 'Tips Bermanfaat', points: ['Tips 1...', 'Tips 2...', 'Tips 3...'] };
-  }
 };
 
-export const generateDocCopy = async (location: string): Promise<{ title: string; sub: string }> => {
-  const prompt = `
-    You are managing the social media for Alfatih Dunia Wisata.
-    Write a caption for a past tour documentation photo in ${location}.
-    Language: Bahasa Indonesia. Tone: Grateful, warm.
-
-    Return strict JSON format with exactly these keys:
-    {
-      "title": "Short warm title (max 4 words, e.g. Alhamdulillah Ceria di Turki)",
-      "sub": "A short sub-text (max 8 words, e.g. Momen indah jamaah Alfatih)"
-    }
-  `;
-
-  try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
-      contents: prompt,
-    });
-    const text = response.text || "{}";
-    const cleaned = text.replace(/```json/gi, '').replace(/```/gi, '').trim();
-    return JSON.parse(cleaned);
-  } catch (error) {
-    console.error("AI Doc Error:", error);
-    return { title: 'Momen Berharga', sub: 'Bersama jamaah Alfatih Dunia Wisata' };
-  }
-};
-
-export const generateTemplateAutofill = async (tour: TourPackage, textNodes: { id: string, text: string }[]): Promise<{ id: string, text: string }[]> => {
-  if (textNodes.length === 0) return [];
-
-  const prompt = `
-    You are an expert travel copywriter for Alfatih Dunia Wisata.
-    We have a poster template with placeholder text, and we need to overwrite the placeholders with actual data from a specific tour package.
-    
-    Data:
-    Tour: ${tour.title}
-    Price: ${tour.room_options?.[0]?.price ? tour.room_options[0].price.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' }) : 'Hubungi Kami'}
-    Date: ${tour.departure_date}
-    Duration: ${tour.duration}
-
-    Here are the text fields currently on the poster:
-    ${JSON.stringify(textNodes, null, 2)}
-
-    Rewrite ONLY the "text" property of each object to realistically pitch the Data above.
-    Keep the length of the new text roughly similar to the original text so you don't break the poster layout!
-    If a text field looks like a button label (e.g. "Daftar Sekarang"), leave it as is.
-    
-    Return strict JSON format as an array of objects:
-    [
-      { "id": "...", "text": "New Text Here" }
-    ]
-  `;
-
-  try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
-      contents: prompt,
-    });
-    const textStr = response.text || "[]";
-    const cleaned = textStr.replace(/```json/gi, '').replace(/```/gi, '').trim();
-    return JSON.parse(cleaned);
-  } catch (error) {
-    console.error("AI Autofill Error:", error);
-    return textNodes; // Fallback to original text if error
-  }
-};
+// Kept for backward compatibility (DraftPanel / legacy callers)
+export const generateTemplateAutofill = async (
+    tour: TourPackage,
+    textNodes: { id: string; text: string }[]
+): Promise<{ id: string; text: string }[]> =>
+    applyTemplateContent({ templateType: 'conversion', package: tour }, textNodes);

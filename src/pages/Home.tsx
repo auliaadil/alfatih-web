@@ -104,7 +104,7 @@ const Home: React.FC = () => {
             <Hero />
             <section id="tours" className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 scroll-mt-20">
                 <div className="text-center mb-12">
-                    <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{t('section_tours_title')}</h2>
+                    <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 font-display">{t('section_tours_title')}</h2>
                     <p className="text-gray-600 max-w-2xl mx-auto">
                         {t('section_tours_subtitle')}
                     </p>
@@ -184,7 +184,7 @@ const Home: React.FC = () => {
                             />
                         </div>
                         <div>
-                            <h2 className="text-3xl font-bold text-gray-900 mb-6">
+                            <h2 className="text-3xl font-bold text-gray-900 mb-6 font-display">
                                 {t('why_choose_title')}
                             </h2>
                             <div className="space-y-8">
@@ -223,7 +223,7 @@ const Home: React.FC = () => {
             <section className="py-20 bg-gray-50">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-12">
-                        <h2 className="text-3xl font-bold text-gray-900">{t('testimonials_title')}</h2>
+                        <h2 className="text-3xl font-bold text-gray-900 font-display">{t('testimonials_title')}</h2>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         {TESTIMONIALS.map((t) => (
@@ -244,7 +244,7 @@ const Home: React.FC = () => {
             </section>
             <section id="contact" className="py-20 bg-primary scroll-mt-20">
                 <div className="max-w-4xl mx-auto px-4 text-center">
-                    <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+                    <h2 className="text-3xl md:text-4xl font-bold text-white mb-6 font-display">
                         {t('ready_title')}
                     </h2>
                     <p className="text-emerald-100 text-lg mb-8 max-w-2xl mx-auto">

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Canvas, FabricObject } from 'fabric';
-import { Eye, EyeOff, Lock, Unlock, Trash2, Type, Square, Image, Circle as CircleIcon, Minus, ChevronUp, ChevronDown } from 'lucide-react';
+import { Eye, EyeOff, Lock, Unlock, Trash2, Type, Square, Image, Circle as CircleIcon, Minus, ChevronUp, ChevronDown, ChevronsUp, ChevronsDown } from 'lucide-react';
 
 interface LayerPanelProps {
     canvas: Canvas | null;
@@ -63,15 +63,30 @@ const LayerPanel: React.FC<LayerPanelProps> = ({ canvas, refreshKey }) => {
 
     const handleToggleLock = (obj: FabricObject) => {
         const isLocked = obj.lockMovementX;
+        const next = !isLocked;
         obj.set({
-            lockMovementX: !isLocked,
-            lockMovementY: !isLocked,
-            lockRotation: !isLocked,
-            lockScalingX: !isLocked,
-            lockScalingY: !isLocked,
-            hasControls: isLocked,
-            selectable: isLocked,
+            lockMovementX: next,
+            lockMovementY: next,
+            lockRotation: next,
+            lockScalingX: next,
+            lockScalingY: next,
+            hasControls: !next,
+            selectable: !next,
+            evented: !next,
         });
+        if ('editable' in obj) (obj as any).editable = !next;
+        canvas.requestRenderAll();
+        setObjects([...canvas.getObjects().slice().reverse()]);
+    };
+
+    const handleSendToFront = (obj: FabricObject) => {
+        canvas.bringObjectToFront(obj);
+        canvas.requestRenderAll();
+        setObjects([...canvas.getObjects().slice().reverse()]);
+    };
+
+    const handleSendToBack = (obj: FabricObject) => {
+        canvas.sendObjectToBack(obj);
         canvas.requestRenderAll();
         setObjects([...canvas.getObjects().slice().reverse()]);
     };
@@ -172,6 +187,13 @@ const LayerPanel: React.FC<LayerPanelProps> = ({ canvas, refreshKey }) => {
                         </span>
 
                         <button
+                            onClick={(e) => { e.stopPropagation(); handleSendToFront(obj); }}
+                            className="p-1 hover:bg-gray-200 rounded text-gray-400 hover:text-gray-600"
+                            title="Send to Front"
+                        >
+                            <ChevronsUp className="w-3 h-3" />
+                        </button>
+                        <button
                             onClick={(e) => { e.stopPropagation(); handleMoveUp(obj); }}
                             className="p-1 hover:bg-gray-200 rounded text-gray-400 hover:text-gray-600"
                             title="Bring Forward"
@@ -184,6 +206,13 @@ const LayerPanel: React.FC<LayerPanelProps> = ({ canvas, refreshKey }) => {
                             title="Send Backward"
                         >
                             <ChevronDown className="w-3 h-3" />
+                        </button>
+                        <button
+                            onClick={(e) => { e.stopPropagation(); handleSendToBack(obj); }}
+                            className="p-1 hover:bg-gray-200 rounded text-gray-400 hover:text-gray-600"
+                            title="Send to Back"
+                        >
+                            <ChevronsDown className="w-3 h-3" />
                         </button>
                         <button
                             onClick={(e) => { e.stopPropagation(); handleToggleVisible(obj); }}

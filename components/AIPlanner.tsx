@@ -170,7 +170,7 @@ const AIPlanner: React.FC = () => {
                         <div className="inline-flex items-center gap-2 px-4 py-2 bg-secondary text-white rounded-full text-xs font-black uppercase tracking-widest mb-4 shadow-xl">
                             <Sparkles className="w-3.5 h-3.5" /> {t('planner_result_badge')}
                         </div>
-                        <h2 className="text-3xl md:text-4xl font-black text-white mb-2">
+                        <h2 className="text-3xl md:text-4xl font-black text-white mb-2 font-display">
                             {t('planner_result_heading')} {destination}
                         </h2>
                         <p className="text-white/80">
@@ -188,7 +188,7 @@ const AIPlanner: React.FC = () => {
 
                     {showContactForm ? (
                         <div className="mt-8 bg-white p-6 md:p-8 rounded-3xl shadow-xl border border-gray-100">
-                            <h3 className="text-xl font-bold text-gray-900 mb-4 text-center">{t('planner_contact_title')}</h3>
+                            <h3 className="text-xl font-bold text-gray-900 mb-4 text-center font-display">{t('planner_contact_title')}</h3>
                             <p className="text-sm text-gray-500 mb-6 text-center">{t('planner_contact_subtitle')}</p>
                             <form onSubmit={handleSubmitLead} className="space-y-4 max-w-md mx-auto">
                                 <div>
@@ -255,7 +255,7 @@ const AIPlanner: React.FC = () => {
                                 <Loader2 className="w-10 h-10 text-white animate-spin" />
                             </div>
                         </div>
-                        <h3 className="text-2xl font-black text-gray-900 mb-3">{t('planner_loading_title')}</h3>
+                        <h3 className="text-2xl font-black text-gray-900 mb-3 font-display">{t('planner_loading_title')}</h3>
                         <p className="text-gray-500 mb-10 max-w-md mx-auto">
                             {t('planner_loading_desc_1')} <strong className="text-primary">{destination}</strong> {t('planner_loading_desc_2')} <strong>{days}</strong> {t('planner_loading_desc_3')}
                         </p>
@@ -286,7 +286,7 @@ const AIPlanner: React.FC = () => {
                     <div className="inline-flex items-center gap-2 px-4 py-2 bg-secondary text-white rounded-full text-xs font-black uppercase tracking-widest mb-6 shadow-xl">
                         <Sparkles className="w-3.5 h-3.5" /> AI-Powered
                     </div>
-                    <h2 className="text-4xl md:text-5xl font-black text-white mb-4">
+                    <h2 className="text-4xl md:text-5xl font-black text-white mb-4 font-display">
                         {t('private_trip_title')}
                     </h2>
                     <p className="text-xl text-white/90 max-w-2xl mx-auto font-medium leading-relaxed">

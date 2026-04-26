@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Package, Map, Plane, Building2, ShoppingCart, Settings, LogOut, Menu, X, Image as ImageIcon } from 'lucide-react';
+import { LayoutDashboard, Package, Map, Plane, Building2, ShoppingCart, Settings, LogOut, Menu, X, Image as ImageIcon, Layers } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
 const AdminLayout: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const isFullHeightPage = location.pathname.startsWith('/admin/poster-maker');
 
     const handleLogout = async () => {
         await supabase.auth.signOut();
@@ -21,6 +22,7 @@ const AdminLayout: React.FC = () => {
         { path: '/admin/airlines', icon: Plane, label: 'Airlines' },
         { path: '/admin/hotels', icon: Building2, label: 'Hotels' },
         { path: '/admin/poster-maker', icon: ImageIcon, label: 'Poster Maker' },
+        { path: '/admin/poster-templates', icon: Layers, label: 'Templates' },
         { path: '/admin/settings', icon: Settings, label: 'Site Settings' },
     ];
 
@@ -102,7 +104,7 @@ const AdminLayout: React.FC = () => {
             </div>
 
             {/* Main Content */}
-            <div className="flex-1 overflow-auto bg-gray-50 lg:static mt-16 lg:mt-0 relative w-full">
+            <div className={`flex-1 bg-gray-50 lg:static mt-16 lg:mt-0 relative w-full ${isFullHeightPage ? 'overflow-hidden' : 'overflow-auto'}`}>
                 <div className="p-4 sm:p-6 lg:p-8">
                     <Outlet />
                 </div>

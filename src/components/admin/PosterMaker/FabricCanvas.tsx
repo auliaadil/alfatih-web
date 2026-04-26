@@ -1,10 +1,11 @@
 import React, { useRef, useEffect, useImperativeHandle, forwardRef, useState } from 'react';
 import { Canvas, Rect, Textbox, Circle, Line, FabricImage, FabricObject } from 'fabric';
+import { installSceneSnap } from './fabricSnap';
 
 export type CanvasSize = 'post' | 'story';
 
 const CANVAS_DIMENSIONS: Record<CanvasSize, { width: number; height: number }> = {
-    post: { width: 1080, height: 1440 },
+    post: { width: 1080, height: 1350 },
     story: { width: 1080, height: 1920 },
 };
 
@@ -18,12 +19,20 @@ export interface FabricCanvasRef {
     deleteSelected: () => void;
     bringForward: () => void;
     sendBackward: () => void;
+    sendToFront: () => void;
+    sendToBack: () => void;
+    copySelected: () => void;
+    paste: () => void;
+    duplicateSelected: () => void;
     alignLeft: () => void;
     alignCenter: () => void;
     alignRight: () => void;
     exportPng: () => Promise<string | null>;
     loadTemplate: (json: object) => void;
     setCanvasSize: (size: CanvasSize) => void;
+    setZoom: (level: number) => void;
+    getZoom: () => number;
+    getFitScale: () => number;
     undo: () => void;
     redo: () => void;
 }
@@ -33,13 +42,19 @@ interface FabricCanvasProps {
     onSelectionChange?: (obj: FabricObject | null) => void;
     onCanvasModified?: () => void;
     onHistoryChange?: (canUndo: boolean, canRedo: boolean) => void;
+    onZoomChange?: (zoom: number) => void;
+    onObjectTransforming?: (obj: FabricObject) => void;
 }
 
+// Module-level clipboard so copy/paste works across renders
+let clipboard: FabricObject | null = null;
+
 const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
-    ({ canvasSize, onSelectionChange, onCanvasModified, onHistoryChange }, ref) => {
+    ({ canvasSize, onSelectionChange, onCanvasModified, onHistoryChange, onZoomChange, onObjectTransforming }, ref) => {
         const canvasEl = useRef<HTMLCanvasElement>(null);
         const fabricRef = useRef<Canvas | null>(null);
         const [scale, setScale] = useState(0.35);
+        const scaleRef = useRef(0.35);
 
         // History State
         const history = useRef<object[]>([]);
@@ -56,13 +71,19 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
 
         const saveHistory = (c: Canvas) => {
             if (isHistoryProcessing.current) return;
-            // Clean up future history array elements if we are not at the end of the history array
             if (historyIndex.current < history.current.length - 1) {
                 history.current = history.current.slice(0, historyIndex.current + 1);
             }
             history.current.push(c.toJSON());
             historyIndex.current = history.current.length - 1;
             updateHistoryState();
+        };
+
+        const calcFitScale = () => {
+            const dims = CANVAS_DIMENSIONS[canvasSize];
+            const maxH = window.innerHeight - 200;
+            const maxW = Math.min(820, window.innerWidth * 0.52);
+            return Math.min(maxW / dims.width, maxH / dims.height, 0.65);
         };
 
         // Initialize canvas
@@ -75,34 +96,36 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
                 height: dims.height,
                 backgroundColor: '#ffffff',
                 preserveObjectStacking: true,
+                uniformScaling: false,
+                uniScaleKey: 'shiftKey',
             });
 
             fabricRef.current = canvas;
+            installSceneSnap(canvas);
 
-            // Trigger an initial save
             setTimeout(() => saveHistory(canvas), 100);
 
-            // Selection events
-            canvas.on('selection:created', (e) => {
-                onSelectionChange?.(e.selected?.[0] || null);
-            });
-            canvas.on('selection:updated', (e) => {
-                onSelectionChange?.(e.selected?.[0] || null);
-            });
-            canvas.on('selection:cleared', () => {
-                onSelectionChange?.(null);
-            });
-            canvas.on('object:modified', () => {
-                onCanvasModified?.();
-                saveHistory(canvas);
-            });
-            canvas.on('object:added', () => {
-                onCanvasModified?.();
-                saveHistory(canvas);
-            });
-            canvas.on('object:removed', () => {
-                onCanvasModified?.();
-                saveHistory(canvas);
+            canvas.on('selection:created', (e) => onSelectionChange?.(e.selected?.[0] || null));
+            canvas.on('selection:updated', (e) => onSelectionChange?.(e.selected?.[0] || null));
+            canvas.on('selection:cleared', () => onSelectionChange?.(null));
+            canvas.on('object:modified', () => { onCanvasModified?.(); saveHistory(canvas); });
+            canvas.on('object:added', () => { onCanvasModified?.(); saveHistory(canvas); });
+            canvas.on('object:removed', () => { onCanvasModified?.(); saveHistory(canvas); });
+            canvas.on('object:scaling', (e) => { if (e.target) onObjectTransforming?.(e.target as FabricObject); });
+            canvas.on('object:moving', (e) => { if (e.target) onObjectTransforming?.(e.target as FabricObject); });
+
+            // When Fabric focuses its hidden textarea for text editing, Chrome silently
+            // scrolls overflow:hidden ancestors to bring the element into view. Reset
+            // any such scroll in the next frame (after Chrome's auto-scroll fires).
+            canvas.on('text:editing:entered', () => {
+                requestAnimationFrame(() => {
+                    let el: HTMLElement | null = canvasEl.current?.parentElement ?? null;
+                    while (el && el !== document.body) {
+                        if (el.scrollTop !== 0) el.scrollTop = 0;
+                        if (el.scrollLeft !== 0) el.scrollLeft = 0;
+                        el = el.parentElement;
+                    }
+                });
             });
 
             return () => {
@@ -114,18 +137,16 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
         // Calculate scale to fit in viewport
         useEffect(() => {
             const updateScale = () => {
-                const dims = CANVAS_DIMENSIONS[canvasSize];
-                const maxH = window.innerHeight - 260;
-                const maxW = Math.min(800, window.innerWidth * 0.5);
-                const s = Math.min(maxW / dims.width, maxH / dims.height, 0.5);
+                const s = calcFitScale();
                 setScale(s);
+                scaleRef.current = s;
+                onZoomChange?.(s);
             };
             updateScale();
             window.addEventListener('resize', updateScale);
             return () => window.removeEventListener('resize', updateScale);
         }, [canvasSize]);
 
-        // Expose methods to parent
         useImperativeHandle(ref, () => ({
             getCanvas: () => fabricRef.current,
 
@@ -133,16 +154,9 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
                 const c = fabricRef.current;
                 if (!c) return;
                 const tb = new Textbox(text || 'Edit this text', {
-                    left: 100,
-                    top: 100,
-                    originX: 'left',
-                    originY: 'top',
-                    width: 500,
-                    fontSize: 48,
-                    fontFamily: 'Inter, sans-serif',
-                    fill: '#1a1a1a',
-                    fontWeight: '700',
-                    editable: true,
+                    left: 100, top: 100, originX: 'left', originY: 'top',
+                    width: 500, fontSize: 48, fontFamily: 'Inter, sans-serif',
+                    fill: '#1a1a1a', fontWeight: '700', editable: true,
                 });
                 c.add(tb);
                 c.setActiveObject(tb);
@@ -153,16 +167,8 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
                 const c = fabricRef.current;
                 if (!c) return;
                 const rect = new Rect({
-                    left: 150,
-                    top: 150,
-                    originX: 'left',
-                    originY: 'top',
-                    width: 300,
-                    height: 200,
-                    fill: '#10b981',
-                    rx: 12,
-                    ry: 12,
-                    opacity: 0.9,
+                    left: 150, top: 150, originX: 'left', originY: 'top',
+                    width: 300, height: 200, fill: '#10b981', rx: 12, ry: 12, opacity: 0.9,
                 });
                 c.add(rect);
                 c.setActiveObject(rect);
@@ -173,13 +179,8 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
                 const c = fabricRef.current;
                 if (!c) return;
                 const circle = new Circle({
-                    left: 200,
-                    top: 200,
-                    originX: 'left',
-                    originY: 'top',
-                    radius: 100,
-                    fill: '#f59e0b',
-                    opacity: 0.9,
+                    left: 200, top: 200, originX: 'left', originY: 'top',
+                    radius: 100, fill: '#f59e0b', opacity: 0.9,
                 });
                 c.add(circle);
                 c.setActiveObject(circle);
@@ -190,10 +191,7 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
                 const c = fabricRef.current;
                 if (!c) return;
                 const line = new Line([100, 300, 500, 300], {
-                    stroke: '#1a1a1a',
-                    strokeWidth: 4,
-                    originX: 'left',
-                    originY: 'top',
+                    stroke: '#1a1a1a', strokeWidth: 4, originX: 'left', originY: 'top',
                 });
                 c.add(line);
                 c.setActiveObject(line);
@@ -203,17 +201,12 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
             addImageFromUrl: (url: string) => {
                 const c = fabricRef.current;
                 if (!c) return;
-
                 const imgElement = document.createElement('img');
                 imgElement.crossOrigin = 'anonymous';
                 imgElement.onload = () => {
                     const fabricImg = new FabricImage(imgElement, {
-                        left: 50,
-                        top: 50,
-                        originX: 'left',
-                        originY: 'top',
+                        left: 50, top: 50, originX: 'left', originY: 'top',
                     });
-                    // Scale the image to fit nicely
                     const maxDim = 500;
                     const imgScale = Math.min(maxDim / fabricImg.width!, maxDim / fabricImg.height!, 1);
                     fabricImg.scale(imgScale);
@@ -221,9 +214,7 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
                     c.setActiveObject(fabricImg);
                     c.requestRenderAll();
                 };
-                imgElement.onerror = () => {
-                    console.error('Failed to load image:', url);
-                };
+                imgElement.onerror = () => console.error('Failed to load image:', url);
                 imgElement.src = url;
             },
 
@@ -242,40 +233,78 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
                 const c = fabricRef.current;
                 if (!c) return;
                 const active = c.getActiveObject();
-                if (active) {
-                    c.bringObjectForward(active);
-                    c.requestRenderAll();
-                }
+                if (active) { c.bringObjectForward(active); c.requestRenderAll(); }
             },
 
             sendBackward: () => {
                 const c = fabricRef.current;
                 if (!c) return;
                 const active = c.getActiveObject();
+                if (active) { c.sendObjectBackwards(active); c.requestRenderAll(); }
+            },
+
+            sendToFront: () => {
+                const c = fabricRef.current;
+                if (!c) return;
+                const active = c.getActiveObject();
+                if (active) { c.bringObjectToFront(active); c.requestRenderAll(); }
+            },
+
+            sendToBack: () => {
+                const c = fabricRef.current;
+                if (!c) return;
+                const active = c.getActiveObject();
+                if (active) { c.sendObjectToBack(active); c.requestRenderAll(); }
+            },
+
+            copySelected: () => {
+                const c = fabricRef.current;
+                if (!c) return;
+                const active = c.getActiveObject();
                 if (active) {
-                    c.sendObjectBackwards(active);
-                    c.requestRenderAll();
+                    active.clone().then((cloned: FabricObject) => { clipboard = cloned; });
                 }
+            },
+
+            paste: () => {
+                const c = fabricRef.current;
+                if (!c || !clipboard) return;
+                clipboard.clone().then((cloned: FabricObject) => {
+                    c.discardActiveObject();
+                    cloned.set({ left: (cloned.left ?? 0) + 20, top: (cloned.top ?? 0) + 20 });
+                    c.add(cloned);
+                    c.setActiveObject(cloned);
+                    c.requestRenderAll();
+                    clipboard = cloned;
+                });
+            },
+
+            duplicateSelected: () => {
+                const c = fabricRef.current;
+                if (!c) return;
+                const active = c.getActiveObject();
+                if (!active) return;
+                active.clone().then((cloned: FabricObject) => {
+                    c.discardActiveObject();
+                    cloned.set({ left: (cloned.left ?? 0) + 20, top: (cloned.top ?? 0) + 20 });
+                    c.add(cloned);
+                    c.setActiveObject(cloned);
+                    c.requestRenderAll();
+                });
             },
 
             alignLeft: () => {
                 const c = fabricRef.current;
                 if (!c) return;
                 const active = c.getActiveObject();
-                if (active) {
-                    active.set({ left: 0 });
-                    c.requestRenderAll();
-                }
+                if (active) { active.set({ left: 0 }); c.requestRenderAll(); }
             },
 
             alignCenter: () => {
                 const c = fabricRef.current;
                 if (!c) return;
                 const active = c.getActiveObject();
-                if (active) {
-                    c.centerObjectH(active);
-                    c.requestRenderAll();
-                }
+                if (active) { c.centerObjectH(active); c.requestRenderAll(); }
             },
 
             alignRight: () => {
@@ -293,7 +322,6 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
                 if (!c) return null;
                 c.discardActiveObject();
                 c.requestRenderAll();
-                // Small delay to let selection handles disappear
                 await new Promise(r => setTimeout(r, 100));
                 return c.toDataURL({ format: 'png', multiplier: 1, quality: 1 });
             },
@@ -315,6 +343,16 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
                 c.requestRenderAll();
                 saveHistory(c);
             },
+
+            setZoom: (level: number) => {
+                setScale(level);
+                scaleRef.current = level;
+                onZoomChange?.(level);
+            },
+
+            getZoom: () => scaleRef.current,
+
+            getFitScale: () => calcFitScale(),
 
             undo: () => {
                 if (historyIndex.current > 0) {
@@ -352,17 +390,14 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
         const dims = CANVAS_DIMENSIONS[canvasSize];
 
         return (
-            <div className="flex-1 flex items-start justify-center overflow-auto py-6 bg-gray-100 rounded-lg border border-gray-200" style={{ minHeight: 500 }}>
-                {/* Outer wrapper sized to the VISUAL (scaled) dimensions so flex centering works correctly */}
+            <div
+                className="flex-1 flex items-start justify-center py-6 bg-gray-100 rounded-lg border border-gray-200"
+                style={{ overflow: 'clip' }}
+            >
                 <div
-                    style={{
-                        width: dims.width * scale,
-                        height: dims.height * scale,
-                        flexShrink: 0,
-                    }}
-                    className="shadow-2xl rounded-sm overflow-hidden"
+                    style={{ width: dims.width * scale, height: dims.height * scale, flexShrink: 0, overflow: 'clip' }}
+                    className="shadow-2xl rounded-sm"
                 >
-                    {/* Inner div at full resolution, scaled down */}
                     <div
                         style={{
                             transform: `scale(${scale})`,

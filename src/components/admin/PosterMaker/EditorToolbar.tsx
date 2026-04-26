@@ -2,8 +2,9 @@ import React from 'react';
 import {
     Type, Square, Circle, Minus, ImagePlus, Trash2,
     AlignLeft, AlignCenter, AlignRight,
-    ChevronUp, ChevronDown, Download, Loader2, RectangleHorizontal, RectangleVertical,
-    Undo, Redo
+    ChevronUp, ChevronDown, ChevronsUp, ChevronsDown,
+    Download, Loader2, RectangleHorizontal, RectangleVertical,
+    Undo, Redo, Copy, Clipboard, CopyPlus
 } from 'lucide-react';
 import { CanvasSize } from './FabricCanvas';
 
@@ -21,6 +22,11 @@ interface EditorToolbarProps {
     onAlignRight: () => void;
     onBringForward: () => void;
     onSendBackward: () => void;
+    onSendToFront: () => void;
+    onSendToBack: () => void;
+    onCopy: () => void;
+    onPaste: () => void;
+    onDuplicate: () => void;
     onExport: () => void;
     onSetCanvasSize: (size: CanvasSize) => void;
     onUndo: () => void;
@@ -59,11 +65,13 @@ const EditorToolbar: React.FC<EditorToolbarProps> = ({
     canvasSize, isExporting,
     onAddText, onAddRect, onAddCircle, onAddLine, onAddImage,
     onDelete, onAlignLeft, onAlignCenter, onAlignRight,
-    onBringForward, onSendBackward, onExport, onSetCanvasSize,
+    onBringForward, onSendBackward, onSendToFront, onSendToBack,
+    onCopy, onPaste, onDuplicate,
+    onExport, onSetCanvasSize,
     onUndo, onRedo, canUndo, canRedo
 }) => {
     return (
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm px-3 py-2 flex items-center gap-1 flex-wrap">
+        <div className="bg-white border border-gray-200 rounded-xl shadow-sm px-3 py-2 flex items-center gap-1 flex-wrap flex-shrink-0">
 
             {/* Canvas Size */}
             <ToolBtn onClick={() => onSetCanvasSize('post')} title="Post (3:4)" active={canvasSize === 'post'}>
@@ -90,6 +98,13 @@ const EditorToolbar: React.FC<EditorToolbarProps> = ({
 
             <Divider />
 
+            {/* Clipboard */}
+            <ToolBtn onClick={onCopy} title="Copy (Ctrl+C)"><Copy className="w-4 h-4" /></ToolBtn>
+            <ToolBtn onClick={onPaste} title="Paste (Ctrl+V)"><Clipboard className="w-4 h-4" /></ToolBtn>
+            <ToolBtn onClick={onDuplicate} title="Duplicate (Ctrl+D)"><CopyPlus className="w-4 h-4" /></ToolBtn>
+
+            <Divider />
+
             {/* Alignment */}
             <ToolBtn onClick={onAlignLeft} title="Align Left"><AlignLeft className="w-4 h-4" /></ToolBtn>
             <ToolBtn onClick={onAlignCenter} title="Align Center"><AlignCenter className="w-4 h-4" /></ToolBtn>
@@ -97,9 +112,11 @@ const EditorToolbar: React.FC<EditorToolbarProps> = ({
 
             <Divider />
 
-            {/* Layers */}
+            {/* Layer Order */}
+            <ToolBtn onClick={onSendToFront} title="Send to Front"><ChevronsUp className="w-4 h-4" /></ToolBtn>
             <ToolBtn onClick={onBringForward} title="Bring Forward"><ChevronUp className="w-4 h-4" /></ToolBtn>
             <ToolBtn onClick={onSendBackward} title="Send Backward"><ChevronDown className="w-4 h-4" /></ToolBtn>
+            <ToolBtn onClick={onSendToBack} title="Send to Back"><ChevronsDown className="w-4 h-4" /></ToolBtn>
 
             <Divider />
 

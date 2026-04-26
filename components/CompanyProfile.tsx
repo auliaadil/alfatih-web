@@ -56,7 +56,7 @@ const CompanyProfile: React.FC = () => {
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-secondary text-white rounded-full text-xs font-black uppercase tracking-widest mb-6 shadow-xl">
             {t('about_badge')}
           </div>
-          <h1 className="text-4xl md:text-6xl font-black text-white mb-6">{t('about_title')}</h1>
+          <h1 className="text-4xl md:text-6xl font-black text-white mb-6 font-display">{t('about_title')}</h1>
           <p className="text-xl text-white/90 max-w-2xl mx-auto font-medium leading-relaxed">
             {t('about_desc')}
           </p>
@@ -78,7 +78,7 @@ const CompanyProfile: React.FC = () => {
               </div>
             </div>
             <div className="space-y-6">
-              <h2 className="text-3xl md:text-4xl font-black text-gray-900 leading-tight">{t('pihk_title_1')}<span className="text-secondary">{t('pihk_title_2')}</span></h2>
+              <h2 className="text-3xl md:text-4xl font-black text-gray-900 leading-tight font-display">{t('pihk_title_1')}<span className="text-secondary">{t('pihk_title_2')}</span></h2>
               <p className="text-gray-600 text-lg leading-relaxed" dangerouslySetInnerHTML={{ __html: t('pihk_desc_1') }} />
               <p className="text-gray-600 leading-relaxed">
                 {t('pihk_desc_2')}
@@ -103,7 +103,7 @@ const CompanyProfile: React.FC = () => {
       <section className="py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">{t('vision_mission_title')}</h2>
+            <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4 font-display">{t('vision_mission_title')}</h2>
             <div className="w-24 h-1.5 bg-secondary mx-auto rounded-full"></div>
           </div>
 
@@ -114,7 +114,7 @@ const CompanyProfile: React.FC = () => {
               <div className="w-16 h-16 bg-primary text-white rounded-2xl flex items-center justify-center mb-8 shadow-lg shadow-primary/20">
                 <Lightbulb className="w-8 h-8" />
               </div>
-              <h3 className="text-3xl font-black text-gray-900 mb-6 uppercase tracking-tight">{t('vision_title')}</h3>
+              <h3 className="text-3xl font-black text-gray-900 mb-6 uppercase tracking-tight font-display">{t('vision_title')}</h3>
               <p className="text-xl text-gray-600 leading-relaxed font-medium">
                 {t('vision_desc')}
               </p>
@@ -126,7 +126,7 @@ const CompanyProfile: React.FC = () => {
               <div className="w-16 h-16 bg-white text-primary rounded-2xl flex items-center justify-center mb-8 shadow-lg">
                 <Compass className="w-8 h-8" />
               </div>
-              <h3 className="text-3xl font-black text-white mb-6 uppercase tracking-tight">{t('mission_title')}</h3>
+              <h3 className="text-3xl font-black text-white mb-6 uppercase tracking-tight font-display">{t('mission_title')}</h3>
               <p className="text-xl text-white/90 leading-relaxed font-medium">
                 {t('mission_desc')}
               </p>
@@ -139,7 +139,7 @@ const CompanyProfile: React.FC = () => {
       <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4 uppercase tracking-tight">{t('advantages_title')}</h2>
+            <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4 uppercase tracking-tight font-display">{t('advantages_title')}</h2>
             <p className="text-gray-500 font-medium">{t('advantages_subtitle')}</p>
           </div>
           <div className="grid md:grid-cols-3 gap-10">
@@ -148,7 +148,7 @@ const CompanyProfile: React.FC = () => {
                 <div className="w-20 h-20 bg-white shadow-md rounded-2xl flex items-center justify-center mb-8 group-hover:bg-primary transition-colors">
                   <div className="text-primary group-hover:text-white transition-colors">{val.icon}</div>
                 </div>
-                <h4 className="text-2xl font-black text-gray-900 mb-4">{val.title}</h4>
+                <h4 className="text-2xl font-black text-gray-900 mb-4 font-display">{val.title}</h4>
                 <p className="text-gray-500 leading-relaxed">{val.desc}</p>
               </div>
             ))}
@@ -170,7 +170,7 @@ const CompanyProfile: React.FC = () => {
           </div>
 
           <div className="mt-20 pt-20 border-t border-white/5 text-center">
-            <h3 className="text-2xl font-black mb-10">Penyelenggara Perjalanan Ibadah Terpercaya</h3>
+            <h3 className="text-2xl font-black mb-10 font-display">Penyelenggara Perjalanan Ibadah Terpercaya</h3>
             <div className="flex flex-wrap justify-center gap-8 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
               {/* Placeholders for partner logos */}
               <div className="h-12 w-32 bg-white/10 rounded flex items-center justify-center font-bold">KEMENAG</div>

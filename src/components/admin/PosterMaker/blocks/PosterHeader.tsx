@@ -15,7 +15,7 @@ const PosterHeader: React.FC<PosterHeaderProps> = ({ options }) => {
                 A
             </div>
             <div>
-                <h3 className={`font-bold text-lg tracking-tight leading-none ${textColorClass}`}>Alfatih</h3>
+                <h3 className={`font-bold text-lg tracking-tight leading-none ${textColorClass} font-display`}>Alfatih</h3>
                 <p className={`text-[10px] font-medium opacity-80 uppercase tracking-widest ${textColorClass}`}>Dunia Wisata</p>
             </div>
         </div>
