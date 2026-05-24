@@ -152,14 +152,14 @@ const AIPlanner: React.FC = () => {
     if (itinerary) {
         return (
             <div className="bg-gray-50">
-                <div className="relative py-16 bg-gradient-to-br from-primary via-accent to-primary overflow-hidden">
+                <div className="relative py-10 bg-gradient-to-br from-primary via-accent to-primary overflow-hidden">
                     <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
                     <div className="absolute -top-24 -right-24 w-96 h-96 bg-white/10 rounded-full blur-[120px]"></div>
                     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
                         <div className="inline-flex items-center gap-2 px-4 py-2 bg-secondary text-white rounded-full text-xs font-black uppercase tracking-widest mb-4 shadow-xl">
                             <Sparkles className="w-3.5 h-3.5" /> {t('planner_result_badge')}
                         </div>
-                        <h2 className="text-3xl md:text-4xl font-black text-white mb-2 font-display">
+                        <h2 className="text-2xl md:text-3xl font-black text-white mb-2 font-display">
                             {t('planner_result_heading')} {destination}
                         </h2>
                         <p className="text-white/80">
@@ -235,7 +235,7 @@ const AIPlanner: React.FC = () => {
     // ─── Loading View ───
     if (isLoading) {
         return (
-            <div className="bg-gray-50 py-20">
+            <div className="bg-gray-50 py-12">
                 <div className="max-w-3xl mx-auto px-4 text-center">
                     <div className="bg-white rounded-3xl shadow-2xl p-12 md:p-16 border border-gray-100">
                         <div className="relative mx-auto mb-8 w-24 h-24">
@@ -267,7 +267,7 @@ const AIPlanner: React.FC = () => {
     return (
         <div className="bg-gray-50">
             {/* Section Header */}
-            <div className="relative py-20 md:py-28 bg-gradient-to-br from-primary via-accent to-primary overflow-hidden">
+            <div className="relative py-10 md:py-14 bg-gradient-to-br from-primary via-accent to-primary overflow-hidden">
                 <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
                 <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-secondary/20 rounded-full blur-[120px]"></div>
                 <div className="absolute -top-20 -right-20 w-80 h-80 bg-white/10 rounded-full blur-[100px]"></div>
@@ -275,7 +275,7 @@ const AIPlanner: React.FC = () => {
                     <div className="inline-flex items-center gap-2 px-4 py-2 bg-secondary text-white rounded-full text-xs font-black uppercase tracking-widest mb-6 shadow-xl">
                         <Sparkles className="w-3.5 h-3.5" /> AI-Powered
                     </div>
-                    <h2 className="text-4xl md:text-5xl font-black text-white mb-4 font-display">
+                    <h2 className="text-2xl md:text-3xl font-black text-white mb-3 font-display">
                         {t('private_trip_title')}
                     </h2>
                     <p className="text-xl text-white/90 max-w-2xl mx-auto font-medium leading-relaxed">
@@ -285,7 +285,7 @@ const AIPlanner: React.FC = () => {
             </div>
 
             {/* Form Card */}
-            <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 -mt-12 relative z-20 pb-20">
+            <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-20 pb-12">
                 <div className="bg-white rounded-[2rem] shadow-2xl shadow-primary/10 border border-gray-100 p-8 md:p-12">
 
                     {/* Destination */}

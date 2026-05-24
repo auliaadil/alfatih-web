@@ -49,41 +49,41 @@ const CompanyProfile: React.FC = () => {
     <div className="bg-white">
 
       {/* Hero Header */}
-      <section className="relative py-24 md:py-32 bg-primary overflow-hidden">
+      <section className="relative py-10 md:py-14 bg-primary overflow-hidden">
         <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
         <div className="absolute -top-24 -right-24 w-96 h-96 bg-white/10 rounded-full blur-[120px]"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-secondary text-white rounded-full text-xs font-black uppercase tracking-widest mb-6 shadow-xl">
             {t('about_badge')}
           </div>
-          <h1 className="text-4xl md:text-6xl font-black text-white mb-6 font-display">{t('about_title')}</h1>
-          <p className="text-xl text-white/90 max-w-2xl mx-auto font-medium leading-relaxed">
+          <h1 className="text-3xl md:text-4xl font-black text-white mb-4 font-display">{t('about_title')}</h1>
+          <p className="text-base text-white/90 max-w-2xl mx-auto font-medium leading-relaxed">
             {t('about_desc')}
           </p>
         </div>
       </section>
 
       {/* Target PIHK 2026 Section */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-16 relative z-30 mb-24">
-        <div className="bg-white rounded-[3rem] p-8 md:p-16 shadow-2xl shadow-primary/10 border border-gray-100">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 relative z-30 mb-10">
+        <div className="bg-white rounded-3xl p-6 md:p-10 shadow-2xl shadow-primary/10 border border-gray-100">
+          <div className="grid lg:grid-cols-2 gap-8 items-center">
             <div className="relative">
-              <div className="absolute -inset-4 bg-secondary/10 rounded-[3rem] -z-10 animate-pulse"></div>
-              <div className="bg-secondary/20 p-10 rounded-[2.5rem] flex items-center justify-center">
+              <div className="absolute -inset-4 bg-secondary/10 rounded-3xl -z-10 animate-pulse"></div>
+              <div className="bg-secondary/20 p-7 rounded-2xl flex items-center justify-center">
                 <div className="text-center">
-                  <BadgeCheck className="w-24 h-24 text-secondary mx-auto mb-6" />
-                  <div className="text-5xl font-black text-secondary">2026</div>
-                  <div className="text-xs font-black text-secondary/60 uppercase tracking-widest mt-2">{t('pihk_badge')}</div>
+                  <BadgeCheck className="w-16 h-16 text-secondary mx-auto mb-3" />
+                  <div className="text-4xl font-black text-secondary">2026</div>
+                  <div className="text-xs font-black text-secondary/60 uppercase tracking-widest mt-1">{t('pihk_badge')}</div>
                 </div>
               </div>
             </div>
-            <div className="space-y-6">
-              <h2 className="text-3xl md:text-4xl font-black text-gray-900 leading-tight font-display">{t('pihk_title_1')}<span className="text-secondary">{t('pihk_title_2')}</span></h2>
-              <p className="text-gray-600 text-lg leading-relaxed" dangerouslySetInnerHTML={{ __html: t('pihk_desc_1') }} />
-              <p className="text-gray-600 leading-relaxed">
+            <div className="space-y-4">
+              <h2 className="text-2xl md:text-3xl font-black text-gray-900 leading-tight font-display">{t('pihk_title_1')}<span className="text-secondary">{t('pihk_title_2')}</span></h2>
+              <p className="text-gray-600 leading-relaxed text-sm" dangerouslySetInnerHTML={{ __html: t('pihk_desc_1') }} />
+              <p className="text-gray-600 leading-relaxed text-sm">
                 {t('pihk_desc_2')}
               </p>
-              <div className="flex items-center gap-4 pt-4">
+              <div className="flex items-center gap-4 pt-2">
                 <div className="bg-gray-50 px-6 py-4 rounded-2xl border border-gray-100">
                   <div className="text-primary font-black text-2xl">PPIU</div>
                   <div className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{t('pihk_current')}</div>
@@ -100,34 +100,34 @@ const CompanyProfile: React.FC = () => {
       </section>
 
       {/* Official Vision & Mission */}
-      <section className="py-24 bg-gray-50">
+      <section className="py-10 md:py-12 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4 font-display">{t('vision_mission_title')}</h2>
-            <div className="w-24 h-1.5 bg-secondary mx-auto rounded-full"></div>
+          <div className="text-center mb-8">
+            <h2 className="text-2xl md:text-3xl font-black text-gray-900 mb-3 font-display">{t('vision_mission_title')}</h2>
+            <div className="w-16 h-1 bg-secondary mx-auto rounded-full"></div>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-12">
+          <div className="grid lg:grid-cols-2 gap-6">
             {/* Visi */}
-            <div className="bg-white p-12 rounded-[3rem] border border-gray-100 shadow-xl relative overflow-hidden group hover:-translate-y-2 transition-transform duration-500">
+            <div className="bg-white p-7 md:p-8 rounded-2xl border border-gray-100 shadow-lg relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300">
               <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform"></div>
-              <div className="w-16 h-16 bg-primary text-white rounded-2xl flex items-center justify-center mb-8 shadow-lg shadow-primary/20">
-                <Lightbulb className="w-8 h-8" />
+              <div className="w-12 h-12 bg-primary text-white rounded-xl flex items-center justify-center mb-5 shadow-lg shadow-primary/20">
+                <Lightbulb className="w-6 h-6" />
               </div>
-              <h3 className="text-3xl font-black text-gray-900 mb-6 uppercase tracking-tight font-display">{t('vision_title')}</h3>
-              <p className="text-xl text-gray-600 leading-relaxed font-medium">
+              <h3 className="text-xl font-black text-gray-900 mb-3 uppercase tracking-tight font-display">{t('vision_title')}</h3>
+              <p className="text-gray-600 leading-relaxed text-sm">
                 {t('vision_desc')}
               </p>
             </div>
 
             {/* Misi */}
-            <div className="bg-primary text-white p-12 rounded-[3rem] shadow-xl relative overflow-hidden group hover:-translate-y-2 transition-transform duration-500">
+            <div className="bg-primary text-white p-7 md:p-8 rounded-2xl shadow-lg relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300">
               <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform"></div>
-              <div className="w-16 h-16 bg-white text-primary rounded-2xl flex items-center justify-center mb-8 shadow-lg">
-                <Compass className="w-8 h-8" />
+              <div className="w-12 h-12 bg-white text-primary rounded-xl flex items-center justify-center mb-5 shadow-lg">
+                <Compass className="w-6 h-6" />
               </div>
-              <h3 className="text-3xl font-black text-white mb-6 uppercase tracking-tight font-display">{t('mission_title')}</h3>
-              <p className="text-xl text-white/90 leading-relaxed font-medium">
+              <h3 className="text-xl font-black text-white mb-3 uppercase tracking-tight font-display">{t('mission_title')}</h3>
+              <p className="text-white/90 leading-relaxed text-sm">
                 {t('mission_desc')}
               </p>
             </div>
@@ -136,20 +136,20 @@ const CompanyProfile: React.FC = () => {
       </section>
 
       {/* Keunggulan Section */}
-      <section className="py-24 bg-white">
+      <section className="py-10 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4 uppercase tracking-tight font-display">{t('advantages_title')}</h2>
-            <p className="text-gray-500 font-medium">{t('advantages_subtitle')}</p>
+          <div className="text-center mb-8">
+            <h2 className="text-2xl md:text-3xl font-black text-gray-900 mb-2 uppercase tracking-tight font-display">{t('advantages_title')}</h2>
+            <p className="text-gray-500 text-sm">{t('advantages_subtitle')}</p>
           </div>
-          <div className="grid md:grid-cols-3 gap-10">
+          <div className="grid md:grid-cols-3 gap-5">
             {values.map((val, i) => (
-              <div key={i} className="bg-gray-50 p-10 rounded-[2.5rem] border border-gray-100 hover:bg-white hover:shadow-2xl transition-all group">
-                <div className="w-20 h-20 bg-white shadow-md rounded-2xl flex items-center justify-center mb-8 group-hover:bg-primary transition-colors">
+              <div key={i} className="bg-gray-50 p-6 md:p-7 rounded-2xl border border-gray-100 hover:bg-white hover:shadow-xl transition-all group">
+                <div className="w-14 h-14 bg-white shadow-md rounded-xl flex items-center justify-center mb-4 group-hover:bg-primary transition-colors">
                   <div className="text-primary group-hover:text-white transition-colors">{val.icon}</div>
                 </div>
-                <h4 className="text-2xl font-black text-gray-900 mb-4 font-display">{val.title}</h4>
-                <p className="text-gray-500 leading-relaxed">{val.desc}</p>
+                <h4 className="text-lg font-black text-gray-900 mb-2 font-display">{val.title}</h4>
+                <p className="text-gray-500 leading-relaxed text-sm">{val.desc}</p>
               </div>
             ))}
           </div>
@@ -157,20 +157,20 @@ const CompanyProfile: React.FC = () => {
       </section>
 
       {/* Legalitas Summary */}
-      <section className="py-24 bg-gray-900 text-white rounded-t-[5rem]">
+      <section className="py-10 bg-gray-900 text-white rounded-t-3xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 text-center">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 text-center">
             {stats.map((stat, i) => (
               <div key={i}>
-                <div className="text-secondary mb-4 flex justify-center">{stat.icon}</div>
-                <div className="text-4xl font-black mb-2">{stat.value}</div>
+                <div className="text-secondary mb-3 flex justify-center">{stat.icon}</div>
+                <div className="text-3xl font-black mb-1">{stat.value}</div>
                 <div className="text-xs font-bold text-gray-500 uppercase tracking-[0.2em]">{stat.label}</div>
               </div>
             ))}
           </div>
 
-          <div className="mt-20 pt-20 border-t border-white/5 text-center">
-            <h3 className="text-2xl font-black mb-10 font-display">Penyelenggara Perjalanan Ibadah Terpercaya</h3>
+          <div className="mt-10 pt-10 border-t border-white/5 text-center">
+            <h3 className="text-lg font-black mb-7 font-display">Penyelenggara Perjalanan Ibadah Terpercaya</h3>
             <div className="flex flex-wrap justify-center gap-8 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
               {/* Placeholders for partner logos */}
               <div className="h-12 w-32 bg-white/10 rounded flex items-center justify-center font-bold">KEMENAG</div>

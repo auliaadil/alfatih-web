@@ -68,16 +68,21 @@ const PackageDetailPage: React.FC = () => {
 
     if (loading) {
         return withLayout(
-            <div className="flex-grow flex items-center justify-center py-20 text-gray-500">
-                Memuat detail paket...
+            <div className="flex-grow flex flex-col items-center justify-center py-20 gap-3">
+                <div className="w-10 h-10 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+                <p className="text-gray-400 text-sm font-medium">Memuat detail paket...</p>
             </div>
         );
     }
 
     if (!tour) {
         return withLayout(
-            <div className="flex-grow flex items-center justify-center py-20 text-gray-500">
-                Paket tour tidak ditemukan.
+            <div className="flex-grow flex flex-col items-center justify-center py-20 gap-3 text-center px-4">
+                <p className="text-gray-900 font-bold text-lg">Paket tidak ditemukan</p>
+                <p className="text-gray-400 text-sm max-w-xs">Paket tour yang Anda cari tidak tersedia atau telah dihapus.</p>
+                <button onClick={() => window.history.back()} className="mt-2 text-primary font-bold text-sm hover:underline">
+                    ← Kembali
+                </button>
             </div>
         );
     }

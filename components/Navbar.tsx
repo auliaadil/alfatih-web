@@ -30,13 +30,13 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, onHomeClick }) => {
   return (
     <nav className="bg-white shadow-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-20">
+        <div className="flex justify-between h-14">
           <div className="flex items-center">
             <div className="flex-shrink-0 flex items-center gap-3 cursor-pointer group" onClick={handleHome}>
               <img
                 src="/assets/alfatih.webp"
                 alt="Alfatih Dunia Wisata"
-                className="h-12 w-auto object-contain transform group-hover:scale-105 transition-transform"
+                className="h-9 w-auto object-contain transform group-hover:scale-105 transition-transform"
               />
             </div>
           </div>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Clock, CheckCircle, Star, User } from 'lucide-react';
+import { Clock, CheckCircle, Star, User, Calendar } from 'lucide-react';
 import { TourPackage } from '../types';
 
 interface TourCardProps {
@@ -17,7 +17,7 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
       to={`/package/${tour.slug || tour.id}`}
       className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 border border-gray-100 flex flex-col h-full group cursor-pointer block"
     >
-      <div className="relative h-56 overflow-hidden bg-gray-100">
+      <div className="relative h-48 overflow-hidden bg-gray-100">
         {tour.image_url ? (
           <img
             src={tour.image_url}
@@ -38,28 +38,33 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
         )}
       </div>
 
-      <div className="p-6 flex-1 flex flex-col">
-        <div className="flex justify-between items-start mb-2">
-          <h3 className="text-xl font-bold text-gray-900 leading-tight group-hover:text-primary transition-colors">
+      <div className="p-4 md:p-5 flex-1 flex flex-col">
+        <div className="flex justify-between items-start mb-1.5">
+          <h3 className="text-base font-bold text-gray-900 leading-tight group-hover:text-primary transition-colors">
             {tour.title}
           </h3>
         </div>
 
-        <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
+        <div className="flex items-center gap-3 text-xs text-gray-500 mb-3 flex-wrap">
           <div className="flex items-center gap-1">
-            <Clock className="w-4 h-4" />
+            <Calendar className="w-3.5 h-3.5" />
+            <span>{tour.departure_date}</span>
+          </div>
+          <span className="text-gray-300">·</span>
+          <div className="flex items-center gap-1">
+            <Clock className="w-3.5 h-3.5" />
             <span>{tour.duration}</span>
           </div>
         </div>
 
-        <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+        <p className="text-gray-600 text-sm mb-3 line-clamp-2">
           {tour.description}
         </p>
 
-        <div className="space-y-2 mb-6">
+        <div className="space-y-1.5 mb-4">
           {tour.features.slice(0, 3).map((feature, idx) => (
             <div key={idx} className="flex items-center gap-2 text-sm text-gray-600">
-              <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
+              <CheckCircle className="w-3.5 h-3.5 text-primary flex-shrink-0" />
               <span>{feature}</span>
             </div>
           ))}

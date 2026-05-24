@@ -8,7 +8,7 @@ import CompanyProfile from '../../components/CompanyProfile';
 import Footer from '../../components/Footer';
 import { TESTIMONIALS } from '../../constants';
 import { TourCategory, TourPackage } from '../../types';
-import { Quote } from 'lucide-react';
+import { Quote, ShieldCheck, Users, Star } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useSiteSettings } from '../contexts/SiteSettingsContext';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -102,10 +102,10 @@ const Home: React.FC = () => {
     return withLayout(
         <main className="flex-grow">
             <Hero />
-            <section id="tours" className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 scroll-mt-20">
-                <div className="text-center mb-12">
-                    <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 font-display">{t('section_tours_title')}</h2>
-                    <p className="text-gray-600 max-w-2xl mx-auto">
+            <section id="tours" className="py-12 md:py-14 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 scroll-mt-14">
+                <div className="text-center mb-7">
+                    <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2 font-display">{t('section_tours_title')}</h2>
+                    <p className="text-gray-600 max-w-2xl mx-auto text-sm">
                         {t('section_tours_subtitle')}
                     </p>
                 </div>
@@ -167,52 +167,52 @@ const Home: React.FC = () => {
                     )}
                 </div>
             </section>
-            <section id="private-trip" className="scroll-mt-20">
+            <section id="private-trip" className="scroll-mt-14">
                 <AIPlanner />
             </section>
-            <section id="about" className="scroll-mt-20">
+            <section id="about" className="scroll-mt-14">
                 <CompanyProfile />
             </section>
-            <section className="py-20 bg-white">
+            <section className="py-10 md:py-12 bg-white">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
                         <div>
                             <img
                                 src="https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&q=80&w=800"
                                 alt="Happy travelers"
-                                className="rounded-2xl shadow-2xl"
+                                className="rounded-2xl shadow-lg"
                             />
                         </div>
                         <div>
-                            <h2 className="text-3xl font-bold text-gray-900 mb-6 font-display">
+                            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-5 font-display">
                                 {t('why_choose_title')}
                             </h2>
-                            <div className="space-y-8">
+                            <div className="space-y-5">
                                 <div className="flex gap-4">
-                                    <div className="flex-shrink-0 w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-                                        <span className="text-2xl">🕌</span>
+                                    <div className="flex-shrink-0 w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+                                        <Star className="w-5 h-5 text-primary" />
                                     </div>
                                     <div>
-                                        <h3 className="text-xl font-bold text-gray-900 mb-2">{t('why_choose_1_title')}</h3>
-                                        <p className="text-gray-600">{t('why_choose_1_desc')}</p>
+                                        <h3 className="text-base font-bold text-gray-900 mb-1">{t('why_choose_1_title')}</h3>
+                                        <p className="text-gray-600 text-sm">{t('why_choose_1_desc')}</p>
                                     </div>
                                 </div>
                                 <div className="flex gap-4">
-                                    <div className="flex-shrink-0 w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-                                        <span className="text-2xl">🤝</span>
+                                    <div className="flex-shrink-0 w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+                                        <Users className="w-5 h-5 text-primary" />
                                     </div>
                                     <div>
-                                        <h3 className="text-xl font-bold text-gray-900 mb-2">{t('why_choose_2_title')}</h3>
-                                        <p className="text-gray-600">{t('why_choose_2_desc')}</p>
+                                        <h3 className="text-base font-bold text-gray-900 mb-1">{t('why_choose_2_title')}</h3>
+                                        <p className="text-gray-600 text-sm">{t('why_choose_2_desc')}</p>
                                     </div>
                                 </div>
                                 <div className="flex gap-4">
-                                    <div className="flex-shrink-0 w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-                                        <span className="text-2xl">🛡️</span>
+                                    <div className="flex-shrink-0 w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+                                        <ShieldCheck className="w-5 h-5 text-primary" />
                                     </div>
                                     <div>
-                                        <h3 className="text-xl font-bold text-gray-900 mb-2">{t('why_choose_3_title')}</h3>
-                                        <p className="text-gray-600">{t('why_choose_3_desc')}</p>
+                                        <h3 className="text-base font-bold text-gray-900 mb-1">{t('why_choose_3_title')}</h3>
+                                        <p className="text-gray-600 text-sm">{t('why_choose_3_desc')}</p>
                                     </div>
                                 </div>
                             </div>
@@ -220,20 +220,20 @@ const Home: React.FC = () => {
                     </div>
                 </div>
             </section>
-            <section className="py-20 bg-gray-50">
+            <section className="py-10 md:py-12 bg-gray-50">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-12">
-                        <h2 className="text-3xl font-bold text-gray-900 font-display">{t('testimonials_title')}</h2>
+                    <div className="text-center mb-7">
+                        <h2 className="text-2xl md:text-3xl font-bold text-gray-900 font-display">{t('testimonials_title')}</h2>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                         {TESTIMONIALS.map((t) => (
-                            <div key={t.id} className="bg-white p-8 rounded-xl shadow-md relative">
-                                <Quote className="absolute top-6 right-6 w-8 h-8 text-gray-100 fill-gray-100" />
-                                <p className="text-gray-600 mb-6 relative z-10 italic">"{t.comment}"</p>
-                                <div className="flex items-center gap-4">
-                                    <img src={t.avatar} alt={t.name} className="w-12 h-12 rounded-full object-cover" />
+                            <div key={t.id} className="bg-white p-5 md:p-6 rounded-xl shadow-sm border border-gray-100 relative">
+                                <Quote className="absolute top-5 right-5 w-6 h-6 text-gray-100 fill-gray-100" />
+                                <p className="text-gray-600 text-sm mb-4 relative z-10 italic">"{t.comment}"</p>
+                                <div className="flex items-center gap-3">
+                                    <img src={t.avatar} alt={t.name} className="w-10 h-10 rounded-full object-cover" />
                                     <div>
-                                        <h4 className="font-bold text-gray-900">{t.name}</h4>
+                                        <h4 className="font-bold text-gray-900 text-sm">{t.name}</h4>
                                         <span className="text-xs text-primary font-medium">{t.role}</span>
                                     </div>
                                 </div>
@@ -242,22 +242,22 @@ const Home: React.FC = () => {
                     </div>
                 </div>
             </section>
-            <section id="contact" className="py-20 bg-primary scroll-mt-20">
+            <section id="contact" className="py-12 md:py-14 bg-primary scroll-mt-14">
                 <div className="max-w-4xl mx-auto px-4 text-center">
-                    <h2 className="text-3xl md:text-4xl font-bold text-white mb-6 font-display">
+                    <h2 className="text-2xl md:text-3xl font-bold text-white mb-4 font-display">
                         {t('ready_title')}
                     </h2>
-                    <p className="text-emerald-100 text-lg mb-8 max-w-2xl mx-auto">
+                    <p className="text-emerald-100 mb-6 max-w-2xl mx-auto text-sm">
                         {t('ready_subtitle')}
                     </p>
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
                         <button
                             onClick={() => window.open(`https://wa.me/${settings.whatsapp}`, '_blank')}
-                            className="bg-white text-primary hover:bg-gray-100 font-bold py-4 px-8 rounded-full shadow-lg transition-transform hover:-translate-y-1"
+                            className="bg-white text-primary hover:bg-gray-100 font-bold py-3 px-7 rounded-full shadow-lg transition-transform hover:-translate-y-1 text-sm"
                         >
                             {t('ready_wa')}
                         </button>
-                        <button className="bg-transparent border-2 border-white text-white hover:bg-white/10 font-bold py-4 px-8 rounded-full transition-all">
+                        <button className="bg-transparent border-2 border-white text-white hover:bg-white/10 font-bold py-3 px-7 rounded-full transition-all text-sm">
                             {t('ready_brochure')}
                         </button>
                     </div>
