@@ -22,7 +22,7 @@ export const generateItinerary = async (input: AIPlannerInput): Promise<string> 
     })
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
     const data = await res.json()
-    return data.itinerary ?? 'Mohon maaf, saya tidak dapat membuat itinerary saat ini. Silakan coba lagi.'
+    return data.itinerary || 'Mohon maaf, saya tidak dapat membuat itinerary saat ini. Silakan coba lagi.'
   } catch (error) {
     console.error('itineraryService error:', error)
     return 'Maaf, sistem AI kami sedang mengalami kendala. Silakan coba lagi beberapa saat lagi.'

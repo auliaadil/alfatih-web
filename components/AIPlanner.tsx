@@ -6,7 +6,7 @@ import { AIPlannerInput } from '../types';
 import { INTERESTS_LIST, DESTINATION_OPTIONS, CONTACT_INFO } from '../constants';
 import { supabase } from '../src/lib/supabase';
 import { useLanguage } from '../src/contexts/LanguageContext';
-import { useRecaptcha } from '../src/hooks/useRecaptcha';
+
 
 interface TravelerOption {
     value: string;
@@ -21,11 +21,8 @@ const DEFAULT_TRAVELER_OPTIONS: TravelerOption[] = [
     { value: 'Rombongan', label: 'Rombongan', icon: '👥' },
 ];
 
-const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY || '';
-
 const AIPlanner: React.FC = () => {
     const { t } = useLanguage();
-    const { executeRecaptcha } = useRecaptcha(RECAPTCHA_SITE_KEY);
 
     const [destination, setDestination] = useState('');
     const [days, setDays] = useState(5);
@@ -82,15 +79,6 @@ const AIPlanner: React.FC = () => {
 
     const handleGenerate = async () => {
         if (!destination.trim() || interests.length === 0) return;
-
-        // reCAPTCHA check
-        if (RECAPTCHA_SITE_KEY) {
-            const token = await executeRecaptcha('generate_itinerary');
-            if (!token) {
-                alert('CAPTCHA verification failed. Please try again.');
-                return;
-            }
-        }
 
         // Save pre-contact if filled
         if (preContact.name || preContact.phone || preContact.email) {
