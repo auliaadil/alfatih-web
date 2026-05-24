@@ -11,11 +11,20 @@ Deno.serve(async (req) => {
   try {
     const { recaptchaToken, destination, days, travelers, interests } = await req.json()
 
+    const recaptchaSecret = Deno.env.get('RECAPTCHA_SECRET_KEY')
+    if (!recaptchaSecret) {
+      console.error('RECAPTCHA_SECRET_KEY is not set')
+      return new Response(
+        JSON.stringify({ error: 'Server misconfiguration' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
     const recaptchaRes = await fetch('https://www.google.com/recaptcha/api/siteverify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({
-        secret: Deno.env.get('RECAPTCHA_SECRET_KEY') ?? '',
+        secret: recaptchaSecret,
         response: recaptchaToken ?? '',
       }),
     })
@@ -65,6 +74,10 @@ Make it feel personalized and luxurious, but clearly state it's a draft referenc
       }
     )
 
+    if (!geminiRes.ok) {
+      const errText = await geminiRes.text()
+      throw new Error(`Gemini API error ${geminiRes.status}: ${errText}`)
+    }
     const geminiData = await geminiRes.json()
     const itinerary = geminiData.candidates?.[0]?.content?.parts?.[0]?.text ?? ''
 
