@@ -1,27 +1,24 @@
-import { supabase } from '@/src/lib/supabase'
-import { TourPackage } from '../types'
+import { supabase } from '@/src/lib/supabase';
+import { TemplateCategory, FieldValues } from '@/src/components/admin/PosterMaker/types';
+import { TourPackage } from '../types';
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 
-export type TemplateType = 'conversion' | 'aspiration' | 'edu-reminder' | 'social-proof' | 'blank'
+export type TemplateType = TemplateCategory;
 
-export interface TemplateInputs {
-  templateType: TemplateType
-  package?: TourPackage
-  topic?: string
-  tagline?: string
-  testimonial?: { quote: string; name: string; batch: string }
+export interface AutofillInputs {
+  templateType: TemplateType;
+  fieldValues: FieldValues;
+  package?: TourPackage;
+  topic?: string;
+  tagline?: string;
+  testimonial?: { quote: string; name: string; batch: string };
 }
 
-export const applyTemplateContent = async (
-  inputs: TemplateInputs,
-  textNodes: { id: string; text: string }[]
-): Promise<{ id: string; text: string }[]> => {
-  if (textNodes.length === 0 || inputs.templateType === 'blank') return textNodes
-
+export const applyAutofill = async (inputs: AutofillInputs): Promise<FieldValues> => {
   try {
-    const { data: { session } } = await supabase.auth.getSession()
-    if (!session) return textNodes
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return inputs.fieldValues;
 
     const res = await fetch(`${SUPABASE_URL}/functions/v1/ai-poster-autofill`, {
       method: 'POST',
@@ -29,19 +26,14 @@ export const applyTemplateContent = async (
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${session.access_token}`,
       },
-      body: JSON.stringify({ ...inputs, textNodes }),
-    })
+      body: JSON.stringify(inputs),
+    });
 
-    if (!res.ok) return textNodes
-    return await res.json()
+    if (!res.ok) return inputs.fieldValues;
+    const json = await res.json();
+    return json.fieldValues ?? inputs.fieldValues;
   } catch (err) {
-    console.error('posterAutofillService error:', err)
-    return textNodes
+    console.error('posterAutofillService error:', err);
+    return inputs.fieldValues;
   }
-}
-
-export const generateTemplateAutofill = async (
-  tour: TourPackage,
-  textNodes: { id: string; text: string }[]
-): Promise<{ id: string; text: string }[]> =>
-  applyTemplateContent({ templateType: 'conversion', package: tour }, textNodes)
+};

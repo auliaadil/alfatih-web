@@ -11,14 +11,10 @@ const formatPrice = (price?: number) =>
     : 'Hubungi Kami'
 
 Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
-  }
+  if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
 
   const authHeader = req.headers.get('Authorization')
-  if (!authHeader) {
-    return new Response('Unauthorized', { status: 401, headers: corsHeaders })
-  }
+  if (!authHeader) return new Response('Unauthorized', { status: 401, headers: corsHeaders })
 
   const supabaseAdmin = createClient(
     Deno.env.get('SUPABASE_URL')!,
@@ -26,15 +22,13 @@ Deno.serve(async (req) => {
   )
   const token = authHeader.replace('Bearer ', '')
   const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token)
-  if (authError || !user) {
-    return new Response('Unauthorized', { status: 401, headers: corsHeaders })
-  }
+  if (authError || !user) return new Response('Unauthorized', { status: 401, headers: corsHeaders })
 
   try {
-    const { templateType, package: pkg, topic, tagline, testimonial, textNodes } = await req.json()
+    const { templateType, fieldValues, package: pkg, topic, tagline, testimonial } = await req.json()
 
-    if (!textNodes || textNodes.length === 0 || templateType === 'blank') {
-      return new Response(JSON.stringify(textNodes ?? []), {
+    if (!fieldValues || templateType === 'blank') {
+      return new Response(JSON.stringify({ fieldValues: fieldValues ?? {} }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
     }
@@ -44,68 +38,39 @@ Deno.serve(async (req) => {
 
     switch (templateType) {
       case 'conversion': {
-        if (!pkg) {
-          return new Response(JSON.stringify(textNodes), {
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          })
-        }
+        if (!pkg) return new Response(JSON.stringify({ fieldValues }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
         const startingPrice = formatPrice(pkg.room_options?.[0]?.price)
-        const tiers = (pkg.room_options || [])
-          .slice(0, 3)
-          .map((r: { name: string; price?: number }) => `${r.name}: ${formatPrice(r.price)}`)
-          .join(' | ')
+        const tiers = (pkg.room_options || []).slice(0, 3).map((r: { name: string; price?: number }) => `${r.name}: ${formatPrice(r.price)}`).join(' | ')
         const features = (pkg.features || []).slice(0, 6).join(', ')
-        contextBlock = `
-Nama Paket: ${pkg.title}
-Tanggal Keberangkatan: ${pkg.departure_date}
-Durasi: ${pkg.duration}
-Kategori: ${pkg.category}
-Harga Mulai: ${startingPrice} per pax
-Tipe Kamar: ${tiers}
-Keunggulan: ${features}
-Deskripsi: ${(pkg.description || '').substring(0, 200)}`
-        instructionBlock = `
-- Ganti headline utama dengan nama paket dan kata kunci unggulan.
-- Ganti tanggal, durasi, harga dengan data aktual dari paket.
-- Ganti baris benefit/keunggulan dengan fitur aktual dari paket (maks 10 kata per baris).
-- Ganti teks kategori/label dengan nama kategori paket.
-- Pertahankan teks singkat seperti label tombol (Daftar Sekarang, Hubungi Kami), social handle, nama brand, dan nomor lisensi PPIU.`
+        contextBlock = `Nama Paket: ${pkg.title}\nTanggal: ${pkg.departure_date}\nDurasi: ${pkg.duration}\nKategori: ${pkg.category}\nHarga Mulai: ${startingPrice}\nTipe Kamar: ${tiers}\nKeunggulan: ${features}\nDeskripsi: ${(pkg.description || '').substring(0, 200)}`
+        instructionBlock = `- Isi "headline" dengan nama paket yang menarik.\n- Isi "badge_text" dengan kategori paket (maks 3 kata).\n- Isi "departure" dengan tanggal keberangkatan.\n- Isi "duration" dengan durasi perjalanan.\n- Isi "price" dengan harga mulai aktual.\n- Isi "feature_1" s/d "feature_4" dengan keunggulan utama paket (maks 5 kata per item).\n- Jangan ubah field yang tidak terdaftar.`
         break
       }
       case 'edu-reminder': {
         contextBlock = `Topik: ${topic || 'Tips Umroh'}`
-        instructionBlock = `
-- Ganti headline poster dengan judul daftar yang menarik dan sesuai topik (contoh: "5 Barang Wajib Dibawa Saat Umroh").
-- Ganti sub-headline dengan kalimat pengantar singkat.
-- Ganti setiap judul item daftar bernomor dengan tips/langkah yang relevan dengan topik (maks 6 kata).
-- Ganti setiap deskripsi item dengan penjelasan singkat (maks 12 kata).
-- Jangan ubah social handle, nama brand, dan tombol.`
+        instructionBlock = `- Isi "headline" dengan judul daftar yang menarik (contoh: "5 Barang Wajib Dibawa Saat Umroh").\n- Isi "intro" dengan kalimat pengantar singkat.\n- Isi "item_1_title" s/d "item_5_title" dengan tips/langkah yang relevan (maks 6 kata).\n- Isi "item_1_desc" s/d "item_5_desc" dengan penjelasan singkat (maks 12 kata).`
         break
       }
       case 'aspiration': {
-        contextBlock = `Tagline kustom: ${tagline?.trim() || '(generate tagline spiritual yang menginspirasi)'}`
-        instructionBlock = `
-- Ganti teks tagline/kutipan utama dengan tagline spiritual yang menginspirasi (boleh menggunakan kata dari konteks, atau generate sendiri jika kosong).
-- Ganti sub-tagline dengan kalimat undangan yang hangat dan profesional.
-- Pertahankan nama brand, social handle, badge, dan teks pillar seperti "Islami", "Amanah", "Premium".`
+        contextBlock = `Tagline kustom: ${tagline?.trim() || '(generate tagline spiritual menginspirasi)'}`
+        instructionBlock = `- Isi "tagline" dengan tagline spiritual yang menginspirasi.\n- Isi "sub_tagline" dengan kalimat undangan hangat dan profesional.`
         break
       }
       case 'social-proof': {
         const hasData = testimonial && (testimonial.quote || testimonial.name || testimonial.batch)
         contextBlock = hasData
           ? `Kutipan: "${testimonial.quote}"\nNama: ${testimonial.name}\nRombongan: ${testimonial.batch}`
-          : '(AI akan membuat testimoni jamaah Umroh yang realistis dan positif)'
-        instructionBlock = `
-- Ganti teks kutipan testimoni dengan kutipan yang diberikan (atau generate jika kosong). Pertahankan gaya italic dan panjang yang mirip.
-- Ganti nama jamaah dan info rombongan dengan data yang diberikan (atau generate jika kosong).
-- Pertahankan statistik (1000+ Jamaah, 12 Thn, ★5.0), nama brand, social handle, dan tombol.`
+          : '(AI buat testimoni jamaah Umroh yang realistis dan positif)'
+        instructionBlock = `- Isi "quote" dengan kutipan testimoni (atau generate jika tidak ada data).\n- Isi "author_name" dengan nama jamaah.\n- Isi "batch" dengan info rombongan.\n- Pertahankan "stat_1", "stat_2", "rating" jika sudah ada nilainya.`
         break
       }
       default:
-        return new Response(JSON.stringify(textNodes), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        })
+        return new Response(JSON.stringify({ fieldValues }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     }
+
+    const currentValues = Object.entries(fieldValues as Record<string, string>)
+      .map(([k, v]) => `  "${k}": "${v}"`)
+      .join('\n')
 
     const prompt = `
 Kamu adalah copywriter profesional Alfatih Dunia Wisata — travel agent premium Indonesia untuk Umroh dan wisata Halal.
@@ -115,66 +80,50 @@ Tipe Template: ${templateType}
 Data Konten:
 ${contextBlock}
 
-Text node yang ada di poster saat ini (field teks yang bisa diedit di kanvas):
-${JSON.stringify(textNodes, null, 2)}
+Nilai field poster saat ini:
+{
+${currentValues}
+}
 
-Instruksi penggantian:
+Instruksi:
 ${instructionBlock}
 
 ATURAN WAJIB:
-1. Hanya ubah nilai "text" setiap node — "id" TIDAK boleh diubah.
+1. Kembalikan HANYA objek JSON dengan field yang diubah — key sama persis seperti di atas.
 2. Panjang teks baru harus mirip dengan aslinya agar tata letak poster tidak rusak.
-3. JANGAN ubah: "Alfatih Dunia Wisata", "@alfatih.umroh", "adwisata.com", nomor PPIU, label tombol singkat, dan teks brand statis.
+3. JANGAN ubah: "Alfatih Dunia Wisata", "@alfatih.umroh", "adwisata.com", nomor PPIU.
 4. Gunakan Bahasa Indonesia untuk semua konten kecuali teks yang memang aslinya berbahasa Inggris.
-5. Kembalikan HANYA array JSON yang valid — tanpa markdown, tanpa penjelasan.
-
-Format respons:
-[{ "id": "...", "text": "..." }, ...]`
+5. Kembalikan format: { "fieldValues": { "key": "value", ... } } — tanpa markdown, tanpa penjelasan.`
 
     const model = Deno.env.get('GEMINI_MODEL') ?? 'gemini-2.5-flash-preview-05-20'
     const apiKey = Deno.env.get('GEMINI_API_KEY')
-    if (!apiKey) {
-      console.error('GEMINI_API_KEY is not set')
-      return new Response(
-        JSON.stringify({ error: 'Server misconfiguration' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
-    }
+    if (!apiKey) return new Response(JSON.stringify({ error: 'Server misconfiguration' }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
 
     const geminiRes = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
-      }
+      { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }) }
     )
 
-    if (!geminiRes.ok) {
-      const errText = await geminiRes.text()
-      throw new Error(`Gemini API error ${geminiRes.status}: ${errText}`)
-    }
+    if (!geminiRes.ok) throw new Error(`Gemini API error ${geminiRes.status}`)
 
     const geminiData = await geminiRes.json()
-    const raw = geminiData.candidates?.[0]?.content?.parts?.[0]?.text ?? '[]'
+    const raw = geminiData.candidates?.[0]?.content?.parts?.[0]?.text ?? '{}'
     const cleaned = raw.replace(/```json/gi, '').replace(/```/gi, '').trim()
 
-    let parsed: unknown
+    let parsed: { fieldValues?: Record<string, string> }
     try {
       parsed = JSON.parse(cleaned)
     } catch {
-      console.error('Gemini returned non-JSON:', cleaned.slice(0, 200))
       throw new Error('Gemini returned invalid JSON')
     }
 
-    return new Response(JSON.stringify(parsed), {
+    const merged = { ...fieldValues, ...(parsed.fieldValues ?? {}) }
+
+    return new Response(JSON.stringify({ fieldValues: merged }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
   } catch (err) {
     console.error('ai-poster-autofill error:', err)
-    return new Response(
-      JSON.stringify({ error: 'Internal server error' }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    )
+    return new Response(JSON.stringify({ error: 'Internal server error' }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
   }
 })
