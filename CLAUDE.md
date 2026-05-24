@@ -18,14 +18,17 @@ Create `.env.local` with:
 ```
 VITE_SUPABASE_URL=
 VITE_SUPABASE_API_KEY=
-VITE_GEMINI_API_KEY=
-GEMINI_API_KEY=
 VITE_RECAPTCHA_SITE_KEY=
 VITE_UNSPLASH_ACCESS_KEY=   # Unsplash Client-ID for image search in Poster Maker (50 req/hr free)
 VITE_PIXABAY_API_KEY=       # Pixabay API key for image search in Poster Maker (100 req/min free)
 ```
 
-Note: Gemini key is exposed to client-side as `process.env.API_KEY` via Vite's `define` plugin in `vite.config.ts`. The `@` alias resolves to the project root.
+AI API keys are managed as Supabase secrets (not in `.env.local`):
+- `GEMINI_API_KEY` — Gemini API key
+- `GEMINI_MODEL` — model name (e.g. `gemini-2.5-flash-preview-05-20`), swappable without redeployment
+- `RECAPTCHA_SECRET_KEY` — Google reCAPTCHA secret for server-side verification
+
+Set via: `supabase secrets set GEMINI_API_KEY=<value> GEMINI_MODEL=<value> RECAPTCHA_SECRET_KEY=<value>`
 
 ## Architecture
 
@@ -34,6 +37,8 @@ Note: Gemini key is exposed to client-side as `process.env.API_KEY` via Vite's `
 - `index.html` — Loads Tailwind CSS via CDN script tag (intentional, not PostCSS). Custom theme colors (`primary`, `secondary`, `accent`, `dark`) are defined here in the Tailwind config inline script.
 - `App.tsx` — Root router. Two areas: public (`/`, `/package/:slug`) and admin (`/admin/*` protected by `AuthGuard`).
 - `index.tsx` — React DOM entry.
+
+Note: The `@` alias resolves to the project root.
 
 ### Two Parallel Component Trees
 
@@ -47,8 +52,8 @@ The project has a **split structure**: root-level `components/` holds public-fac
 ### Data Layer
 
 - `src/lib/supabase.ts` — Single Supabase client (uses `VITE_SUPABASE_API_KEY`, not `VITE_SUPABASE_ANON_KEY`)
-- `services/geminiService.ts` — Gemini AI calls for itinerary generation (reads `process.env.API_KEY`)
-- `services/posterAI.ts` — Gemini AI calls for AI Magic Auto-Fill in the Poster Maker
+- `services/itineraryService.ts` — Thin fetch wrapper that calls the `ai-itinerary` Supabase Edge Function for itinerary generation
+- `services/posterAutofillService.ts` — Thin fetch wrapper that calls the `ai-poster-autofill` Supabase Edge Function for AI Magic Auto-Fill in the Poster Maker
 - `constants.ts` (root) — Static testimonials and interest lists
 - `types.ts` (root) — Shared TypeScript types: `TourPackage`, `TourCategory`, `AIPlannerInput`, `Testimonial`
 - `src/types/poster.ts` — Poster-specific types: `AspectRatio`, `LayoutType`, `TemplateConfig`
@@ -71,7 +76,7 @@ Built on Fabric.js v7. The canvas editor (`FabricCanvas.tsx`) manages a `fabric.
 ## Key Conventions
 
 - Tailwind stays CDN-based — do not migrate to PostCSS unless explicitly instructed.
-- Gemini model used: `gemini-2.5-flash-preview-05-20` (check `geminiService.ts` for current model name).
+- Gemini model used: `gemini-2.5-flash-preview-05-20` (configured via `GEMINI_MODEL` Supabase secret; swappable without redeployment).
 - All content and AI-generated itineraries must be in Bahasa Indonesia and maintain Halal/Islamic tone.
 - TypeScript strict mode — avoid `any`; update `types.ts` when adding new data shapes.
 - New admin pages go in `src/pages/admin/`, new admin components in `src/components/admin/`.
