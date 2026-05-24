@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Pencil, Trash2, LayoutTemplate, Loader2, Lock } from 'lucide-react';
+import { Plus, Pencil, Trash2, LayoutTemplate, Loader2 } from 'lucide-react';
 import { SavedTemplate, fetchTemplates, deleteTemplate } from '../../services/posterTemplates';
-import { STARTER_TEMPLATES, PosterTemplate, TemplateThumbnail } from '../../components/admin/PosterMaker/TemplatePanel';
+import { PosterTemplate } from '../../components/admin/PosterMaker/types';
+import { CODE_TEMPLATES } from '../../components/admin/PosterMaker/templates';
 
 const TYPE_LABELS: Record<string, string> = {
     conversion: 'Conversion',
@@ -22,14 +23,6 @@ const TYPE_COLORS: Record<string, string> = {
     custom: 'bg-orange-100 text-orange-700',
 };
 
-const getStarterType = (id: string): string => {
-    if (id.includes('conversion')) return 'conversion';
-    if (id.includes('aspiration')) return 'aspiration';
-    if (id.includes('edu-reminder')) return 'edu-reminder';
-    if (id.includes('social-proof')) return 'social-proof';
-    return 'blank';
-};
-
 type FilterTab = 'all' | 'post' | 'story';
 
 const PosterTemplates: React.FC = () => {
@@ -38,13 +31,6 @@ const PosterTemplates: React.FC = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [deletingId, setDeletingId] = useState<string | null>(null);
     const [filter, setFilter] = useState<FilterTab>('all');
-
-    // Map starter_id → override for quick lookup
-    const starterOverrides = React.useMemo(() => {
-        const map = new Map<string, SavedTemplate>();
-        customTemplates.forEach(t => { if (t.starter_id) map.set(t.starter_id, t); });
-        return map;
-    }, [customTemplates]);
 
     useEffect(() => {
         loadTemplates();
@@ -64,31 +50,18 @@ const PosterTemplates: React.FC = () => {
         setDeletingId(null);
     };
 
-    const handleEditCustom = (template: SavedTemplate) => {
-        navigate('/admin/poster-maker', {
-            state: { templateId: template.id, templateName: template.name },
-        });
-    };
-
-    const handleUseStarter = (template: PosterTemplate) => {
-        navigate('/admin/poster-maker', {
-            state: { starterId: template.id },
-        });
-    };
-
-    const filteredStarters = filter === 'all'
-        ? STARTER_TEMPLATES
-        : STARTER_TEMPLATES.filter(t => t.aspectRatio === filter);
+    const filteredBuiltIn = filter === 'all'
+        ? CODE_TEMPLATES
+        : CODE_TEMPLATES.filter(t => t.aspectRatio === filter);
 
     const filteredCustom = filter === 'all'
         ? customTemplates
         : customTemplates.filter(t => t.aspect_ratio === filter);
 
-    const totalCount = filteredStarters.length + filteredCustom.length;
+    const totalCount = filteredBuiltIn.length + filteredCustom.length;
 
     return (
         <div className="space-y-6">
-            {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900">Template Manager</h1>
@@ -105,7 +78,6 @@ const PosterTemplates: React.FC = () => {
                 </button>
             </div>
 
-            {/* Filter tabs */}
             <div className="flex items-center gap-2">
                 {(['all', 'post', 'story'] as FilterTab[]).map(tab => (
                     <button
@@ -131,28 +103,20 @@ const PosterTemplates: React.FC = () => {
                 </div>
             ) : (
                 <div className="space-y-8">
-                    {/* ── Built-in Templates ───────────────────────────────── */}
-                    {filteredStarters.length > 0 && (
+                    {filteredBuiltIn.length > 0 && (
                         <section>
                             <div className="flex items-center gap-2 mb-3">
-                                <Lock className="w-3.5 h-3.5 text-gray-400" />
                                 <h2 className="text-sm font-bold text-gray-500 uppercase tracking-wider">Built-in</h2>
-                                <span className="text-xs text-gray-300">{filteredStarters.length} template</span>
+                                <span className="text-xs text-gray-300">{filteredBuiltIn.length} template</span>
                             </div>
                             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                                {filteredStarters.map(t => (
-                                    <StarterCard
-                                        key={t.id}
-                                        template={t}
-                                        override={starterOverrides.get(t.id)}
-                                        onUse={() => handleUseStarter(t)}
-                                    />
+                                {filteredBuiltIn.map(t => (
+                                    <BuiltInCard key={t.id} template={t} onUse={() => navigate('/admin/poster-maker')} />
                                 ))}
                             </div>
                         </section>
                     )}
 
-                    {/* ── Custom Templates ─────────────────────────────────── */}
                     <section>
                         <div className="flex items-center gap-2 mb-3">
                             <h2 className="text-sm font-bold text-gray-500 uppercase tracking-wider">Custom</h2>
@@ -163,7 +127,7 @@ const PosterTemplates: React.FC = () => {
                                 <LayoutTemplate className="w-10 h-10 text-gray-200 mb-3" />
                                 <p className="text-sm text-gray-500 font-medium">Belum ada template custom</p>
                                 <p className="text-xs text-gray-400 mt-1 text-center max-w-xs">
-                                    Buat poster di Poster Maker, lalu klik "Simpan Template".
+                                    Buat template baru di Poster Maker dengan block builder.
                                 </p>
                                 <button
                                     onClick={() => navigate('/admin/poster-maker')}
@@ -179,7 +143,6 @@ const PosterTemplates: React.FC = () => {
                                         key={t.id}
                                         template={t}
                                         isDeleting={deletingId === t.id}
-                                        onEdit={() => handleEditCustom(t)}
                                         onDelete={() => handleDelete(t.id, t.name)}
                                     />
                                 ))}
@@ -192,71 +155,46 @@ const PosterTemplates: React.FC = () => {
     );
 };
 
-// ── Built-in template card (read-only) ───────────────────────────────────────
-interface StarterCardProps {
+interface BuiltInCardProps {
     template: PosterTemplate;
-    override?: SavedTemplate;
     onUse: () => void;
 }
 
-const StarterCard: React.FC<StarterCardProps> = ({ template: t, override, onUse }) => {
-    const type = getStarterType(t.id);
-    return (
-        <div className={`bg-white rounded-xl border shadow-sm overflow-hidden hover:shadow-md transition-shadow relative ${override ? 'border-primary/40' : 'border-gray-200'}`}>
-            {override && (
-                <span className="absolute top-2 right-2 z-10 text-[9px] font-bold bg-primary text-white px-1.5 py-0.5 rounded-full leading-none">
-                    Modified
+const BuiltInCard: React.FC<BuiltInCardProps> = ({ template: t, onUse }) => (
+    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+        <div className="p-2">
+            <div
+                className={`w-full rounded overflow-hidden ${t.aspectRatio === 'story' ? 'aspect-[9/16]' : 'aspect-[4/5]'}`}
+                style={{ background: `linear-gradient(135deg, ${t.previewColors[0]}, ${t.previewColors[1]})` }}
+            />
+        </div>
+        <div className="px-3 pb-2">
+            <p className="text-sm font-semibold text-gray-800 leading-tight line-clamp-1">{t.name}</p>
+            <p className="text-xs text-gray-400 mt-0.5 line-clamp-1">{t.description}</p>
+            <div className="flex flex-wrap items-center gap-1.5 mt-2">
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${TYPE_COLORS[t.category] ?? TYPE_COLORS.custom}`}>
+                    {TYPE_LABELS[t.category] ?? t.category}
                 </span>
-            )}
-            <div className="p-2">
-                {override?.thumbnail_data_url ? (
-                    <div className={`w-full overflow-hidden rounded ${t.aspectRatio === 'story' ? 'aspect-[9/16]' : 'aspect-[4/5]'} bg-gray-100 border border-gray-200`}>
-                        <img src={override.thumbnail_data_url} alt={t.name} className="w-full h-full object-cover" />
-                    </div>
-                ) : (
-                    <TemplateThumbnail t={t} />
-                )}
-            </div>
-            <div className="px-3 pb-2">
-                <p className="text-sm font-semibold text-gray-800 leading-tight line-clamp-1">{t.name}</p>
-                <p className="text-xs text-gray-400 mt-0.5 line-clamp-1">
-                    {override ? override.name : t.description}
-                </p>
-                <div className="flex flex-wrap items-center gap-1.5 mt-2">
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${TYPE_COLORS[type] ?? TYPE_COLORS.custom}`}>
-                        {TYPE_LABELS[type] ?? type}
-                    </span>
-                    <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">
-                        {t.aspectRatio === 'post' ? '4:5' : '9:16'}
-                    </span>
-                </div>
-            </div>
-            <div className="border-t border-gray-100">
-                <button
-                    onClick={onUse}
-                    className="w-full py-2 text-xs font-semibold text-primary hover:bg-blue-50 transition flex items-center justify-center gap-1.5"
-                >
-                    {override ? 'Edit →' : 'Gunakan →'}
-                </button>
+                <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">
+                    {t.aspectRatio === 'post' ? '4:5' : '9:16'}
+                </span>
             </div>
         </div>
-    );
-};
+        <div className="border-t border-gray-100">
+            <button onClick={onUse} className="w-full py-2 text-xs font-semibold text-primary hover:bg-blue-50 transition">
+                Gunakan →
+            </button>
+        </div>
+    </div>
+);
 
-// ── Custom template card (editable) ─────────────────────────────────────────
 interface CustomCardProps {
     template: SavedTemplate;
     isDeleting: boolean;
-    onEdit: () => void;
     onDelete: () => void;
 }
 
-const CustomCard: React.FC<CustomCardProps> = ({ template: t, isDeleting, onEdit, onDelete }) => {
-    const starterName = t.starter_id
-        ? STARTER_TEMPLATES.find(s => s.id === t.starter_id)?.name
-        : null;
-
-    return (
+const CustomCard: React.FC<CustomCardProps> = ({ template: t, isDeleting, onDelete }) => (
     <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
         <div className={`w-full bg-gray-100 overflow-hidden ${t.aspect_ratio === 'story' ? 'aspect-[9/16]' : 'aspect-[4/5]'}`}>
             {t.thumbnail_data_url ? (
@@ -279,11 +217,6 @@ const CustomCard: React.FC<CustomCardProps> = ({ template: t, isDeleting, onEdit
                 <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">
                     {t.aspect_ratio === 'post' ? '4:5' : '9:16'}
                 </span>
-                {starterName && (
-                    <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded-full bg-blue-50 text-primary border border-blue-100">
-                        ↳ {starterName}
-                    </span>
-                )}
             </div>
             <p className="text-[10px] text-gray-300 mt-2">
                 {new Date(t.created_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })}
@@ -291,11 +224,11 @@ const CustomCard: React.FC<CustomCardProps> = ({ template: t, isDeleting, onEdit
         </div>
         <div className="border-t border-gray-100 flex">
             <button
-                onClick={onEdit}
+                onClick={() => {}}
                 className="flex-1 py-2 text-xs font-semibold text-primary hover:bg-blue-50 transition flex items-center justify-center gap-1.5"
             >
                 <Pencil className="w-3 h-3" />
-                Edit
+                Gunakan
             </button>
             <div className="w-px bg-gray-100" />
             <button
@@ -308,7 +241,6 @@ const CustomCard: React.FC<CustomCardProps> = ({ template: t, isDeleting, onEdit
             </button>
         </div>
     </div>
-    );
-};
+);
 
 export default PosterTemplates;
