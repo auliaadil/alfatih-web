@@ -58,6 +58,19 @@ The project has a **split structure**: root-level `components/` holds public-fac
 - `types.ts` (root) — Shared TypeScript types: `TourPackage`, `TourCategory`, `AIPlannerInput`, `Testimonial`
 - `src/types/poster.ts` — Poster-specific types: `AspectRatio`, `LayoutType`, `TemplateConfig`
 
+### Edge Functions
+
+Supabase Edge Functions live in `supabase/functions/`. They run on Deno and call the Gemini REST API directly (no SDK). Secrets (`GEMINI_API_KEY`, `GEMINI_MODEL`, `RECAPTCHA_SECRET_KEY`) are injected at runtime — never committed.
+
+- `supabase/functions/ai-itinerary/` — Public endpoint. Verifies reCAPTCHA v3 token (score ≥ 0.5), builds the Halal itinerary prompt, calls Gemini, returns `{ itinerary: string }`.
+- `supabase/functions/ai-poster-autofill/` — Admin-only endpoint. Verifies Supabase JWT, builds poster copywriting prompt per template type, calls Gemini, returns updated `textNodes` array.
+
+Deploy commands:
+```bash
+supabase functions deploy ai-itinerary
+supabase functions deploy ai-poster-autofill
+```
+
 ### Contexts
 
 - `SiteSettingsContext` — Fetches `site_settings` table from Supabase on mount; provides contact info (WhatsApp, phone, email, social links) site-wide

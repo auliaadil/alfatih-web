@@ -2,7 +2,7 @@
 
 Welcome to the **Alfatih Dunia Wisata** project repository! This is a modern, enterprise-grade web application for a premium travel agency specializing in Umrah and Halal-friendly international tourism.
 
-The application features a sleek, responsive UI/UX and integrates **Google Gemini AI** and **Supabase** to offer a full-featured platform including a dynamic public site and a powerful administrative suite.
+The application features a sleek, responsive UI/UX and integrates **Google Gemini AI** (via Supabase Edge Functions) and **Supabase** to offer a full-featured platform including a dynamic public site and a powerful administrative suite.
 
 ## 🚀 Key Features
 
@@ -24,10 +24,10 @@ The application features a sleek, responsive UI/UX and integrates **Google Gemin
 ## 🛠 Tech Stack
 
 - **Framework**: [React 19](https://react.dev/) + [Vite](https://vitejs.dev/)
-- **Backend**: [Supabase](https://supabase.com/) (Database, Auth, Storage)
-- **AI Engine**: [Google Gemini AI SDK](https://ai.google.dev/) (`@google/genai`)
-- **Canvas Engine**: [Fabric.js v6](http://fabricjs.com/)
-- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **Backend**: [Supabase](https://supabase.com/) (Database, Auth, Storage, Edge Functions)
+- **AI Engine**: [Google Gemini](https://ai.google.dev/) via Supabase Edge Functions (Deno, REST API — API key never exposed to the browser)
+- **Canvas Engine**: [Fabric.js v7](http://fabricjs.com/)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/) (CDN)
 - **Icons**: [Lucide React](https://lucide.dev/)
 - **Rendering**: [React Markdown](https://github.com/remarkjs/react-markdown)
 
@@ -36,8 +36,8 @@ The application features a sleek, responsive UI/UX and integrates **Google Gemin
 Before you begin, ensure you have:
 - **Node.js**: v18.0.0+
 - **npm**: v9.0.0+
-- **Supabase Account**: A project setup with the required schema.
-- **Gemini API Key**: From [Google AI Studio](https://aistudio.google.com/).
+- **Supabase Account**: A project set up with the required schema and Edge Functions deployed.
+- **Supabase CLI**: For deploying edge functions (`brew install supabase/tap/supabase`).
 
 ## 💻 Installation & Setup
 
@@ -56,11 +56,27 @@ Before you begin, ensure you have:
     Create a `.env.local` file:
     ```env
     VITE_SUPABASE_URL=your_supabase_url
-    VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-    VITE_GEMINI_API_KEY=your_gemini_api_key
+    VITE_SUPABASE_API_KEY=your_supabase_anon_key
+    VITE_RECAPTCHA_SITE_KEY=your_recaptcha_site_key
+    VITE_UNSPLASH_ACCESS_KEY=your_unsplash_client_id
+    VITE_PIXABAY_API_KEY=your_pixabay_api_key
     ```
 
-4.  **Run the development server:**
+    AI keys are stored as Supabase secrets (never in `.env.local`):
+    ```bash
+    supabase secrets set \
+      GEMINI_API_KEY=your_gemini_api_key \
+      GEMINI_MODEL=gemini-2.5-flash-preview-05-20 \
+      RECAPTCHA_SECRET_KEY=your_recaptcha_secret_key
+    ```
+
+4.  **Deploy Edge Functions:**
+    ```bash
+    supabase functions deploy ai-itinerary
+    supabase functions deploy ai-poster-autofill
+    ```
+
+5.  **Run the development server:**
     ```bash
     npm run dev
     ```
@@ -69,16 +85,24 @@ Before you begin, ensure you have:
 
 ```
 alfatih-web/
+├── components/          # Public-facing UI (Hero, Navbar, AIPlanner, etc.)
+├── services/            # Thin fetch wrappers for Edge Functions
+│   ├── itineraryService.ts       # Calls ai-itinerary edge function
+│   └── posterAutofillService.ts  # Calls ai-poster-autofill edge function
 ├── src/
 │   ├── components/      # Reusable UI components (Public & Admin)
 │   │   ├── admin/       # Specialized admin components (PosterMaker, etc.)
-│   ├── contexts/        # React Contexts (Language, etc.)
+│   ├── contexts/        # React Contexts (Language, SiteSettings)
+│   ├── hooks/           # Custom hooks (useRecaptcha, etc.)
 │   ├── lib/             # Third-party configurations (Supabase client)
 │   ├── pages/           # Page components (Home, TourDetails, Admin Dashboard)
-│   ├── services/        # API and AI logic (geminiService.ts, posterAI.ts)
 │   ├── types/           # Global TypeScript definitions
-│   └── data/            # Static assets and local constants
-├── supabase/            # Database migrations and seed data
+│   └── services/        # Non-AI services (posterTemplates, etc.)
+├── supabase/
+│   ├── functions/       # Supabase Edge Functions (Deno)
+│   │   ├── ai-itinerary/         # reCAPTCHA-gated itinerary generation
+│   │   └── ai-poster-autofill/   # JWT-gated poster copy generation
+│   └── migrations/      # Database migrations
 └── public/              # Static public assets
 ```
 
