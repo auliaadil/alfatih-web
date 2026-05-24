@@ -26,7 +26,11 @@ export const DraftPanel: React.FC<Props> = ({ template, fieldValues, onLoadDraft
 
   const persist = (d: PosterDraft[]) => {
     setDrafts(d);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(d));
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(d));
+    } catch {
+      alert('Penyimpanan lokal penuh. Hapus beberapa draft untuk melanjutkan.');
+    }
   };
 
   const handleSave = async () => {
@@ -44,6 +48,9 @@ export const DraftPanel: React.FC<Props> = ({ template, fieldValues, onLoadDraft
       };
       persist([draft, ...drafts]);
       setDraftName('');
+    } catch (err) {
+      console.error('Failed to save draft', err);
+      alert('Gagal menyimpan draft. Coba lagi.');
     } finally {
       setIsSaving(false);
     }
@@ -95,6 +102,8 @@ export const DraftPanel: React.FC<Props> = ({ template, fieldValues, onLoadDraft
               </div>
               <button
                 onClick={(e) => handleDelete(draft.id, e)}
+                aria-label="Hapus draft"
+                title="Hapus draft"
                 className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition shadow"
               >
                 <Trash2 className="w-3 h-3" />
