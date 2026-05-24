@@ -1,160 +1,233 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
-import { Plus, Trash2, Edit } from 'lucide-react';
+import { Plus, Edit2, Trash2, Building2, Star } from 'lucide-react';
+import {
+    PageHeader, TableCard, THead, Th, Td, SkeletonRows, EmptyState, SlideOver,
+    ConfirmDialog, FormField, inputClass, selectClass, btnPrimary, btnSecondary, btnGhost,
+    useToast,
+} from '../../components/admin/ui';
 
-interface Hotel {
-    id: string;
-    name: string;
-    location: string;
-    stars: number;
-}
+interface Hotel { id: string; name: string; location: string; stars: number; }
+
+const EMPTY_FORM = { name: '', location: '', stars: 3 };
+
+const StarRating: React.FC<{ count: number }> = ({ count }) => (
+    <div className="flex items-center gap-0.5">
+        {Array.from({ length: 5 }).map((_, i) => (
+            <Star key={i} className={`w-3.5 h-3.5 ${i < count ? 'text-amber-400 fill-amber-400' : 'text-gray-200 fill-gray-200'}`} />
+        ))}
+    </div>
+);
 
 const Hotels: React.FC = () => {
+    const toast = useToast();
     const [hotels, setHotels] = useState<Hotel[]>([]);
     const [loading, setLoading] = useState(true);
-    const [name, setName] = useState('');
-    const [locationInput, setLocationInput] = useState('');
-    const [stars, setStars] = useState<number>(3);
-    const [editingId, setEditingId] = useState<string | null>(null);
+    const [saving, setSaving] = useState(false);
 
-    useEffect(() => {
-        fetchHotels();
-    }, []);
+    const [isFormOpen, setIsFormOpen] = useState(false);
+    const [editingId, setEditingId] = useState<string | null>(null);
+    const [form, setForm] = useState(EMPTY_FORM);
+
+    const [deleteId, setDeleteId] = useState<string | null>(null);
+    const [deleting, setDeleting] = useState(false);
+
+    useEffect(() => { fetchHotels(); }, []);
 
     const fetchHotels = async () => {
         setLoading(true);
         const { data, error } = await supabase.from('hotels').select('*').order('name');
-        if (!error && data) {
-            setHotels(data);
-        }
+        if (!error && data) setHotels(data);
         setLoading(false);
+    };
+
+    const openCreate = () => {
+        setEditingId(null);
+        setForm(EMPTY_FORM);
+        setIsFormOpen(true);
+    };
+
+    const openEdit = (hotel: Hotel) => {
+        setEditingId(hotel.id);
+        setForm({ name: hotel.name, location: hotel.location, stars: hotel.stars });
+        setIsFormOpen(true);
     };
 
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
+        setSaving(true);
+        const payload = { name: form.name, location: form.location, stars: form.stars };
+        const { error } = editingId
+            ? await supabase.from('hotels').update(payload).eq('id', editingId)
+            : await supabase.from('hotels').insert([payload]);
 
-        if (editingId) {
-            await supabase.from('hotels').update({ name, location: locationInput, stars }).eq('id', editingId);
+        setSaving(false);
+        if (error) {
+            toast('error', 'Failed to save hotel.');
         } else {
-            await supabase.from('hotels').insert([{ name, location: locationInput, stars }]);
+            toast('success', editingId ? 'Hotel updated.' : 'Hotel added.');
+            setIsFormOpen(false);
+            fetchHotels();
         }
-
-        setName('');
-        setLocationInput('');
-        setStars(3);
-        setEditingId(null);
-        fetchHotels();
     };
 
-    const handleEdit = (hotel: Hotel) => {
-        setEditingId(hotel.id);
-        setName(hotel.name);
-        setLocationInput(hotel.location);
-        setStars(hotel.stars);
-    };
-
-    const handleDelete = async (id: string) => {
-        if (confirm('Are you sure you want to delete this hotel?')) {
-            await supabase.from('hotels').delete().eq('id', id);
+    const handleDelete = async () => {
+        if (!deleteId) return;
+        setDeleting(true);
+        const { error } = await supabase.from('hotels').delete().eq('id', deleteId);
+        setDeleting(false);
+        setDeleteId(null);
+        if (error) {
+            toast('error', 'Failed to delete hotel.');
+        } else {
+            toast('success', 'Hotel deleted.');
             fetchHotels();
         }
     };
 
     return (
         <div>
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
-                <h1 className="text-2xl font-bold text-gray-900">Hotels Management</h1>
-            </div>
+            <PageHeader
+                title="Hotels"
+                badge={hotels.length}
+                subtitle="Manage hotel accommodations used in packages"
+                breadcrumbs={[{ label: 'Resources' }, { label: 'Hotels' }]}
+                action={
+                    <button onClick={openCreate} className={btnPrimary}>
+                        <Plus className="w-4 h-4" /> Add Hotel
+                    </button>
+                }
+            />
 
-            <form onSubmit={handleSave} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8 max-w-4xl flex gap-4 items-end flex-wrap">
-                <div className="flex-1 min-w-[200px]">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Hotel Name</label>
-                    <input
-                        type="text"
-                        required
-                        className="w-full px-4 py-2 border rounded-md focus:ring-primary focus:border-primary"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        placeholder="e.g., Anjum Hotel"
-                    />
-                </div>
-                <div className="flex-1 min-w-[150px]">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
-                    <input
-                        type="text"
-                        required
-                        className="w-full px-4 py-2 border rounded-md focus:ring-primary focus:border-primary"
-                        value={locationInput}
-                        onChange={(e) => setLocationInput(e.target.value)}
-                        placeholder="e.g., Makkah"
-                    />
-                </div>
-                <div className="w-24">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Stars</label>
-                    <input
-                        type="number"
-                        required
-                        min="1" max="5"
-                        className="w-full px-4 py-2 border rounded-md focus:ring-primary focus:border-primary"
-                        value={stars}
-                        onChange={(e) => setStars(parseInt(e.target.value))}
-                    />
-                </div>
-                <button type="submit" className="bg-primary hover:bg-emerald-700 text-white px-4 py-2 rounded-md flex items-center gap-2">
-                    <Plus className="w-4 h-4" />
-                    {editingId ? 'Update' : 'Add'}
-                </button>
-                {editingId && (
-                    <button type="button" onClick={() => { setEditingId(null); setName(''); setLocationInput(''); setStars(3); }} className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-md">Cancel</button>
-                )}
-            </form>
-
-            {loading ? (
-                <div className="text-gray-500">Loading hotels...</div>
-            ) : (
-                <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
+            <TableCard>
+                <table className="min-w-full">
+                    <THead>
+                        <Th>Hotel Name</Th>
+                        <Th>Location</Th>
+                        <Th>Rating</Th>
+                        <Th align="right">Actions</Th>
+                    </THead>
+                    <tbody className="divide-y divide-gray-100">
+                        {loading ? (
+                            <SkeletonRows cols={4} rows={5} />
+                        ) : hotels.length === 0 ? (
                             <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stars</th>
-                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                <td colSpan={4}>
+                                    <EmptyState
+                                        icon={<Building2 className="w-7 h-7" />}
+                                        title="No hotels yet"
+                                        description="Add your first hotel to start building packages."
+                                        action={
+                                            <button onClick={openCreate} className={btnPrimary}>
+                                                <Plus className="w-4 h-4" /> Add Hotel
+                                            </button>
+                                        }
+                                    />
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                            {hotels.map((hotel) => (
-                                <tr key={hotel.id}>
-                                    <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">
-                                        {hotel.name}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-gray-500">
-                                        {hotel.location}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-gray-500">
-                                        {Array.from({ length: hotel.stars }).map((_, i) => (
-                                            <span key={i} className="text-yellow-400">★</span>
-                                        ))}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <button onClick={() => handleEdit(hotel)} className="text-indigo-600 hover:text-indigo-900 mr-4">
-                                            <Edit className="w-4 h-4" />
-                                        </button>
-                                        <button onClick={() => handleDelete(hotel.id)} className="text-red-600 hover:text-red-900">
-                                            <Trash2 className="w-4 h-4" />
-                                        </button>
-                                    </td>
+                        ) : (
+                            hotels.map((hotel) => (
+                                <tr key={hotel.id} className="hover:bg-gray-50/60 transition-colors group">
+                                    <Td>
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center shrink-0">
+                                                <Building2 className="w-4 h-4 text-amber-600" />
+                                            </div>
+                                            <span className="font-medium text-gray-900">{hotel.name}</span>
+                                        </div>
+                                    </Td>
+                                    <Td>
+                                        <span className="text-gray-600">{hotel.location}</span>
+                                    </Td>
+                                    <Td>
+                                        <StarRating count={hotel.stars} />
+                                    </Td>
+                                    <Td className="text-right">
+                                        <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button onClick={() => openEdit(hotel)} className={btnGhost} title="Edit">
+                                                <Edit2 className="w-4 h-4" />
+                                            </button>
+                                            <button
+                                                onClick={() => setDeleteId(hotel.id)}
+                                                className="inline-flex items-center px-3 py-2 text-sm font-medium text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+                                                title="Delete"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    </Td>
                                 </tr>
+                            ))
+                        )}
+                    </tbody>
+                </table>
+            </TableCard>
+
+            {/* Form Slide-Over */}
+            <SlideOver
+                isOpen={isFormOpen}
+                onClose={() => setIsFormOpen(false)}
+                title={editingId ? 'Edit Hotel' : 'Add Hotel'}
+                subtitle={editingId ? 'Update hotel details below.' : 'Fill in the details to add a new hotel.'}
+                footer={
+                    <div className="flex gap-3">
+                        <button type="button" onClick={() => setIsFormOpen(false)} className={btnSecondary}>
+                            Cancel
+                        </button>
+                        <button form="hotel-form" type="submit" disabled={saving} className={btnPrimary}>
+                            {saving ? 'Saving...' : (editingId ? 'Update Hotel' : 'Add Hotel')}
+                        </button>
+                    </div>
+                }
+            >
+                <form id="hotel-form" onSubmit={handleSave} className="space-y-5">
+                    <FormField label="Hotel Name" required>
+                        <input
+                            type="text"
+                            required
+                            className={inputClass}
+                            placeholder="e.g., Anjum Hotel Makkah"
+                            value={form.name}
+                            onChange={(e) => setForm({ ...form, name: e.target.value })}
+                        />
+                    </FormField>
+                    <FormField label="Location" required>
+                        <input
+                            type="text"
+                            required
+                            className={inputClass}
+                            placeholder="e.g., Makkah"
+                            value={form.location}
+                            onChange={(e) => setForm({ ...form, location: e.target.value })}
+                        />
+                    </FormField>
+                    <FormField label="Star Rating" required>
+                        <select
+                            className={selectClass}
+                            value={form.stars}
+                            onChange={(e) => setForm({ ...form, stars: parseInt(e.target.value) })}
+                        >
+                            {[1, 2, 3, 4, 5].map((n) => (
+                                <option key={n} value={n}>{n} Star{n > 1 ? 's' : ''}</option>
                             ))}
-                            {hotels.length === 0 && (
-                                <tr>
-                                    <td colSpan={4} className="px-6 py-4 text-center text-gray-500">No hotels found.</td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-            )}
+                        </select>
+                        <div className="mt-2">
+                            <StarRating count={form.stars} />
+                        </div>
+                    </FormField>
+                </form>
+            </SlideOver>
+
+            {/* Delete Confirm */}
+            <ConfirmDialog
+                isOpen={!!deleteId}
+                title="Delete Hotel"
+                message="This hotel will be permanently removed. Packages referencing it may be affected."
+                confirmLabel="Delete"
+                onConfirm={handleDelete}
+                onCancel={() => setDeleteId(null)}
+                loading={deleting}
+            />
         </div>
     );
 };

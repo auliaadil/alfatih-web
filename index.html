@@ -14,37 +14,63 @@
               secondary: '#F59E0B', // Orange/Amber from Logo
               accent: '#0066CC', // Darker Blue
               dark: '#0F172A', // Slate-900 for dark sections
+              gray: {
+                50: '#F9FAFB', 100: '#F3F4F6', 200: '#E5E7EB', 300: '#D1D5DB',
+                400: '#9CA3AF', 500: '#6B7280', 600: '#4B5563', 700: '#374151',
+                800: '#1F2937', 900: '#111827', 950: '#0A0F1A',
+              },
             },
             fontFamily: {
               sans: ['Inter', 'sans-serif'],
               display: ['Outfit', 'sans-serif'],
+              jakarta: ['"Plus Jakarta Sans"', 'sans-serif'],
             },
           },
         },
       }
     </script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
       body {
         font-family: 'Inter', sans-serif;
       }
       ::-webkit-scrollbar {
-        width: 8px;
+        width: 6px;
       }
       ::-webkit-scrollbar-track {
-        background: #f1f1f1; 
+        background: transparent;
       }
       ::-webkit-scrollbar-thumb {
-        background: #0084FF; 
-        border-radius: 4px;
+        background: #CBD5E1;
+        border-radius: 99px;
       }
       ::-webkit-scrollbar-thumb:hover {
-        background: #0066CC;
+        background: #94A3B8;
       }
       @keyframes shimmer {
         0% { background-position: 200% 0; }
         100% { background-position: -200% 0; }
       }
+      @keyframes slideInRight {
+        from { opacity: 0; transform: translateX(32px); }
+        to { opacity: 1; transform: translateX(0); }
+      }
+      @keyframes slideInPanel {
+        from { transform: translateX(100%); }
+        to { transform: translateX(0); }
+      }
+      @keyframes fadeScaleIn {
+        from { opacity: 0; transform: scale(0.96); }
+        to { opacity: 1; transform: scale(1); }
+      }
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      .animate-slide-in-right { animation: slideInRight 0.2s ease-out both; }
+      .animate-slide-in-panel { animation: slideInPanel 0.28s cubic-bezier(0.32, 0.72, 0, 1) both; }
+      .animate-fade-scale-in { animation: fadeScaleIn 0.18s ease-out both; }
+      .animate-fade-in { animation: fadeIn 0.15s ease-out both; }
     </style>
     <script type="importmap">
 {

@@ -1,7 +1,43 @@
 import React, { useState } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Package, Map, Plane, Building2, ShoppingCart, Settings, LogOut, Menu, X, Image as ImageIcon, Layers } from 'lucide-react';
+import {
+    LayoutDashboard, Package, Map, Plane, Building2, ShoppingCart,
+    Settings, LogOut, Menu, X, Image as ImageIcon, Layers, ChevronRight,
+} from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { ToastProvider } from '../../components/admin/ui';
+
+const NAV_GROUPS = [
+    {
+        label: 'Operations',
+        items: [
+            { path: '/admin', icon: LayoutDashboard, label: 'Dashboard', exact: true },
+            { path: '/admin/orders', icon: ShoppingCart, label: 'Orders' },
+            { path: '/admin/packages', icon: Package, label: 'Packages' },
+            { path: '/admin/private-trips', icon: Map, label: 'Private Trips' },
+        ],
+    },
+    {
+        label: 'Resources',
+        items: [
+            { path: '/admin/airlines', icon: Plane, label: 'Airlines' },
+            { path: '/admin/hotels', icon: Building2, label: 'Hotels' },
+        ],
+    },
+    {
+        label: 'Marketing',
+        items: [
+            { path: '/admin/poster-maker', icon: ImageIcon, label: 'Poster Maker' },
+            { path: '/admin/poster-templates', icon: Layers, label: 'Templates' },
+        ],
+    },
+    {
+        label: 'System',
+        items: [
+            { path: '/admin/settings', icon: Settings, label: 'Site Settings' },
+        ],
+    },
+];
 
 const AdminLayout: React.FC = () => {
     const navigate = useNavigate();
@@ -14,102 +50,122 @@ const AdminLayout: React.FC = () => {
         navigate('/admin/login');
     };
 
-    const navItems = [
-        { path: '/admin', icon: LayoutDashboard, label: 'Dashboard' },
-        { path: '/admin/orders', icon: ShoppingCart, label: 'Orders' },
-        { path: '/admin/packages', icon: Package, label: 'Packages' },
-        { path: '/admin/private-trips', icon: Map, label: 'Private Trips' },
-        { path: '/admin/airlines', icon: Plane, label: 'Airlines' },
-        { path: '/admin/hotels', icon: Building2, label: 'Hotels' },
-        { path: '/admin/poster-maker', icon: ImageIcon, label: 'Poster Maker' },
-        { path: '/admin/poster-templates', icon: Layers, label: 'Templates' },
-        { path: '/admin/settings', icon: Settings, label: 'Site Settings' },
-    ];
+    const isActive = (path: string, exact?: boolean) =>
+        exact ? location.pathname === path : (path !== '/admin' && location.pathname.startsWith(path));
 
     const closeSidebar = () => setIsSidebarOpen(false);
 
-    return (
-        <div className="flex h-screen bg-gray-50 font-sans overflow-hidden">
-            {/* Mobile Header & Hamburger */}
-            <div className="lg:hidden fixed top-0 left-0 right-0 bg-white shadow-sm z-20 px-4 py-3 flex items-center justify-between border-b">
-                <div className="flex items-center gap-3">
-                    <img src="/assets/alfatih_logo_only.webp" alt="Alfatih Logo" className="h-8 w-auto object-contain" />
-                    <span className="text-lg font-medium text-gray-700">Admin</span>
+    const Sidebar = () => (
+        <div className="flex flex-col h-full bg-gray-950 text-gray-300 w-64 shrink-0">
+            {/* Logo */}
+            <div className="px-5 py-5 flex items-center gap-3 border-b border-white/5 shrink-0">
+                <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center shrink-0">
+                    <img src="/assets/alfatih_logo_only.webp" alt="Logo" className="w-5 h-5 object-contain" />
+                </div>
+                <div className="min-w-0">
+                    <p className="text-white text-sm font-semibold leading-tight truncate font-jakarta">
+                        Alfatih Admin
+                    </p>
+                    <p className="text-gray-500 text-xs leading-tight">Dunia Wisata</p>
                 </div>
                 <button
-                    onClick={() => setIsSidebarOpen(true)}
-                    className="p-2 text-gray-600 hover:bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                    onClick={closeSidebar}
+                    className="lg:hidden ml-auto p-1.5 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors shrink-0"
                 >
-                    <Menu className="w-6 h-6" />
+                    <X className="w-4 h-4" />
                 </button>
             </div>
 
-            {/* Overlay for mobile */}
-            {isSidebarOpen && (
-                <div
-                    className="fixed inset-0 bg-black/50 z-30 lg:hidden transition-opacity"
-                    onClick={closeSidebar}
-                />
-            )}
-
-            {/* Sidebar */}
-            <div className={`
-                fixed inset-y-0 left-0 z-40 w-64 bg-white shadow-xl transform transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 flex flex-col
-                ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-            `}>
-                <div className="p-4 border-b flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <img src="/assets/alfatih_logo_only.webp" alt="Alfatih Logo" className="h-8 w-auto object-contain hidden lg:block" />
-                        <span className="text-lg font-medium text-gray-700 hidden lg:block">Admin Menu</span>
-                        <span className="text-lg font-medium text-gray-700 lg:hidden">Menu</span>
+            {/* Nav */}
+            <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-5">
+                {NAV_GROUPS.map((group) => (
+                    <div key={group.label}>
+                        <p className="text-[10px] font-semibold uppercase tracking-widest text-gray-600 px-3 mb-1.5">
+                            {group.label}
+                        </p>
+                        <div className="space-y-0.5">
+                            {group.items.map((item) => {
+                                const active = isActive(item.path, (item as any).exact);
+                                return (
+                                    <Link
+                                        key={item.path}
+                                        to={item.path}
+                                        onClick={closeSidebar}
+                                        className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-sm font-medium group ${active
+                                            ? 'bg-white/10 text-white'
+                                            : 'text-gray-400 hover:bg-white/5 hover:text-gray-200'
+                                        }`}
+                                    >
+                                        <item.icon className={`w-4 h-4 shrink-0 transition-colors ${active ? 'text-primary' : 'text-gray-500 group-hover:text-gray-300'}`} />
+                                        <span className="truncate">{item.label}</span>
+                                        {active && <ChevronRight className="w-3.5 h-3.5 ml-auto text-gray-500 shrink-0" />}
+                                    </Link>
+                                );
+                            })}
+                        </div>
                     </div>
-                    <button
-                        onClick={closeSidebar}
-                        className="lg:hidden p-2 text-gray-500 hover:bg-gray-100 rounded-md"
-                    >
-                        <X className="w-5 h-5" />
-                    </button>
-                </div>
+                ))}
+            </nav>
 
-                <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-                    {navItems.map((item) => {
-                        const isActive = location.pathname === item.path || (item.path !== '/admin' && location.pathname.startsWith(item.path));
-
-                        return (
-                            <Link
-                                key={item.path}
-                                to={item.path}
-                                onClick={closeSidebar}
-                                className={`flex items-center gap-3 px-3 py-2 rounded-md transition-colors ${isActive
-                                    ? 'bg-primary text-white'
-                                    : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-                                    }`}
-                            >
-                                <item.icon className="w-5 h-5" />
-                                <span className="font-medium text-sm">{item.label}</span>
-                            </Link>
-                        );
-                    })}
-                </nav>
-
-                <div className="p-4 border-t">
-                    <button
-                        onClick={handleLogout}
-                        className="flex items-center gap-3 px-3 py-2 w-full text-left rounded-md text-red-600 hover:bg-red-50 transition-colors"
-                    >
-                        <LogOut className="w-5 h-5" />
-                        <span className="font-medium text-sm">Logout</span>
-                    </button>
-                </div>
-            </div>
-
-            {/* Main Content */}
-            <div className={`flex-1 bg-gray-50 lg:static mt-16 lg:mt-0 relative w-full ${isFullHeightPage ? 'overflow-hidden' : 'overflow-auto'}`}>
-                <div className="p-4 sm:p-6 lg:p-8">
-                    <Outlet />
-                </div>
+            {/* Footer */}
+            <div className="px-3 py-4 border-t border-white/5 shrink-0">
+                <button
+                    onClick={handleLogout}
+                    className="flex items-center gap-3 px-3 py-2.5 w-full rounded-xl text-sm font-medium text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-all"
+                >
+                    <LogOut className="w-4 h-4 shrink-0" />
+                    <span>Logout</span>
+                </button>
             </div>
         </div>
+    );
+
+    return (
+        <ToastProvider>
+            <div className="flex h-screen bg-gray-100 overflow-hidden">
+                {/* Mobile top bar */}
+                <div className="lg:hidden fixed top-0 left-0 right-0 z-30 bg-gray-950 px-4 py-3 flex items-center justify-between border-b border-white/5">
+                    <div className="flex items-center gap-2.5">
+                        <img src="/assets/alfatih_logo_only.webp" alt="Logo" className="h-7 w-auto" />
+                        <span className="text-white text-sm font-semibold font-jakarta">Admin</span>
+                    </div>
+                    <button
+                        onClick={() => setIsSidebarOpen(true)}
+                        className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                    >
+                        <Menu className="w-5 h-5" />
+                    </button>
+                </div>
+
+                {/* Mobile overlay */}
+                {isSidebarOpen && (
+                    <div
+                        className="fixed inset-0 bg-black/60 z-40 lg:hidden backdrop-blur-sm animate-fade-in"
+                        onClick={closeSidebar}
+                    />
+                )}
+
+                {/* Desktop sidebar */}
+                <div className="hidden lg:flex shrink-0">
+                    <Sidebar />
+                </div>
+
+                {/* Mobile sidebar */}
+                <div className={`
+                    fixed inset-y-0 left-0 z-50 lg:hidden transform transition-transform duration-300 ease-in-out
+                    ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+                `}>
+                    <Sidebar />
+                </div>
+
+                {/* Main content */}
+                <div className={`flex-1 min-w-0 ${isFullHeightPage ? 'overflow-hidden' : 'overflow-auto'} mt-[52px] lg:mt-0`}>
+                    <div className={`${isFullHeightPage ? 'h-full' : 'min-h-full'} p-5 sm:p-6 lg:p-8`}>
+                        <Outlet />
+                    </div>
+                </div>
+            </div>
+        </ToastProvider>
     );
 };
 

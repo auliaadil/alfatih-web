@@ -1,17 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
-import { Plus, Edit, Trash2 } from 'lucide-react';
+import { Plus, Edit2, Trash2, ShoppingCart } from 'lucide-react';
+import {
+    PageHeader, TableCard, THead, Th, Td, SkeletonRows, EmptyState,
+    ConfirmDialog, StatusBadge, btnPrimary, btnGhost, useToast,
+} from '../../components/admin/ui';
 import OrderForm from './OrderForm';
 
 const Orders: React.FC = () => {
+    const toast = useToast();
     const [orders, setOrders] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [editingOrder, setEditingOrder] = useState<any | null>(null);
 
-    useEffect(() => {
-        fetchOrders();
-    }, []);
+    const [deleteId, setDeleteId] = useState<string | null>(null);
+    const [deleting, setDeleting] = useState(false);
+
+    useEffect(() => { fetchOrders(); }, []);
 
     const fetchOrders = async () => {
         setLoading(true);
@@ -19,116 +26,148 @@ const Orders: React.FC = () => {
             .from('orders')
             .select('*, packages(title), participants(*)')
             .order('created_at', { ascending: false });
-
-        if (!error && data) {
-            setOrders(data);
-        }
+        if (!error && data) setOrders(data);
         setLoading(false);
     };
 
-    const handleDelete = async (id: string) => {
-        if (confirm('Are you sure? This will delete the order, and potentially leave quotas unbalanced unless handled by complex triggers.')) {
-            await supabase.from('orders').delete().eq('id', id);
+    const handleDelete = async () => {
+        if (!deleteId) return;
+        setDeleting(true);
+        const { error } = await supabase.from('orders').delete().eq('id', deleteId);
+        setDeleting(false);
+        setDeleteId(null);
+        if (error) {
+            toast('error', 'Failed to delete order.');
+        } else {
+            toast('success', 'Order deleted.');
             fetchOrders();
         }
-    }
+    };
+
+    const getPaymentVariant = (status: string): 'pending' | 'success' | 'warning' | 'info' => {
+        const s = (status || '').toLowerCase();
+        if (s.includes('lunas') || s.includes('full')) return 'success';
+        if (s.includes('dp') || s.includes('down')) return 'warning';
+        if (s.includes('cancel')) return 'pending';
+        return 'info';
+    };
 
     return (
         <div>
-            <div className="flex flex-col sm:flex-row gap-4 sm:justify-between sm:items-center mb-6">
-                <h1 className="text-2xl font-bold text-gray-900">Orders Management</h1>
-                <button
-                    onClick={() => {
-                        setEditingOrder(null);
-                        setIsFormOpen(true);
-                    }}
-                    className="bg-primary hover:bg-emerald-700 text-white px-4 py-2 rounded-md flex items-center gap-2"
-                >
-                    <Plus className="w-5 h-5" />
-                    New Order
-                </button>
-            </div>
+            <PageHeader
+                title="Orders"
+                badge={orders.length}
+                subtitle="Track and manage customer bookings"
+                breadcrumbs={[{ label: 'Operations' }, { label: 'Orders' }]}
+                action={
+                    <button
+                        onClick={() => { setEditingOrder(null); setIsFormOpen(true); }}
+                        className={btnPrimary}
+                    >
+                        <Plus className="w-4 h-4" /> New Order
+                    </button>
+                }
+            />
 
-            {loading ? (
-                <div className="text-gray-500">Loading orders...</div>
-            ) : (
-                <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
+            <TableCard>
+                <table className="min-w-full">
+                    <THead>
+                        <Th>Customer</Th>
+                        <Th>Package</Th>
+                        <Th align="center">Pax / Rooms</Th>
+                        <Th>Total Price</Th>
+                        <Th>Payment Status</Th>
+                        <Th align="right">Actions</Th>
+                    </THead>
+                    <tbody className="divide-y divide-gray-100">
+                        {loading ? (
+                            <SkeletonRows cols={6} rows={5} />
+                        ) : orders.length === 0 ? (
                             <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Package</th>
-                                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Pax / Rooms</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Price</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+                                <td colSpan={6}>
+                                    <EmptyState
+                                        icon={<ShoppingCart className="w-7 h-7" />}
+                                        title="No orders yet"
+                                        description="Create your first order to start tracking bookings."
+                                        action={
+                                            <button
+                                                onClick={() => { setEditingOrder(null); setIsFormOpen(true); }}
+                                                className={btnPrimary}
+                                            >
+                                                <Plus className="w-4 h-4" /> New Order
+                                            </button>
+                                        }
+                                    />
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                            {orders.map((order) => (
-                                <tr key={order.id}>
-                                    <td className="px-6 py-4">
-                                        <div className="font-medium text-gray-900">{order.customer_name}</div>
-                                        <div className="text-sm text-gray-500">{order.customer_phone}</div>
-                                    </td>
-                                    <td className="px-6 py-4 text-sm text-gray-900 truncate max-w-[200px]">
-                                        {order.packages?.title || 'Unknown Package'}
-                                    </td>
-                                    <td className="px-6 py-4 text-center text-sm">
-                                        <span className="font-bold">{order.participant_count}</span> pax
-                                        <br />
-                                        <span className="text-gray-500 text-xs">{order.room_count_booked} rooms</span>
-                                    </td>
-                                    <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                                        Rp {order.total_price?.toLocaleString('id-ID')}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                                            {order.payment_status}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4 text-right text-sm font-medium">
-                                        <button
-                                            onClick={() => {
-                                                setEditingOrder(order);
-                                                setIsFormOpen(true);
-                                            }}
-                                            className="text-indigo-600 hover:text-indigo-900 mr-4"
-                                        >
-                                            <Edit className="w-5 h-5" />
-                                        </button>
-                                        <button onClick={() => handleDelete(order.id)} className="text-red-600 hover:text-red-900">
-                                            <Trash2 className="w-5 h-5" />
-                                        </button>
-                                    </td>
+                        ) : (
+                            orders.map((order) => (
+                                <tr key={order.id} className="hover:bg-gray-50/60 transition-colors group">
+                                    <Td>
+                                        <div>
+                                            <p className="font-semibold text-gray-900">{order.customer_name}</p>
+                                            <p className="text-xs text-gray-400 mt-0.5">{order.customer_phone}</p>
+                                        </div>
+                                    </Td>
+                                    <Td>
+                                        <p className="text-gray-900 max-w-[200px] truncate">
+                                            {order.packages?.title || '—'}
+                                        </p>
+                                    </Td>
+                                    <Td className="text-center">
+                                        <p className="font-semibold text-gray-900">{order.participant_count} <span className="font-normal text-gray-400 text-xs">pax</span></p>
+                                        <p className="text-xs text-gray-400">{order.room_count_booked} rooms</p>
+                                    </Td>
+                                    <Td>
+                                        <p className="font-semibold text-gray-900">
+                                            Rp {order.total_price?.toLocaleString('id-ID') ?? '—'}
+                                        </p>
+                                    </Td>
+                                    <Td>
+                                        <StatusBadge status={order.payment_status || 'Unknown'} />
+                                    </Td>
+                                    <Td className="text-right">
+                                        <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button
+                                                onClick={() => { setEditingOrder(order); setIsFormOpen(true); }}
+                                                className={btnGhost}
+                                                title="Edit"
+                                            >
+                                                <Edit2 className="w-4 h-4" />
+                                            </button>
+                                            <button
+                                                onClick={() => setDeleteId(order.id)}
+                                                className="inline-flex items-center px-3 py-2 text-sm font-medium text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+                                                title="Delete"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    </Td>
                                 </tr>
-                            ))}
-                            {orders.length === 0 && (
-                                <tr>
-                                    <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
-                                        No orders found.
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-            )}
+                            ))
+                        )}
+                    </tbody>
+                </table>
+            </TableCard>
 
             {isFormOpen && (
                 <OrderForm
                     initialData={editingOrder}
-                    onClose={() => {
-                        setIsFormOpen(false);
-                        setEditingOrder(null);
-                    }}
-                    onSuccess={() => {
-                        setIsFormOpen(false);
-                        setEditingOrder(null);
-                        fetchOrders();
-                    }}
+                    onClose={() => { setIsFormOpen(false); setEditingOrder(null); }}
+                    onSuccess={() => { setIsFormOpen(false); setEditingOrder(null); fetchOrders(); toast('success', editingOrder ? 'Order updated.' : 'Order created.'); }}
                 />
             )}
+
+            <ConfirmDialog
+                isOpen={!!deleteId}
+                title="Delete Order"
+                message="This order and its participants will be permanently deleted. Package quotas may become unbalanced."
+                confirmLabel="Delete Order"
+                onConfirm={handleDelete}
+                onCancel={() => setDeleteId(null)}
+                loading={deleting}
+            />
         </div>
     );
 };
