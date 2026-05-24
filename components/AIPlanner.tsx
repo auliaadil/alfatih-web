@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Plane, Users, Calendar, Sparkles, MapPin, Send, RotateCcw, Loader2, ChevronDown, ChevronUp, User } from 'lucide-react';
-import { generateItinerary } from '../services/geminiService';
+import { generateItinerary } from '../services/itineraryService';
 import { AIPlannerInput } from '../types';
 import { INTERESTS_LIST, DESTINATION_OPTIONS, CONTACT_INFO } from '../constants';
 import { supabase } from '../src/lib/supabase';
