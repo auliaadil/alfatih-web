@@ -132,7 +132,15 @@ Format respons:
 [{ "id": "...", "text": "..." }, ...]`
 
     const model = Deno.env.get('GEMINI_MODEL') ?? 'gemini-2.5-flash-preview-05-20'
-    const apiKey = Deno.env.get('GEMINI_API_KEY') ?? ''
+    const apiKey = Deno.env.get('GEMINI_API_KEY')
+    if (!apiKey) {
+      console.error('GEMINI_API_KEY is not set')
+      return new Response(
+        JSON.stringify({ error: 'Server misconfiguration' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
     const geminiRes = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
       {
@@ -151,7 +159,15 @@ Format respons:
     const raw = geminiData.candidates?.[0]?.content?.parts?.[0]?.text ?? '[]'
     const cleaned = raw.replace(/```json/gi, '').replace(/```/gi, '').trim()
 
-    return new Response(cleaned, {
+    let parsed: unknown
+    try {
+      parsed = JSON.parse(cleaned)
+    } catch {
+      console.error('Gemini returned non-JSON:', cleaned.slice(0, 200))
+      throw new Error('Gemini returned invalid JSON')
+    }
+
+    return new Response(JSON.stringify(parsed), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
   } catch (err) {
