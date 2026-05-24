@@ -1,19 +1,9 @@
 import { supabase } from '../lib/supabase';
 
-export interface SavedTemplate {
-    id: string;
-    name: string;
-    description: string;
-    aspect_ratio: 'post' | 'story';
-    template_type: string;
-    canvas_json: object;
-    thumbnail_data_url?: string;
-    starter_id: string | null;
-    created_at: string;
-    updated_at: string;
-}
+export type { SavedTemplate } from '../components/admin/PosterMaker/types';
+import type { SavedTemplate } from '../components/admin/PosterMaker/types';
 
-export type SavedTemplateInsert = Omit<SavedTemplate, 'id' | 'created_at' | 'updated_at'>;
+type SavedTemplateInsert = Omit<SavedTemplate, 'id' | 'created_at' | 'updated_at'>;
 
 export const fetchTemplateByStarterId = async (starterId: string): Promise<SavedTemplate | null> => {
     const { data, error } = await supabase

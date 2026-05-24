@@ -1,6 +1,6 @@
 // src/components/admin/PosterMaker/types.ts
 
-import React from 'react';
+import type { FC } from 'react';
 
 export type AspectRatio = 'post' | 'story';
 export type TemplateCategory = 'conversion' | 'edu-reminder' | 'aspiration' | 'social-proof' | 'blank';
@@ -24,7 +24,7 @@ export interface PosterTemplate {
   aspectRatio: AspectRatio;
   previewColors: [string, string, string];
   fields: FieldSchema[];
-  Component: React.FC<FieldValues>;
+  Component: FC<FieldValues>;
 }
 
 export type BlockType =
