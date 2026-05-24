@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Loader2, Sparkles, LayoutTemplate, Save, X, Image as ImageIcon } from 'lucide-react';
-import { applyTemplateContent, TemplateInputs, TemplateType } from '../../../services/posterAI';
+import { applyTemplateContent, TemplateInputs, TemplateType } from '../../../services/posterAutofillService';
 import { fetchTemplate, fetchTemplates, saveTemplate, updateTemplate, SavedTemplate } from '../../services/posterTemplates';
 import { STARTER_TEMPLATES as ALL_STARTERS } from '../../components/admin/PosterMaker/TemplatePanel';
 import { supabase } from '../../lib/supabase';
