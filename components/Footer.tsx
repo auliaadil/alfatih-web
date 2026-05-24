@@ -140,6 +140,13 @@ const Footer: React.FC<FooterProps> = () => {
             <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
           </div>
         </div>
+        <p className="text-center text-xs text-gray-600 mt-4">
+          This site is protected by reCAPTCHA and the Google{' '}
+          <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-400 transition-colors">Privacy Policy</a>
+          {' '}and{' '}
+          <a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-400 transition-colors">Terms of Service</a>
+          {' '}apply.
+        </p>
       </div>
     </footer>
   );
