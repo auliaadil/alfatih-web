@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import {
     LayoutDashboard, Package, Map, Plane, Building2, ShoppingCart,
-    Settings, LogOut, Menu, X, Image as ImageIcon, Layers, ChevronRight,
+    Settings, LogOut, Menu, X, Image as ImageIcon, Layers, ChevronRight, Megaphone,
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { ToastProvider } from '../../components/admin/ui';
@@ -29,6 +29,7 @@ const NAV_GROUPS = [
         items: [
             { path: '/admin/poster-maker', icon: ImageIcon, label: 'Poster Maker' },
             { path: '/admin/poster-templates', icon: Layers, label: 'Templates' },
+            { path: '/admin/text-campaign', icon: Megaphone, label: 'Text Campaign' },
         ],
     },
     {
@@ -43,7 +44,7 @@ const AdminLayout: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const isFullHeightPage = location.pathname.startsWith('/admin/poster-maker');
+    const isFullHeightPage = location.pathname.startsWith('/admin/poster-maker') || location.pathname.startsWith('/admin/text-campaign');
 
     const handleLogout = async () => {
         await supabase.auth.signOut();

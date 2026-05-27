@@ -14,6 +14,7 @@ import Hotels from './src/pages/admin/Hotels';
 import SiteSettings from './src/pages/admin/SiteSettings';
 import PosterMaker from './src/pages/admin/PosterMaker';
 import PosterTemplates from './src/pages/admin/PosterTemplates';
+import TextCampaign from './src/pages/admin/TextCampaign';
 import { SiteSettingsProvider } from './src/contexts/SiteSettingsContext';
 import { LanguageProvider } from './src/contexts/LanguageContext';
 
@@ -40,6 +41,7 @@ const App: React.FC = () => {
                                 <Route path="hotels" element={<Hotels />} />
                                 <Route path="poster-maker" element={<PosterMaker />} />
                                 <Route path="poster-templates" element={<PosterTemplates />} />
+                                <Route path="text-campaign" element={<TextCampaign />} />
                                 <Route path="settings" element={<SiteSettings />} />
                             </Route>
                         </Route>
