@@ -44,7 +44,7 @@ const AdminLayout: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const isFullHeightPage = location.pathname.startsWith('/admin/poster-maker') || location.pathname.startsWith('/admin/text-campaign');
+    const isFullHeightPage = location.pathname.startsWith('/admin/poster-maker');
 
     const handleLogout = async () => {
         await supabase.auth.signOut();
