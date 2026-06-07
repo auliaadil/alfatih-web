@@ -21,6 +21,7 @@ import { LanguageProvider } from './src/contexts/LanguageContext';
 
 const App: React.FC = () => {
     return (
+        <>
         <SiteSettingsProvider>
             <LanguageProvider>
                 <BrowserRouter>
@@ -51,6 +52,7 @@ const App: React.FC = () => {
             </LanguageProvider>
         </SiteSettingsProvider>
         <Analytics />
+        </>
     );
 };
 
