@@ -21,6 +21,7 @@ VITE_SUPABASE_API_KEY=
 VITE_RECAPTCHA_SITE_KEY=
 VITE_UNSPLASH_ACCESS_KEY=   # Unsplash Client-ID for image search in Poster Maker (50 req/hr free)
 VITE_PIXABAY_API_KEY=       # Pixabay API key for image search in Poster Maker (100 req/min free)
+VITE_ADMIN_EMAILS=          # Comma-separated allowed admin emails (e.g. "admin@example.com,other@example.com")
 ```
 
 AI API keys are managed as Supabase secrets (not in `.env.local`):

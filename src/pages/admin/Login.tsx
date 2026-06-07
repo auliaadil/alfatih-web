@@ -1,13 +1,18 @@
 import React, { useState } from 'react';
 import { supabase } from '../../lib/supabase';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Mail, Lock, ArrowRight, AlertCircle } from 'lucide-react';
 
 const Login: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    const [searchParams] = useSearchParams();
+    const [error, setError] = useState<string | null>(
+        searchParams.get('error') === 'unauthorized'
+            ? 'Akun ini tidak memiliki akses admin.'
+            : null
+    );
     const navigate = useNavigate();
 
     const handleLogin = async (e: React.FormEvent) => {

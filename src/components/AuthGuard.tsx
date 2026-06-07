@@ -2,30 +2,46 @@ import React, { useEffect, useState } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 
+const ALLOWED_EMAILS = (import.meta.env.VITE_ADMIN_EMAILS as string | undefined ?? '')
+    .split(',')
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean);
+
+type AuthState = 'loading' | 'allowed' | 'denied' | 'unauthorized';
+
 export const AuthGuard: React.FC = () => {
-    const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+    const [authState, setAuthState] = useState<AuthState>('loading');
+
+    const resolveSession = async (session: { user: { email?: string } } | null) => {
+        if (!session) { setAuthState('denied'); return; }
+        const email = session.user.email?.toLowerCase() ?? '';
+        if (ALLOWED_EMAILS.length > 0 && !ALLOWED_EMAILS.includes(email)) {
+            await supabase.auth.signOut();
+            setAuthState('unauthorized');
+            return;
+        }
+        setAuthState('allowed');
+    };
 
     useEffect(() => {
-        const checkAuth = async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-            setIsAuthenticated(!!session);
-        };
-
-        checkAuth();
+        supabase.auth.getSession().then(({ data: { session } }) => resolveSession(session));
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            setIsAuthenticated(!!session);
+            resolveSession(session);
         });
 
         return () => subscription.unsubscribe();
     }, []);
 
-    // Show nothing or a loader while checking auth state
-    if (isAuthenticated === null) {
+    if (authState === 'loading') {
         return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
     }
 
-    if (!isAuthenticated) {
+    if (authState === 'unauthorized') {
+        return <Navigate to="/admin/login?error=unauthorized" replace />;
+    }
+
+    if (authState === 'denied') {
         return <Navigate to="/admin/login" replace />;
     }
 
