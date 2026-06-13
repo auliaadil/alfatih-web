@@ -37,12 +37,19 @@ const Airlines: React.FC = () => {
     const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
+        const MAX_MB = 2;
+        if (file.size > MAX_MB * 1024 * 1024) {
+            toast('error', `File terlalu besar. Maksimum ${MAX_MB} MB.`);
+            e.target.value = '';
+            return;
+        }
         setUploading(true);
-        const ext = file.name.split('.').pop() ?? 'png';
+        const raw = file.name.split('.').pop() ?? 'png';
+        const ext = raw.toLowerCase().slice(0, 5);
         const path = `${crypto.randomUUID()}.${ext}`;
         const { data, error } = await supabase.storage
             .from('airline-logos')
-            .upload(path, file, { upsert: true });
+            .upload(path, file, { upsert: true, contentType: file.type || 'image/png' });
         if (error) {
             toast('error', 'Logo upload failed.');
             setUploading(false);
@@ -51,6 +58,7 @@ const Airlines: React.FC = () => {
         const { data: urlData } = supabase.storage.from('airline-logos').getPublicUrl(data.path);
         setForm((f) => ({ ...f, logo_url: urlData.publicUrl }));
         setUploading(false);
+        toast('success', 'Logo uploaded.');
         e.target.value = '';
     };
 
