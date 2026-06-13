@@ -51,7 +51,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialData, onClose, onSuccess }
 
     useEffect(() => {
         const loadPackages = async () => {
-            const { data } = await supabase.from('packages').select('id, title, room_options, quotas, available_rooms');
+            const { data } = await supabase.from('packages').select('id, title, room_options, quotas');
             if (data) {
                 setPackages(data);
             }
@@ -108,11 +108,6 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialData, onClose, onSuccess }
         if (pkg) {
             if (totalPax > pkg.quotas) {
                 setErrorMsg(`Cannot exceed package quotas. Available: ${pkg.quotas}`);
-                setSaving(false);
-                return;
-            }
-            if (totalRooms > pkg.available_rooms) {
-                setErrorMsg(`Cannot exceed available physical rooms. Available: ${pkg.available_rooms}`);
                 setSaving(false);
                 return;
             }
@@ -273,7 +268,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialData, onClose, onSuccess }
                                     <option value="" disabled>-- Select a Package --</option>
                                     {packages.map(p => (
                                         <option key={p.id} value={p.id}>
-                                            {p.title} (Quotas: {p.quotas} | Rooms: {p.available_rooms})
+                                            {p.title} (Quotas: {p.quotas})
                                         </option>
                                     ))}
                                 </select>
