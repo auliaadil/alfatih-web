@@ -267,8 +267,24 @@ Secrets used: `UNSPLASH_ACCESS_KEY`, `PIXABAY_API_KEY` — must be set as Supaba
 
 ---
 
+## Public Page Changes
+
+Two targeted changes required in public-facing components due to schema changes. No visual redesign.
+
+### `TourDetail.tsx`
+- **Flight info** — `tour.flight_details` (line 225) is replaced with a `formatFlightRoutes(routes, airlines)` helper that derives a display string from `tour.flight_routes`. Example output: `"Garuda Indonesia: CGK → IST → JED"`. Falls back to `"Flight details TBA"` if `flight_routes` is empty.
+- **Image credit** — render `tour.image_credit` as a small attribution caption below the cover image when present (required by Unsplash terms of service).
+
+### `TourCard.tsx`
+- No changes needed. `room_options` shape change (adding `hotel_id`) is backward-compatible — cheapest-room price calculation is unaffected.
+
+### `formatFlightRoutes` helper
+A pure utility function in `src/lib/formatFlightRoutes.ts`. Takes `flight_routes` JSONB and a lookup of airline names, returns a human-readable string. Used by `TourDetail` and any future components that need to display route info.
+
+---
+
 ## Out of Scope
 
-- Public-facing package detail page changes (uses existing `TourPackage` shape; `arrival_date` can be displayed but no redesign)
+- Public-facing package detail page visual redesign
 - Order form changes
 - Poster Maker integration
