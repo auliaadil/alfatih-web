@@ -65,7 +65,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    let active = true;
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       const isNewUser = session?.user?.id !== currentUserIdRef.current;
 
       // Show spinner only on initial load or a genuine new login (different user).
@@ -78,19 +80,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       currentUserIdRef.current = session?.user?.id ?? null;
       setUser(session?.user ?? null);
 
-      try {
-        if (session?.user) {
-          await loadProfile(session.user.id);
-        } else {
-          setProfile(null);
-          setBranchIds([]);
+      // CRITICAL: do NOT await Supabase calls directly inside this callback.
+      // onAuthStateChange runs while GoTrue holds its internal auth lock, and the
+      // SDK awaits this callback before releasing it. Any supabase.from()/getSession()
+      // call here would try to re-acquire that same (non-reentrant) lock and
+      // deadlock — which is exactly what froze every page on the spinner after
+      // idle / token refresh. setTimeout(…, 0) defers the DB work until after the
+      // callback returns and the lock is released. (Documented Supabase gotcha.)
+      setTimeout(async () => {
+        if (!active) return;
+        try {
+          if (session?.user) {
+            await loadProfile(session.user.id);
+          } else {
+            setProfile(null);
+            setBranchIds([]);
+          }
+        } finally {
+          if (active) setLoading(false);
         }
-      } finally {
-        setLoading(false);
-      }
+      }, 0);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      active = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   return (
