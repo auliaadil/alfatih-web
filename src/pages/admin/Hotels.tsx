@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
-import { Plus, Edit2, Trash2, Building2, Star } from 'lucide-react';
+import { Plus, Edit2, Trash2, Building2, Star, X } from 'lucide-react';
 import {
     PageHeader, TableCard, THead, Th, Td, SkeletonRows, EmptyState, SlideOver,
     ConfirmDialog, FormField, inputClass, selectClass, btnPrimary, btnSecondary, btnGhost,
     useToast,
 } from '../../components/admin/ui';
 
-interface Hotel { id: string; name: string; location: string; stars: number; }
+interface RoomTypeRow { name: string; capacity: number; }
 
-const EMPTY_FORM = { name: '', location: '', stars: 3 };
+interface Hotel { id: string; name: string; location: string; stars: number; room_types: RoomTypeRow[]; }
+
+const EMPTY_FORM = { name: '', location: '', stars: 3, room_types: [] as RoomTypeRow[] };
 
 const StarRating: React.FC<{ count: number }> = ({ count }) => (
     <div className="flex items-center gap-0.5">
@@ -49,14 +51,14 @@ const Hotels: React.FC = () => {
 
     const openEdit = (hotel: Hotel) => {
         setEditingId(hotel.id);
-        setForm({ name: hotel.name, location: hotel.location, stars: hotel.stars });
+        setForm({ name: hotel.name, location: hotel.location, stars: hotel.stars, room_types: hotel.room_types ?? [] });
         setIsFormOpen(true);
     };
 
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
         setSaving(true);
-        const payload = { name: form.name, location: form.location, stars: form.stars };
+        const payload = { name: form.name, location: form.location, stars: form.stars, room_types: form.room_types };
         const { error } = editingId
             ? await supabase.from('hotels').update(payload).eq('id', editingId)
             : await supabase.from('hotels').insert([payload]);
@@ -84,6 +86,19 @@ const Hotels: React.FC = () => {
             fetchHotels();
         }
     };
+
+    const addRoomType = () =>
+        setForm((f) => ({ ...f, room_types: [...f.room_types, { name: '', capacity: 2 }] }));
+
+    const updateRoomType = (i: number, field: keyof RoomTypeRow, value: string | number) =>
+        setForm((f) => {
+            const rt = [...f.room_types];
+            rt[i] = { ...rt[i], [field]: value };
+            return { ...f, room_types: rt };
+        });
+
+    const removeRoomType = (i: number) =>
+        setForm((f) => ({ ...f, room_types: f.room_types.filter((_, idx) => idx !== i) }));
 
     return (
         <div>
@@ -215,6 +230,46 @@ const Hotels: React.FC = () => {
                             <StarRating count={form.stars} />
                         </div>
                     </FormField>
+                    {/* Room Types */}
+                    <div>
+                        <div className="flex items-center justify-between mb-3">
+                            <label className="block text-sm font-medium text-gray-700">Room Types</label>
+                            <button type="button" onClick={addRoomType} className="text-xs text-primary font-medium hover:underline flex items-center gap-1">
+                                <Plus className="w-3 h-3" /> Add room type
+                            </button>
+                        </div>
+                        {form.room_types.length === 0 && (
+                            <p className="text-xs text-gray-400">No room types defined. Click "Add room type" to begin.</p>
+                        )}
+                        <div className="space-y-2">
+                            {form.room_types.map((rt, i) => (
+                                <div key={i} className="flex items-center gap-2">
+                                    <input
+                                        type="text"
+                                        required
+                                        placeholder="e.g., Quad"
+                                        className={inputClass + ' flex-1'}
+                                        value={rt.name}
+                                        onChange={(e) => updateRoomType(i, 'name', e.target.value)}
+                                    />
+                                    <input
+                                        type="number"
+                                        required
+                                        min={1}
+                                        max={10}
+                                        placeholder="Pax"
+                                        className={inputClass + ' w-20'}
+                                        value={rt.capacity}
+                                        onChange={(e) => updateRoomType(i, 'capacity', parseInt(e.target.value) || 1)}
+                                    />
+                                    <button type="button" onClick={() => removeRoomType(i)} className="text-red-400 hover:text-red-600 p-1">
+                                        <X className="w-4 h-4" />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                        <p className="text-xs text-gray-400 mt-2">These room types will be available when creating packages.</p>
+                    </div>
                 </form>
             </SlideOver>
 
