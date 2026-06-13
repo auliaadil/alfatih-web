@@ -17,6 +17,9 @@ import SiteSettings from './src/pages/admin/SiteSettings';
 import PosterMaker from './src/pages/admin/PosterMaker';
 import PosterTemplates from './src/pages/admin/PosterTemplates';
 import TextCampaign from './src/pages/admin/TextCampaign';
+import PackageWizard from './src/pages/admin/PackageWizard';
+import Airports from './src/pages/admin/Airports';
+import Categories from './src/pages/admin/Categories';
 import { SiteSettingsProvider } from './src/contexts/SiteSettingsContext';
 import { LanguageProvider } from './src/contexts/LanguageContext';
 
@@ -39,6 +42,10 @@ const App: React.FC = () => {
                                 <Route index element={<Dashboard />} />
                                 <Route path="orders" element={<Orders />} />
                                 <Route path="packages" element={<Packages />} />
+                                <Route path="packages/new" element={<PackageWizard />} />
+                                <Route path="packages/:id/edit" element={<PackageWizard />} />
+                                <Route path="airports" element={<Airports />} />
+                                <Route path="categories" element={<Categories />} />
                                 <Route path="private-trips" element={<PrivateTrips />} />
                                 <Route path="airlines" element={<Airlines />} />
                                 <Route path="hotels" element={<Hotels />} />

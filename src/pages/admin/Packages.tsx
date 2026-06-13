@@ -1,20 +1,18 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { Plus, Edit2, Trash2, Users, Package, CalendarDays } from 'lucide-react';
 import {
     PageHeader, SkeletonCard, EmptyState, ConfirmDialog,
     btnPrimary, btnGhost, useToast, StatusBadge,
 } from '../../components/admin/ui';
-import PackageForm from './PackageForm';
 import PackageDetailModal from './PackageDetailModal';
 
 const Packages: React.FC = () => {
     const toast = useToast();
+    const navigate = useNavigate();
     const [packages, setPackages] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-
-    const [isFormOpen, setIsFormOpen] = useState(false);
-    const [editingPackage, setEditingPackage] = useState<any | null>(null);
 
     const [isDetailOpen, setIsDetailOpen] = useState(false);
     const [selectedPackage, setSelectedPackage] = useState<any | null>(null);
@@ -22,22 +20,9 @@ const Packages: React.FC = () => {
     const [deleteId, setDeleteId] = useState<string | null>(null);
     const [deleting, setDeleting] = useState(false);
 
-    const [airlinesData, setAirlinesData] = useState<any[]>([]);
-    const [hotelsData, setHotelsData] = useState<any[]>([]);
-
     useEffect(() => {
         fetchPackages();
-        fetchConfigData();
     }, []);
-
-    const fetchConfigData = async () => {
-        const [airlinesRes, hotelsRes] = await Promise.all([
-            supabase.from('airlines').select('*'),
-            supabase.from('hotels').select('*'),
-        ]);
-        if (airlinesRes.data) setAirlinesData(airlinesRes.data);
-        if (hotelsRes.data) setHotelsData(hotelsRes.data);
-    };
 
     const fetchPackages = async () => {
         setLoading(true);
@@ -78,7 +63,7 @@ const Packages: React.FC = () => {
                 breadcrumbs={[{ label: 'Operations' }, { label: 'Packages' }]}
                 action={
                     <button
-                        onClick={() => { setEditingPackage(null); setIsFormOpen(true); }}
+                        onClick={() => navigate('/admin/packages/new')}
                         className={btnPrimary}
                     >
                         <Plus className="w-4 h-4" /> New Package
@@ -98,7 +83,7 @@ const Packages: React.FC = () => {
                         description="Create your first tour package to start accepting bookings."
                         action={
                             <button
-                                onClick={() => { setEditingPackage(null); setIsFormOpen(true); }}
+                                onClick={() => navigate('/admin/packages/new')}
                                 className={btnPrimary}
                             >
                                 <Plus className="w-4 h-4" /> New Package
@@ -171,7 +156,7 @@ const Packages: React.FC = () => {
                                         </button>
                                         <div className="flex items-center gap-1">
                                             <button
-                                                onClick={() => { setEditingPackage(pkg); setIsFormOpen(true); }}
+                                                onClick={() => navigate(`/admin/packages/${pkg.id}/edit`)}
                                                 className={btnGhost}
                                                 title="Edit"
                                             >
@@ -191,21 +176,6 @@ const Packages: React.FC = () => {
                         );
                     })}
                 </div>
-            )}
-
-            {isFormOpen && (
-                <PackageForm
-                    airlinesData={airlinesData}
-                    hotelsData={hotelsData}
-                    initialData={editingPackage}
-                    onClose={() => { setIsFormOpen(false); setEditingPackage(null); }}
-                    onSuccess={() => {
-                        setIsFormOpen(false);
-                        setEditingPackage(null);
-                        fetchPackages();
-                        toast('success', editingPackage ? 'Package updated.' : 'Package created.');
-                    }}
-                />
             )}
 
             {isDetailOpen && selectedPackage && (
