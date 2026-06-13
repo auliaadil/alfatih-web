@@ -1,49 +1,27 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-
-const ALLOWED_EMAILS = (import.meta.env.VITE_ADMIN_EMAILS as string | undefined ?? '')
-    .split(',')
-    .map((e) => e.trim().toLowerCase())
-    .filter(Boolean);
-
-type AuthState = 'loading' | 'allowed' | 'denied' | 'unauthorized';
+import { useAuth } from '../contexts/AuthContext';
 
 export const AuthGuard: React.FC = () => {
-    const [authState, setAuthState] = useState<AuthState>('loading');
+  const { user, profile, loading } = useAuth();
 
-    const resolveSession = async (session: { user: { email?: string } } | null) => {
-        if (!session) { setAuthState('denied'); return; }
-        const email = session.user.email?.toLowerCase() ?? '';
-        if (ALLOWED_EMAILS.length > 0 && !ALLOWED_EMAILS.includes(email)) {
-            await supabase.auth.signOut();
-            setAuthState('unauthorized');
-            return;
-        }
-        setAuthState('allowed');
-    };
-
-    useEffect(() => {
-        supabase.auth.getSession().then(({ data: { session } }) => resolveSession(session));
-
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            resolveSession(session);
-        });
-
-        return () => subscription.unsubscribe();
-    }, []);
-
-    if (authState === 'loading') {
-        return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  useEffect(() => {
+    if (!loading && user && !profile) {
+      supabase.auth.signOut();
     }
+  }, [loading, user, profile]);
 
-    if (authState === 'unauthorized') {
-        return <Navigate to="/admin/login?error=unauthorized" replace />;
-    }
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-950">
+        <div className="w-6 h-6 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+      </div>
+    );
+  }
 
-    if (authState === 'denied') {
-        return <Navigate to="/admin/login" replace />;
-    }
+  if (!user) return <Navigate to="/admin/login" replace />;
+  if (!profile) return <Navigate to="/admin/login?error=unauthorized" replace />;
 
-    return <Outlet />;
+  return <Outlet />;
 };
