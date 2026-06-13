@@ -105,6 +105,15 @@ const Airlines: React.FC = () => {
     const handleDelete = async () => {
         if (!deleteId) return;
         setDeleting(true);
+
+        // Best-effort cleanup of uploaded logo
+        const target = airlines.find((a) => a.id === deleteId);
+        const storagePrefix = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/airline-logos/`;
+        if (target?.logo_url?.startsWith(storagePrefix)) {
+            const storagePath = target.logo_url.slice(storagePrefix.length);
+            await supabase.storage.from('airline-logos').remove([storagePath]);
+        }
+
         const { error } = await supabase.from('airlines').delete().eq('id', deleteId);
         setDeleting(false);
         setDeleteId(null);
@@ -112,7 +121,6 @@ const Airlines: React.FC = () => {
             toast('error', 'Failed to delete airline.');
         } else {
             toast('success', 'Airline deleted.');
-            setPage(0);
             fetchAirlines();
         }
     };
