@@ -10,7 +10,7 @@ const Hero: React.FC = () => {
       <div className="absolute inset-0">
         <img
           className="w-full h-full object-cover opacity-20"
-          src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=1920"
+          src="/assets/kaaba-hero.jpg"
           alt="Al Fatih Dunia Wisata - Premium Travel"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-dark via-dark/90 to-dark/50"></div>
@@ -55,7 +55,7 @@ const Hero: React.FC = () => {
           <div className="hidden lg:block">
             <div className="relative h-[360px] rounded-2xl overflow-hidden border border-white/10">
               <img
-                src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=800"
+                src="/assets/kaaba-hero.jpg"
                 alt="AlFatih Travel"
                 className="w-full h-full object-cover"
               />

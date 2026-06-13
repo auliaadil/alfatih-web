@@ -68,9 +68,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(session?.user ?? null);
       if (session?.user) await loadProfile(session.user.id);
       setLoading(false);
-    });
+    }).catch(() => setLoading(false));
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      // Set loading=true during SIGNED_IN so AuthGuard doesn't see user+no-profile
+      // and trigger a premature signOut before the profile query completes.
+      if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
+        setLoading(true);
+      }
       setUser(session?.user ?? null);
       if (session?.user) {
         await loadProfile(session.user.id);
@@ -78,6 +83,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setProfile(null);
         setBranchIds([]);
       }
+      setLoading(false);
     });
 
     return () => subscription.unsubscribe();
