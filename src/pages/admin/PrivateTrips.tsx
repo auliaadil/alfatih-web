@@ -4,8 +4,10 @@ import { CheckCircle, Clock, Trash2, Map, Save, X, MessageCircle } from 'lucide-
 import {
     PageHeader, TableCard, THead, Th, Td, SkeletonRows, EmptyState, SlideOver,
     ConfirmDialog, StatusBadge, FormField, textareaClass, btnPrimary, btnSecondary, btnGhost,
-    useToast,
+    useToast, SearchInput, Pagination,
 } from '../../components/admin/ui';
+
+const PAGE_SIZE = 10;
 
 const PrivateTrips: React.FC = () => {
     const toast = useToast();
@@ -19,7 +21,12 @@ const PrivateTrips: React.FC = () => {
     const [deleteId, setDeleteId] = useState<string | null>(null);
     const [deleting, setDeleting] = useState(false);
 
+    const [searchQuery, setSearchQuery] = useState('');
+    const [page, setPage] = useState(0);
+
     useEffect(() => { fetchRequests(); }, []);
+
+    useEffect(() => { setPage(0); }, [searchQuery]);
 
     const fetchRequests = async () => {
         setLoading(true);
@@ -34,6 +41,7 @@ const PrivateTrips: React.FC = () => {
     const markAsHandled = async (id: string, currentStatus: string) => {
         const newStatus = currentStatus === 'pending' ? 'handled' : 'pending';
         await supabase.from('private_trip_requests').update({ status: newStatus }).eq('id', id);
+        setPage(0);
         fetchRequests();
         if (selectedRequest?.id === id) {
             setSelectedRequest((prev: any) => prev ? { ...prev, status: newStatus } : null);
@@ -69,11 +77,19 @@ const PrivateTrips: React.FC = () => {
         } else {
             toast('success', 'Request deleted.');
             if (selectedRequest?.id === deleteId) setSelectedRequest(null);
+            setPage(0);
             fetchRequests();
         }
     };
 
     const pendingCount = requests.filter(r => r.status === 'pending').length;
+
+    const filtered = requests.filter((r) =>
+        [r.name, r.phone, r.destination, r.email].some((f) =>
+            (f ?? '').toLowerCase().includes(searchQuery.toLowerCase())
+        )
+    );
+    const paginated = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
     return (
         <div>
@@ -83,6 +99,10 @@ const PrivateTrips: React.FC = () => {
                 subtitle={pendingCount > 0 ? `${pendingCount} pending follow-up` : 'All caught up!'}
                 breadcrumbs={[{ label: 'Operations' }, { label: 'Private Trips' }]}
             />
+
+            <div className="mb-4">
+                <SearchInput value={searchQuery} onChange={setSearchQuery} placeholder="Cari nama, tujuan..." />
+            </div>
 
             <TableCard>
                 <table className="min-w-full">
@@ -96,18 +116,26 @@ const PrivateTrips: React.FC = () => {
                     <tbody className="divide-y divide-gray-100">
                         {loading ? (
                             <SkeletonRows cols={5} rows={5} />
-                        ) : requests.length === 0 ? (
+                        ) : filtered.length === 0 ? (
                             <tr>
                                 <td colSpan={5}>
-                                    <EmptyState
-                                        icon={<Map className="w-7 h-7" />}
-                                        title="No private trip requests yet"
-                                        description="Requests from the public AI planner will appear here."
-                                    />
+                                    {requests.length === 0 ? (
+                                        <EmptyState
+                                            icon={<Map className="w-7 h-7" />}
+                                            title="No private trip requests yet"
+                                            description="Requests from the public AI planner will appear here."
+                                        />
+                                    ) : (
+                                        <EmptyState
+                                            icon={<Map className="w-7 h-7" />}
+                                            title="Tidak ada hasil"
+                                            description={`Tidak ada permintaan yang cocok dengan "${searchQuery}".`}
+                                        />
+                                    )}
                                 </td>
                             </tr>
                         ) : (
-                            requests.map((req) => (
+                            paginated.map((req) => (
                                 <tr
                                     key={req.id}
                                     onClick={() => { setSelectedRequest(req); setNotes(req.admin_notes || ''); }}
@@ -156,6 +184,10 @@ const PrivateTrips: React.FC = () => {
                     </tbody>
                 </table>
             </TableCard>
+
+            {!loading && (
+                <Pagination page={page} totalItems={filtered.length} pageSize={PAGE_SIZE} onPageChange={setPage} />
+            )}
 
             {/* Detail Slide-Over */}
             <SlideOver
