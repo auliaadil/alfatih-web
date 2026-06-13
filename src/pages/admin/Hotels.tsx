@@ -7,6 +7,7 @@ import {
     useToast,
 } from '../../components/admin/ui';
 
+// Catalogue-level room type (no price — pricing is set per-package in the wizard)
 interface RoomTypeRow { name: string; capacity: number; }
 
 interface Hotel { id: string; name: string; location: string; stars: number; room_types: RoomTypeRow[]; }

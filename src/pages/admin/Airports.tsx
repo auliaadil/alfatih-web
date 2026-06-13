@@ -25,7 +25,8 @@ const Airports: React.FC = () => {
   const fetchAirports = async () => {
     setLoading(true);
     const { data, error } = await supabase.from('airports').select('*').order('iata_code');
-    if (!error && data) setAirports(data);
+    if (error) toast('error', 'Failed to load airports.');
+    else if (data) setAirports(data);
     setLoading(false);
   };
 
@@ -44,7 +45,10 @@ const Airports: React.FC = () => {
       ? await supabase.from('airports').update(payload).eq('id', editingId)
       : await supabase.from('airports').insert([payload]);
     setSaving(false);
-    if (error) { toast('error', 'Failed to save airport.'); }
+    if (error) {
+      const msg = error.code === '23505' ? 'That IATA code already exists.' : 'Failed to save airport.';
+      toast('error', msg);
+    }
     else { toast('success', editingId ? 'Airport updated.' : 'Airport added.'); setIsFormOpen(false); fetchAirports(); }
   };
 

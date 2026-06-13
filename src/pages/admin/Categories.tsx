@@ -28,7 +28,8 @@ const Categories: React.FC = () => {
   const fetchCategories = async () => {
     setLoading(true);
     const { data, error } = await supabase.from('categories').select('*').order('name');
-    if (!error && data) setCategories(data);
+    if (error) toast('error', 'Failed to load categories.');
+    else if (data) setCategories(data);
     setLoading(false);
   };
 
@@ -43,7 +44,10 @@ const Categories: React.FC = () => {
       ? await supabase.from('categories').update(payload).eq('id', editingId)
       : await supabase.from('categories').insert([payload]);
     setSaving(false);
-    if (error) { toast('error', 'Failed to save category.'); }
+    if (error) {
+      const msg = error.code === '23505' ? 'A category with that name or slug already exists.' : 'Failed to save category.';
+      toast('error', msg);
+    }
     else { toast('success', editingId ? 'Category updated.' : 'Category added.'); setIsFormOpen(false); fetchCategories(); }
   };
 
