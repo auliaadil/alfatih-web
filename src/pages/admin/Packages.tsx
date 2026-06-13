@@ -5,8 +5,11 @@ import { Plus, Edit2, Trash2, Users, Package, CalendarDays } from 'lucide-react'
 import {
     PageHeader, SkeletonCard, EmptyState, ConfirmDialog,
     btnPrimary, btnGhost, useToast, StatusBadge,
+    SearchInput, Pagination,
 } from '../../components/admin/ui';
 import PackageDetailModal from './PackageDetailModal';
+
+const PAGE_SIZE = 12;
 
 const Packages: React.FC = () => {
     const toast = useToast();
@@ -20,9 +23,14 @@ const Packages: React.FC = () => {
     const [deleteId, setDeleteId] = useState<string | null>(null);
     const [deleting, setDeleting] = useState(false);
 
+    const [searchQuery, setSearchQuery] = useState('');
+    const [page, setPage] = useState(0);
+
     useEffect(() => {
         fetchPackages();
     }, []);
+
+    useEffect(() => { setPage(0); }, [searchQuery]);
 
     const fetchPackages = async () => {
         setLoading(true);
@@ -44,6 +52,7 @@ const Packages: React.FC = () => {
             toast('error', 'Failed to delete package.');
         } else {
             toast('success', 'Package deleted.');
+            setPage(0);
             fetchPackages();
         }
     };
@@ -53,6 +62,13 @@ const Packages: React.FC = () => {
         const used = total - (pkg.quotas || 0);
         return Math.round((used / total) * 100);
     };
+
+    const filtered = packages.filter((p) =>
+        [p.title, p.category, p.departure_date].some((f) =>
+            (f ?? '').toLowerCase().includes(searchQuery.toLowerCase())
+        )
+    );
+    const paginated = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
     return (
         <div>
@@ -71,29 +87,38 @@ const Packages: React.FC = () => {
                 }
             />
 
+            <div className="mb-4">
+                <SearchInput value={searchQuery} onChange={setSearchQuery} placeholder="Cari judul, kategori, tanggal..." />
+            </div>
+
             {loading ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
                     {Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)}
                 </div>
-            ) : packages.length === 0 ? (
+            ) : filtered.length === 0 ? (
                 <div className="bg-white rounded-2xl border border-gray-200 shadow-sm">
-                    <EmptyState
-                        icon={<Package className="w-7 h-7" />}
-                        title="No packages yet"
-                        description="Create your first tour package to start accepting bookings."
-                        action={
-                            <button
-                                onClick={() => navigate('/admin/packages/new')}
-                                className={btnPrimary}
-                            >
-                                <Plus className="w-4 h-4" /> New Package
-                            </button>
-                        }
-                    />
+                    {packages.length === 0 ? (
+                        <EmptyState
+                            icon={<Package className="w-7 h-7" />}
+                            title="No packages yet"
+                            description="Create your first tour package to start accepting bookings."
+                            action={
+                                <button onClick={() => navigate('/admin/packages/new')} className={btnPrimary}>
+                                    <Plus className="w-4 h-4" /> New Package
+                                </button>
+                            }
+                        />
+                    ) : (
+                        <EmptyState
+                            icon={<Package className="w-7 h-7" />}
+                            title="Tidak ada hasil"
+                            description={`Tidak ada paket yang cocok dengan "${searchQuery}".`}
+                        />
+                    )}
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-                    {packages.map((pkg) => {
+                    {paginated.map((pkg) => {
                         const filledPct = quotaPercent(pkg);
                         const isAlmostFull = filledPct >= 80;
                         return (
@@ -176,6 +201,10 @@ const Packages: React.FC = () => {
                         );
                     })}
                 </div>
+            )}
+
+            {!loading && (
+                <Pagination page={page} totalItems={filtered.length} pageSize={PAGE_SIZE} onPageChange={setPage} />
             )}
 
             {isDetailOpen && selectedPackage && (
