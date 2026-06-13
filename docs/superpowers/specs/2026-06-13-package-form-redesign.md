@@ -67,11 +67,6 @@ Navigation: "Next" and "Back" buttons. Steps are not freely skippable — each s
 - Multiple legs per airline (e.g. CGK→IST, IST→JED)
 - "+ Add leg" button per airline; "✕" removes a leg
 
-**Flight Details Override:**
-- Text input, editable
-- "✨ Auto-generate" button composes a readable string from selected airlines + route legs (client-side, no AI call needed)
-- Example output: `"Garuda Indonesia CGK → IST → JED"`
-
 **Hotels section:**
 - Searchable checkbox list (search filters by hotel name or location)
 - Each row shows hotel name, star rating, city
@@ -187,7 +182,8 @@ ALTER TABLE packages
   ADD COLUMN flight_routes   JSONB DEFAULT '[]'::jsonb,
   ADD COLUMN image_credit    TEXT,
   DROP COLUMN initial_rooms,
-  DROP COLUMN available_rooms;
+  DROP COLUMN available_rooms,
+  DROP COLUMN flight_details;
 
 -- flight_routes shape:
 -- [{airline_id: "uuid", legs: [{from_airport_id: "uuid", to_airport_id: "uuid"}]}]
@@ -198,7 +194,7 @@ ALTER TABLE packages
 
 ### Types (`types.ts`)
 - Add `Airport`, `Category` interfaces
-- Update `TourPackage`: add `arrival_date`, `flight_routes`, `image_credit`; remove `available_rooms`, `initial_rooms`
+- Update `TourPackage`: add `arrival_date`, `flight_routes`, `image_credit`; remove `available_rooms`, `initial_rooms`, `flight_details`
 - Update `RoomOption`: add `hotel_id`
 
 ---
