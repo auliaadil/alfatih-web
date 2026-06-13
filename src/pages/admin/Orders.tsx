@@ -4,8 +4,11 @@ import { Plus, Edit2, Trash2, ShoppingCart } from 'lucide-react';
 import {
     PageHeader, TableCard, THead, Th, Td, SkeletonRows, EmptyState,
     ConfirmDialog, StatusBadge, btnPrimary, btnGhost, useToast,
+    SearchInput, Pagination,
 } from '../../components/admin/ui';
 import OrderForm from './OrderForm';
+
+const PAGE_SIZE = 10;
 
 const Orders: React.FC = () => {
     const toast = useToast();
@@ -18,7 +21,12 @@ const Orders: React.FC = () => {
     const [deleteId, setDeleteId] = useState<string | null>(null);
     const [deleting, setDeleting] = useState(false);
 
+    const [searchQuery, setSearchQuery] = useState('');
+    const [page, setPage] = useState(0);
+
     useEffect(() => { fetchOrders(); }, []);
+
+    useEffect(() => { setPage(0); }, [searchQuery]);
 
     const fetchOrders = async () => {
         setLoading(true);
@@ -40,6 +48,7 @@ const Orders: React.FC = () => {
             toast('error', 'Failed to delete order.');
         } else {
             toast('success', 'Order deleted.');
+            setPage(0);
             fetchOrders();
         }
     };
@@ -51,6 +60,13 @@ const Orders: React.FC = () => {
         if (s.includes('cancel')) return 'pending';
         return 'info';
     };
+
+    const filtered = orders.filter((o) =>
+        [o.customer_name, o.customer_phone, o.packages?.title].some((f) =>
+            (f ?? '').toLowerCase().includes(searchQuery.toLowerCase())
+        )
+    );
+    const paginated = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
     return (
         <div>
@@ -69,6 +85,10 @@ const Orders: React.FC = () => {
                 }
             />
 
+            <div className="mb-4">
+                <SearchInput value={searchQuery} onChange={setSearchQuery} placeholder="Cari nama customer atau paket..." />
+            </div>
+
             <TableCard>
                 <table className="min-w-full">
                     <THead>
@@ -82,26 +102,34 @@ const Orders: React.FC = () => {
                     <tbody className="divide-y divide-gray-100">
                         {loading ? (
                             <SkeletonRows cols={6} rows={5} />
-                        ) : orders.length === 0 ? (
+                        ) : filtered.length === 0 ? (
                             <tr>
                                 <td colSpan={6}>
-                                    <EmptyState
-                                        icon={<ShoppingCart className="w-7 h-7" />}
-                                        title="No orders yet"
-                                        description="Create your first order to start tracking bookings."
-                                        action={
-                                            <button
-                                                onClick={() => { setEditingOrder(null); setIsFormOpen(true); }}
-                                                className={btnPrimary}
-                                            >
-                                                <Plus className="w-4 h-4" /> New Order
-                                            </button>
-                                        }
-                                    />
+                                    {orders.length === 0 ? (
+                                        <EmptyState
+                                            icon={<ShoppingCart className="w-7 h-7" />}
+                                            title="No orders yet"
+                                            description="Create your first order to start tracking bookings."
+                                            action={
+                                                <button
+                                                    onClick={() => { setEditingOrder(null); setIsFormOpen(true); }}
+                                                    className={btnPrimary}
+                                                >
+                                                    <Plus className="w-4 h-4" /> New Order
+                                                </button>
+                                            }
+                                        />
+                                    ) : (
+                                        <EmptyState
+                                            icon={<ShoppingCart className="w-7 h-7" />}
+                                            title="Tidak ada hasil"
+                                            description={`Tidak ada pesanan yang cocok dengan "${searchQuery}".`}
+                                        />
+                                    )}
                                 </td>
                             </tr>
                         ) : (
-                            orders.map((order) => (
+                            paginated.map((order) => (
                                 <tr key={order.id} className="hover:bg-gray-50/60 transition-colors group">
                                     <Td>
                                         <div>
@@ -151,11 +179,15 @@ const Orders: React.FC = () => {
                 </table>
             </TableCard>
 
+            {!loading && (
+                <Pagination page={page} totalItems={filtered.length} pageSize={PAGE_SIZE} onPageChange={setPage} />
+            )}
+
             {isFormOpen && (
                 <OrderForm
                     initialData={editingOrder}
                     onClose={() => { setIsFormOpen(false); setEditingOrder(null); }}
-                    onSuccess={() => { setIsFormOpen(false); setEditingOrder(null); fetchOrders(); toast('success', editingOrder ? 'Order updated.' : 'Order created.'); }}
+                    onSuccess={() => { setIsFormOpen(false); setEditingOrder(null); setPage(0); fetchOrders(); toast('success', editingOrder ? 'Order updated.' : 'Order created.'); }}
                 />
             )}
 
