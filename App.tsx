@@ -5,6 +5,7 @@ import { SpeedInsights } from '@vercel/speed-insights/react';
 import Home from './src/pages/Home';
 import PackageDetailPage from './src/pages/PackageDetailPage';
 import { AuthGuard } from './src/components/AuthGuard';
+import { RoleGuard } from './src/components/admin/RoleGuard';
 import Login from './src/pages/admin/Login';
 import AdminLayout from './src/pages/admin/AdminLayout';
 import Dashboard from './src/pages/admin/Dashboard';
@@ -20,43 +21,50 @@ import TextCampaign from './src/pages/admin/TextCampaign';
 import PackageWizard from './src/pages/admin/PackageWizard';
 import Airports from './src/pages/admin/Airports';
 import Categories from './src/pages/admin/Categories';
+import Users from './src/pages/admin/Users';
 import { SiteSettingsProvider } from './src/contexts/SiteSettingsContext';
 import { LanguageProvider } from './src/contexts/LanguageContext';
+import { AuthProvider } from './src/contexts/AuthContext';
 
 const App: React.FC = () => {
     return (
         <>
         <SiteSettingsProvider>
             <LanguageProvider>
-                <BrowserRouter>
-                    <Routes>
-                        <Route path="/" element={<Home />} />
-                        <Route path="/package/:slug" element={<PackageDetailPage />} />
+                <AuthProvider>
+                    <BrowserRouter>
+                        <Routes>
+                            <Route path="/" element={<Home />} />
+                            <Route path="/package/:slug" element={<PackageDetailPage />} />
 
-                        {/* Admin Auth */}
-                        <Route path="/admin/login" element={<Login />} />
+                            {/* Admin Auth */}
+                            <Route path="/admin/login" element={<Login />} />
 
-                        {/* Admin Secured Routes */}
-                        <Route path="/admin" element={<AuthGuard />}>
-                            <Route element={<AdminLayout />}>
-                                <Route index element={<Dashboard />} />
-                                <Route path="orders" element={<Orders />} />
-                                <Route path="packages" element={<Packages />} />
-                                <Route path="packages/new" element={<PackageWizard />} />
-                                <Route path="packages/:id/edit" element={<PackageWizard />} />
-                                <Route path="airports" element={<Airports />} />
-                                <Route path="categories" element={<Categories />} />
-                                <Route path="private-trips" element={<PrivateTrips />} />
-                                <Route path="airlines" element={<Airlines />} />
-                                <Route path="hotels" element={<Hotels />} />
-                                <Route path="poster-maker" element={<PosterMaker />} />
-                                <Route path="poster-templates" element={<PosterTemplates />} />
-                                <Route path="text-campaign" element={<TextCampaign />} />
-                                <Route path="settings" element={<SiteSettings />} />
+                            {/* Admin Secured Routes */}
+                            <Route path="/admin" element={<AuthGuard />}>
+                                <Route element={<AdminLayout />}>
+                                    <Route index element={<Dashboard />} />
+                                    <Route path="orders" element={<Orders />} />
+                                    <Route path="packages" element={<Packages />} />
+                                    <Route path="packages/new" element={<PackageWizard />} />
+                                    <Route path="packages/:id/edit" element={<PackageWizard />} />
+                                    <Route path="airports" element={<Airports />} />
+                                    <Route path="categories" element={<Categories />} />
+                                    <Route path="private-trips" element={<PrivateTrips />} />
+                                    <Route path="airlines" element={<Airlines />} />
+                                    <Route path="hotels" element={<Hotels />} />
+                                    <Route path="poster-maker" element={<PosterMaker />} />
+                                    <Route path="poster-templates" element={<PosterTemplates />} />
+                                    <Route path="text-campaign" element={<TextCampaign />} />
+                                    <Route path="settings" element={<SiteSettings />} />
+                                    <Route element={<RoleGuard roles={['superadmin']} />}>
+                                        <Route path="users" element={<Users />} />
+                                    </Route>
+                                </Route>
                             </Route>
-                        </Route>
-                    </Routes>
-                </BrowserRouter>
+                        </Routes>
+                    </BrowserRouter>
+                </AuthProvider>
             </LanguageProvider>
         </SiteSettingsProvider>
         <Analytics />
