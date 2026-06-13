@@ -4,12 +4,14 @@ import { Plus, Edit2, Trash2, Plane } from 'lucide-react';
 import {
     PageHeader, TableCard, THead, Th, Td, SkeletonRows, EmptyState, SlideOver,
     ConfirmDialog, FormField, inputClass, btnPrimary, btnSecondary, btnGhost,
-    useToast,
+    useToast, SearchInput, Pagination,
 } from '../../components/admin/ui';
 
 interface Airline { id: string; name: string; logo_url: string | null; }
 
 const EMPTY_FORM = { name: '', logo_url: '' };
+
+const PAGE_SIZE = 10;
 
 const Airlines: React.FC = () => {
     const toast = useToast();
@@ -24,7 +26,11 @@ const Airlines: React.FC = () => {
     const [deleteId, setDeleteId] = useState<string | null>(null);
     const [deleting, setDeleting] = useState(false);
 
+    const [searchQuery, setSearchQuery] = useState('');
+    const [page, setPage] = useState(0);
+
     useEffect(() => { fetchAirlines(); }, []);
+    useEffect(() => { setPage(0); }, [searchQuery]);
 
     const fetchAirlines = async () => {
         setLoading(true);
@@ -77,6 +83,11 @@ const Airlines: React.FC = () => {
         }
     };
 
+    const filtered = airlines.filter((a) =>
+        (a.name ?? '').toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    const paginated = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+
     return (
         <div>
             <PageHeader
@@ -91,6 +102,10 @@ const Airlines: React.FC = () => {
                 }
             />
 
+            <div className="mb-4">
+                <SearchInput value={searchQuery} onChange={setSearchQuery} placeholder="Cari nama maskapai..." />
+            </div>
+
             <TableCard>
                 <table className="min-w-full">
                     <THead>
@@ -101,23 +116,31 @@ const Airlines: React.FC = () => {
                     <tbody className="divide-y divide-gray-100">
                         {loading ? (
                             <SkeletonRows cols={3} rows={4} />
-                        ) : airlines.length === 0 ? (
+                        ) : filtered.length === 0 ? (
                             <tr>
                                 <td colSpan={3}>
-                                    <EmptyState
-                                        icon={<Plane className="w-7 h-7" />}
-                                        title="No airlines yet"
-                                        description="Add your first airline partner to get started."
-                                        action={
-                                            <button onClick={openCreate} className={btnPrimary}>
-                                                <Plus className="w-4 h-4" /> Add Airline
-                                            </button>
-                                        }
-                                    />
+                                    {airlines.length === 0 ? (
+                                        <EmptyState
+                                            icon={<Plane className="w-7 h-7" />}
+                                            title="No airlines yet"
+                                            description="Add your first airline partner to get started."
+                                            action={
+                                                <button onClick={openCreate} className={btnPrimary}>
+                                                    <Plus className="w-4 h-4" /> Add Airline
+                                                </button>
+                                            }
+                                        />
+                                    ) : (
+                                        <EmptyState
+                                            icon={<Plane className="w-7 h-7" />}
+                                            title="Tidak ada hasil"
+                                            description={`Tidak ada maskapai yang cocok dengan "${searchQuery}".`}
+                                        />
+                                    )}
                                 </td>
                             </tr>
                         ) : (
-                            airlines.map((airline) => (
+                            paginated.map((airline) => (
                                 <tr key={airline.id} className="hover:bg-gray-50/60 transition-colors group">
                                     <Td className="w-32">
                                         {airline.logo_url ? (
@@ -151,6 +174,10 @@ const Airlines: React.FC = () => {
                     </tbody>
                 </table>
             </TableCard>
+
+            {!loading && (
+                <Pagination page={page} totalItems={filtered.length} pageSize={PAGE_SIZE} onPageChange={setPage} />
+            )}
 
             {/* Form Slide-Over */}
             <SlideOver
