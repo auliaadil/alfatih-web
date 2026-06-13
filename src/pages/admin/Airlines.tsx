@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
-import { Plus, Edit2, Trash2, Plane } from 'lucide-react';
+import { Plus, Edit2, Trash2, Plane, Upload, Link } from 'lucide-react';
 import {
     PageHeader, TableCard, THead, Th, Td, SkeletonRows, EmptyState, SlideOver,
     ConfirmDialog, FormField, inputClass, btnPrimary, btnSecondary, btnGhost,
@@ -28,9 +28,31 @@ const Airlines: React.FC = () => {
 
     const [searchQuery, setSearchQuery] = useState('');
     const [page, setPage] = useState(0);
+    const [logoTab, setLogoTab] = useState<'upload' | 'url'>('upload');
+    const [uploading, setUploading] = useState(false);
 
     useEffect(() => { fetchAirlines(); }, []);
     useEffect(() => { setPage(0); }, [searchQuery]);
+
+    const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setUploading(true);
+        const ext = file.name.split('.').pop() ?? 'png';
+        const path = `${crypto.randomUUID()}.${ext}`;
+        const { data, error } = await supabase.storage
+            .from('airline-logos')
+            .upload(path, file, { upsert: true });
+        if (error) {
+            toast('error', 'Logo upload failed.');
+            setUploading(false);
+            return;
+        }
+        const { data: urlData } = supabase.storage.from('airline-logos').getPublicUrl(data.path);
+        setForm((f) => ({ ...f, logo_url: urlData.publicUrl }));
+        setUploading(false);
+        e.target.value = '';
+    };
 
     const fetchAirlines = async () => {
         setLoading(true);
@@ -42,12 +64,14 @@ const Airlines: React.FC = () => {
     const openCreate = () => {
         setEditingId(null);
         setForm(EMPTY_FORM);
+        setLogoTab('upload');
         setIsFormOpen(true);
     };
 
     const openEdit = (airline: Airline) => {
         setEditingId(airline.id);
         setForm({ name: airline.name, logo_url: airline.logo_url || '' });
+        setLogoTab(airline.logo_url ? 'url' : 'upload');
         setIsFormOpen(true);
     };
 
@@ -195,7 +219,7 @@ const Airlines: React.FC = () => {
                         <button
                             form="airline-form"
                             type="submit"
-                            disabled={saving}
+                            disabled={saving || uploading}
                             className={btnPrimary}
                         >
                             {saving ? 'Saving...' : (editingId ? 'Update Airline' : 'Add Airline')}
@@ -214,21 +238,58 @@ const Airlines: React.FC = () => {
                             onChange={(e) => setForm({ ...form, name: e.target.value })}
                         />
                     </FormField>
-                    <FormField label="Logo URL" hint="Paste a direct URL to the airline logo image.">
-                        <input
-                            type="url"
-                            className={inputClass}
-                            placeholder="https://..."
-                            value={form.logo_url}
-                            onChange={(e) => setForm({ ...form, logo_url: e.target.value })}
-                        />
-                    </FormField>
-                    {form.logo_url && (
-                        <div className="rounded-xl border border-gray-200 p-4 bg-gray-50">
-                            <p className="text-xs text-gray-500 mb-2">Preview</p>
-                            <img src={form.logo_url} alt="Logo preview" className="h-10 max-w-[180px] object-contain" />
+                    <FormField label="Logo">
+                        {/* Tab switcher */}
+                        <div className="flex rounded-lg border border-gray-200 overflow-hidden mb-3 w-fit">
+                            {(['upload', 'url'] as const).map((tab) => (
+                                <button
+                                    key={tab}
+                                    type="button"
+                                    onClick={() => setLogoTab(tab)}
+                                    className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-colors ${
+                                        logoTab === tab
+                                            ? 'bg-primary text-white'
+                                            : 'bg-white text-gray-500 hover:bg-gray-50'
+                                    }`}
+                                >
+                                    {tab === 'upload' ? <Upload className="w-3 h-3" /> : <Link className="w-3 h-3" />}
+                                    {tab === 'upload' ? 'Upload' : 'URL'}
+                                </button>
+                            ))}
                         </div>
-                    )}
+
+                        {logoTab === 'upload' ? (
+                            <label className={`flex items-center justify-center gap-2 cursor-pointer rounded-lg border-2 border-dashed border-gray-200 p-4 hover:border-primary/40 transition-colors ${uploading ? 'opacity-50 pointer-events-none' : ''}`}>
+                                <Upload className="w-4 h-4 text-gray-400" />
+                                <span className="text-sm text-gray-500">
+                                    {uploading ? 'Uploading...' : 'Click to upload JPG / PNG / WebP / SVG'}
+                                </span>
+                                <input
+                                    type="file"
+                                    accept="image/jpeg,image/png,image/webp,image/svg+xml"
+                                    className="sr-only"
+                                    onChange={handleLogoUpload}
+                                    disabled={uploading}
+                                />
+                            </label>
+                        ) : (
+                            <input
+                                type="url"
+                                className={inputClass}
+                                placeholder="https://..."
+                                value={form.logo_url}
+                                onChange={(e) => setForm({ ...form, logo_url: e.target.value })}
+                            />
+                        )}
+
+                        {/* Shared preview */}
+                        {form.logo_url && (
+                            <div className="rounded-xl border border-gray-200 p-4 bg-gray-50 mt-3">
+                                <p className="text-xs text-gray-500 mb-2">Preview</p>
+                                <img src={form.logo_url} alt="Logo preview" className="h-10 max-w-[180px] object-contain" />
+                            </div>
+                        )}
+                    </FormField>
                 </form>
             </SlideOver>
 
