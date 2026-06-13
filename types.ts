@@ -5,6 +5,30 @@ export enum TourCategory {
   MIDDLE_EAST = 'Middle East'
 }
 
+export interface Airport {
+  id: string;
+  iata_code: string;
+  name: string;
+  city: string;
+  country: string;
+}
+
+export interface Category {
+  id: string;
+  name: string;
+  slug: string;
+}
+
+export interface FlightLeg {
+  from_airport_id: string;
+  to_airport_id: string;
+}
+
+export interface FlightRoute {
+  airline_id: string;
+  legs: FlightLeg[];
+}
+
 export interface DayItinerary {
   day: number;
   title: string;
@@ -15,6 +39,7 @@ export interface DayItinerary {
 }
 
 export interface RoomOption {
+  hotel_id?: string;
   name: string;
   capacity: number;
   price: number;
@@ -29,18 +54,21 @@ export interface TourPackage {
   duration: string;
   room_options: RoomOption[];
   image_url: string;
-  brochure_url?: string;
+  image_credit?: string;
   features: string[];
   description: string;
   is_popular?: boolean;
   quotas?: number;
   initial_quotas?: number;
-  available_rooms?: number;
-  initial_rooms?: number;
 
-  // Detailed fields
+  // Dates
   departure_date: string;
-  flight_details?: string;
+  arrival_date?: string;
+
+  // Flight routes (structured)
+  flight_routes?: FlightRoute[];
+
+  // Resolved relations (from joins)
   airlines?: {
     name: string;
     logo_url?: string;
