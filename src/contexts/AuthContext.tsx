@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 
@@ -31,6 +31,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [branchIds, setBranchIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const currentUserIdRef = useRef<string | null>(null);
 
   const loadProfile = async (userId: string) => {
     const { data } = await supabase
@@ -64,26 +65,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      if (session?.user) await loadProfile(session.user.id);
-      setLoading(false);
-    }).catch(() => setLoading(false));
-
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      // Set loading=true during SIGNED_IN so AuthGuard doesn't see user+no-profile
-      // and trigger a premature signOut before the profile query completes.
-      if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
+      const isNewUser = session?.user?.id !== currentUserIdRef.current;
+
+      // Show spinner only on initial load or a genuine new login (different user).
+      // Token refreshes (TOKEN_REFRESHED, or SIGNED_IN for the same user) run
+      // silently in the background without re-triggering the loading spinner.
+      if (event === 'INITIAL_SESSION' || (event === 'SIGNED_IN' && isNewUser)) {
         setLoading(true);
       }
+
+      currentUserIdRef.current = session?.user?.id ?? null;
       setUser(session?.user ?? null);
-      if (session?.user) {
-        await loadProfile(session.user.id);
-      } else {
-        setProfile(null);
-        setBranchIds([]);
+
+      try {
+        if (session?.user) {
+          await loadProfile(session.user.id);
+        } else {
+          setProfile(null);
+          setBranchIds([]);
+        }
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     });
 
     return () => subscription.unsubscribe();
