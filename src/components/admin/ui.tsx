@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react';
-import { X, AlertTriangle, CheckCircle, Info, XCircle, ChevronRight } from 'lucide-react';
+import { X, AlertTriangle, CheckCircle, Info, XCircle, ChevronRight, ChevronLeft, Search } from 'lucide-react';
 
 // ── Toast System ──────────────────────────────────────────
 
@@ -189,7 +189,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({ title, subtitle, badge, 
                     {title}
                 </h1>
                 {badge !== undefined && (
-                    <span className="px-2.5 py-0.5 text-xs font-semibold bg-gray-100 text-gray-600 rounded-full tabular-nums">
+                    <span className="px-2.5 py-0.5 text-xs font-semibold bg-blue-50 text-primary border border-blue-100 rounded-full tabular-nums">
                         {badge}
                     </span>
                 )}
@@ -337,6 +337,99 @@ export const SectionCard: React.FC<{ title?: string; description?: string; child
         </div>
     </div>
 );
+
+// ── Search Input ───────────────────────────────────────────
+
+interface SearchInputProps {
+    value: string;
+    onChange: (value: string) => void;
+    placeholder?: string;
+}
+
+export const SearchInput: React.FC<SearchInputProps> = ({ value, onChange, placeholder = 'Search...' }) => (
+    <div className="relative w-full max-w-xs">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+        <input
+            type="text"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder={placeholder}
+            className="w-full pl-9 pr-8 py-2 text-sm border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors placeholder:text-gray-300"
+        />
+        {value && (
+            <button
+                onClick={() => onChange('')}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 text-gray-400 hover:text-gray-600 transition-colors"
+            >
+                <X className="w-3.5 h-3.5" />
+            </button>
+        )}
+    </div>
+);
+
+// ── Pagination ─────────────────────────────────────────────
+
+interface PaginationProps {
+    page: number;
+    totalItems: number;
+    pageSize: number;
+    onPageChange: (page: number) => void;
+}
+
+export const Pagination: React.FC<PaginationProps> = ({ page, totalItems, pageSize, onPageChange }) => {
+    const totalPages = Math.ceil(totalItems / pageSize);
+    if (totalPages <= 1) return null;
+    const start = page * pageSize + 1;
+    const end = Math.min((page + 1) * pageSize, totalItems);
+
+    const pageNumbers = (): (number | '…')[] => {
+        if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i);
+        if (page < 4) return [0, 1, 2, 3, 4, '…', totalPages - 1];
+        if (page > totalPages - 5) return [0, '…', totalPages - 5, totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1];
+        return [0, '…', page - 1, page, page + 1, '…', totalPages - 1];
+    };
+
+    return (
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-1 pt-4">
+            <p className="text-sm text-gray-500">
+                Showing <span className="font-semibold text-gray-700">{start}–{end}</span> of <span className="font-semibold text-gray-700">{totalItems}</span>
+            </p>
+            <div className="flex items-center gap-1">
+                <button
+                    onClick={() => onPageChange(page - 1)}
+                    disabled={page === 0}
+                    className="inline-flex items-center gap-1 px-3 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                >
+                    <ChevronLeft className="w-4 h-4" /> Prev
+                </button>
+                {pageNumbers().map((n, i) =>
+                    n === '…' ? (
+                        <span key={`ellipsis-${i}`} className="w-9 h-9 flex items-center justify-center text-sm text-gray-400">…</span>
+                    ) : (
+                        <button
+                            key={n}
+                            onClick={() => onPageChange(n as number)}
+                            className={`w-9 h-9 text-sm font-medium rounded-lg transition-colors ${
+                                n === page
+                                    ? 'bg-primary text-white shadow-sm shadow-blue-200/60'
+                                    : 'text-gray-600 hover:bg-gray-100'
+                            }`}
+                        >
+                            {(n as number) + 1}
+                        </button>
+                    )
+                )}
+                <button
+                    onClick={() => onPageChange(page + 1)}
+                    disabled={page === totalPages - 1}
+                    className="inline-flex items-center gap-1 px-3 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                >
+                    Next <ChevronRight className="w-4 h-4" />
+                </button>
+            </div>
+        </div>
+    );
+};
 
 // ── Stat Card ──────────────────────────────────────────────
 
