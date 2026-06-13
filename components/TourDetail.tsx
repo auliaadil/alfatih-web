@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSiteSettings } from '../src/contexts/SiteSettingsContext';
 import {
   ArrowLeft,
@@ -17,7 +17,9 @@ import {
   Info,
   FileText
 } from 'lucide-react';
-import { TourPackage } from '../types';
+import { TourPackage, Airport } from '../types';
+import { supabase } from '../src/lib/supabase';
+import { formatFlightRoutes } from '../src/lib/formatFlightRoutes';
 
 interface TourDetailProps {
   tour: TourPackage;
@@ -28,6 +30,35 @@ const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
   const settings = useSiteSettings();
   const [activeTab, setActiveTab] = useState<'itinerary' | 'logistics' | 'inclusions'>('itinerary');
   const [selectedRoomIndex, setSelectedRoomIndex] = useState(0);
+  const [airports, setAirports] = useState<Airport[]>([]);
+  const [airlineNames, setAirlineNames] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    const airlineIds = (tour.flight_routes ?? []).map((r) => r.airline_id).filter(Boolean);
+
+    const fetchData = async () => {
+      const [airportsResult, airlinesResult] = await Promise.all([
+        supabase.from('airports').select('id, iata_code, name, city, country'),
+        airlineIds.length > 0
+          ? supabase.from('airlines').select('id, name').in('id', airlineIds)
+          : Promise.resolve({ data: [], error: null }),
+      ]);
+
+      if (airportsResult.data) setAirports(airportsResult.data as Airport[]);
+
+      if (airlinesResult.data) {
+        const nameMap: Record<string, string> = {};
+        (airlinesResult.data as { id: string; name: string }[]).forEach((a) => {
+          nameMap[a.id] = a.name;
+        });
+        setAirlineNames(nameMap);
+      }
+    };
+
+    fetchData();
+  }, [tour.id]);
+
+  const flightDisplay = formatFlightRoutes(tour.flight_routes, airlineNames, airports);
 
   const selectedRoom = tour.room_options?.[selectedRoomIndex];
 
@@ -112,6 +143,9 @@ const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
           </div>
         </div>
       </div>
+      {tour.image_credit && (
+        <p className="text-xs text-gray-400 mt-1 text-center">{tour.image_credit}</p>
+      )}
 
       {/* Features strip — overlaps hero */}
       {(tour.features?.length ?? 0) > 0 && (
@@ -222,7 +256,7 @@ const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
                         <p className="text-base font-bold text-gray-900">{tour.airlines?.[0]?.name || 'Airline TBA'}</p>
                         <p className="text-gray-500 text-sm flex items-center gap-1.5 mt-1">
                           <MapPin className="w-3.5 h-3.5" />
-                          {tour.flight_details || 'Flight details TBA'}
+                          {flightDisplay}
                         </p>
                       </div>
                     </div>
