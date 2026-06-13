@@ -65,6 +65,7 @@ const Airlines: React.FC = () => {
         } else {
             toast('success', editingId ? 'Airline updated.' : 'Airline added.');
             setIsFormOpen(false);
+            setPage(0);
             fetchAirlines();
         }
     };
@@ -79,6 +80,7 @@ const Airlines: React.FC = () => {
             toast('error', 'Failed to delete airline.');
         } else {
             toast('success', 'Airline deleted.');
+            setPage(0);
             fetchAirlines();
         }
     };
