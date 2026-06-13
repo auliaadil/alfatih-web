@@ -28,8 +28,10 @@ AI API keys are managed as Supabase secrets (not in `.env.local`):
 - `GEMINI_API_KEY` — Gemini API key
 - `GEMINI_MODEL` — model name (e.g. `gemini-2.5-flash-preview-05-20`), swappable without redeployment
 - `RECAPTCHA_SECRET_KEY` — Google reCAPTCHA secret for server-side verification
+- `UNSPLASH_ACCESS_KEY` — Unsplash API key used by the `image-search` edge function (not the `VITE_` frontend key)
+- `PIXABAY_API_KEY` — Pixabay API key used by the `image-search` edge function (not the `VITE_` frontend key)
 
-Set via: `supabase secrets set GEMINI_API_KEY=<value> GEMINI_MODEL=<value> RECAPTCHA_SECRET_KEY=<value>`
+Set via: `supabase secrets set GEMINI_API_KEY=<value> GEMINI_MODEL=<value> RECAPTCHA_SECRET_KEY=<value> UNSPLASH_ACCESS_KEY=<value> PIXABAY_API_KEY=<value>`
 
 ## Architecture
 
