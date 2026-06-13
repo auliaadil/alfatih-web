@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, X, Loader2 } from 'lucide-react';
 import { searchImages, ImageResult } from '../../../../services/imageSearchService';
 import { inputClass } from '../ui';
@@ -16,6 +16,14 @@ const ImagePickerModal: React.FC<Props> = ({ isOpen, onClose, onSelect }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  useEffect(() => {
+    if (!isOpen) {
+      setQuery('');
+      setResults([]);
+      setError('');
+    }
+  }, [isOpen]);
+
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!query.trim()) return;
@@ -24,8 +32,8 @@ const ImagePickerModal: React.FC<Props> = ({ isOpen, onClose, onSelect }) => {
     try {
       const imgs = await searchImages(query, source);
       setResults(imgs);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
     } finally {
       setLoading(false);
     }
@@ -86,9 +94,9 @@ const ImagePickerModal: React.FC<Props> = ({ isOpen, onClose, onSelect }) => {
             <div className="text-center py-12 text-gray-400 text-sm">Search for an image above</div>
           )}
           <div className="grid grid-cols-3 gap-3">
-            {results.map((img, i) => (
+            {results.map((img) => (
               <button
-                key={i}
+                key={img.url}
                 type="button"
                 onClick={() => { onSelect(img.url, img.credit); onClose(); }}
                 className="relative group aspect-video rounded-lg overflow-hidden border-2 border-transparent hover:border-primary transition-colors focus:outline-none focus:border-primary"
