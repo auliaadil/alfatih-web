@@ -4,6 +4,7 @@ import { Plus, Edit2, Trash2, Tag } from 'lucide-react';
 import {
   PageHeader, TableCard, THead, Th, Td, SkeletonRows, EmptyState, SlideOver,
   ConfirmDialog, FormField, inputClass, btnPrimary, btnSecondary, btnGhost, useToast,
+  SearchInput, Pagination,
 } from '../../components/admin/ui';
 import { Category } from '../../../types';
 
@@ -11,6 +12,8 @@ const toSlug = (name: string) =>
   name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
 
 const EMPTY_FORM = { name: '', slug: '' };
+
+const PAGE_SIZE = 10;
 
 const Categories: React.FC = () => {
   const toast = useToast();
@@ -22,8 +25,12 @@ const Categories: React.FC = () => {
   const [form, setForm] = useState(EMPTY_FORM);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [page, setPage] = useState(0);
 
   useEffect(() => { fetchCategories(); }, []);
+
+  useEffect(() => { setPage(0); }, [searchQuery]);
 
   const fetchCategories = async () => {
     setLoading(true);
@@ -48,7 +55,7 @@ const Categories: React.FC = () => {
       const msg = error.code === '23505' ? 'A category with that name or slug already exists.' : 'Failed to save category.';
       toast('error', msg);
     }
-    else { toast('success', editingId ? 'Category updated.' : 'Category added.'); setIsFormOpen(false); fetchCategories(); }
+    else { toast('success', editingId ? 'Category updated.' : 'Category added.'); setIsFormOpen(false); setPage(0); fetchCategories(); }
   };
 
   const handleDelete = async () => {
@@ -58,8 +65,15 @@ const Categories: React.FC = () => {
     setDeleting(false);
     setDeleteId(null);
     if (error) { toast('error', 'Failed to delete category.'); }
-    else { toast('success', 'Category deleted.'); fetchCategories(); }
+    else { toast('success', 'Category deleted.'); setPage(0); fetchCategories(); }
   };
+
+  const filtered = categories.filter((c) =>
+    [c.name, c.slug].some((f) =>
+      (f ?? '').toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  );
+  const paginated = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
   return (
     <div>
@@ -70,27 +84,45 @@ const Categories: React.FC = () => {
         breadcrumbs={[{ label: 'Resources' }, { label: 'Categories' }]}
         action={<button onClick={openCreate} className={btnPrimary}><Plus className="w-4 h-4" /> Add Category</button>}
       />
+      <div className="mb-4">
+        <SearchInput value={searchQuery} onChange={setSearchQuery} placeholder="Cari nama atau slug..." />
+      </div>
       <TableCard>
         <table className="min-w-full">
           <THead><Th>Name</Th><Th>Slug</Th><Th align="right">Actions</Th></THead>
           <tbody className="divide-y divide-gray-100">
-            {loading ? <SkeletonRows cols={3} rows={5} /> : categories.length === 0 ? (
-              <tr><td colSpan={3}><EmptyState icon={<Tag className="w-7 h-7" />} title="No categories yet" description="Add categories to classify packages." action={<button onClick={openCreate} className={btnPrimary}><Plus className="w-4 h-4" /> Add Category</button>} /></td></tr>
-            ) : categories.map((c) => (
-              <tr key={c.id} className="hover:bg-gray-50/60 transition-colors group">
-                <Td><span className="font-medium text-gray-900">{c.name}</span></Td>
-                <Td><span className="font-mono text-sm text-gray-500">{c.slug}</span></Td>
-                <Td className="text-right">
-                  <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onClick={() => openEdit(c)} className={btnGhost}><Edit2 className="w-4 h-4" /></button>
-                    <button onClick={() => setDeleteId(c.id)} className="inline-flex items-center px-3 py-2 text-sm font-medium text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"><Trash2 className="w-4 h-4" /></button>
-                  </div>
-                </Td>
-              </tr>
-            ))}
+            {loading ? <SkeletonRows cols={3} rows={5} /> : filtered.length === 0 ? (
+              <tr><td colSpan={3}>
+                {categories.length === 0 ? (
+                  <EmptyState icon={<Tag className="w-7 h-7" />} title="No categories yet" description="Add categories to classify packages." action={<button onClick={openCreate} className={btnPrimary}><Plus className="w-4 h-4" /> Add Category</button>} />
+                ) : (
+                  <EmptyState
+                    icon={<Tag className="w-7 h-7" />}
+                    title="Tidak ada hasil"
+                    description={`Tidak ada kategori yang cocok dengan "${searchQuery}".`}
+                  />
+                )}
+              </td></tr>
+            ) : (
+              paginated.map((c) => (
+                <tr key={c.id} className="hover:bg-gray-50/60 transition-colors group">
+                  <Td><span className="font-medium text-gray-900">{c.name}</span></Td>
+                  <Td><span className="font-mono text-sm text-gray-500">{c.slug}</span></Td>
+                  <Td className="text-right">
+                    <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button onClick={() => openEdit(c)} className={btnGhost}><Edit2 className="w-4 h-4" /></button>
+                      <button onClick={() => setDeleteId(c.id)} className="inline-flex items-center px-3 py-2 text-sm font-medium text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"><Trash2 className="w-4 h-4" /></button>
+                    </div>
+                  </Td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </TableCard>
+      {!loading && (
+        <Pagination page={page} totalItems={filtered.length} pageSize={PAGE_SIZE} onPageChange={setPage} />
+      )}
 
       <SlideOver isOpen={isFormOpen} onClose={() => setIsFormOpen(false)} title={editingId ? 'Edit Category' : 'Add Category'} subtitle="Slug is auto-generated from the name."
         footer={<div className="flex gap-3"><button type="button" onClick={() => setIsFormOpen(false)} className={btnSecondary}>Cancel</button><button form="category-form" type="submit" disabled={saving} className={btnPrimary}>{saving ? 'Saving...' : editingId ? 'Update' : 'Add Category'}</button></div>}>
