@@ -4,6 +4,7 @@ import { Plus, Edit2, Trash2, PlaneTakeoff } from 'lucide-react';
 import {
   PageHeader, TableCard, THead, Th, Td, SkeletonRows, EmptyState, SlideOver,
   ConfirmDialog, FormField, inputClass, btnPrimary, btnSecondary, btnGhost, useToast,
+  SearchInput, Pagination,
 } from '../../components/admin/ui';
 import { Airport } from '../../../types';
 
@@ -20,7 +21,12 @@ const Airports: React.FC = () => {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
 
+  const PAGE_SIZE = 10;
+  const [searchQuery, setSearchQuery] = useState('');
+  const [page, setPage] = useState(0);
+
   useEffect(() => { fetchAirports(); }, []);
+  useEffect(() => { setPage(0); }, [searchQuery]);
 
   const fetchAirports = async () => {
     setLoading(true);
@@ -62,6 +68,13 @@ const Airports: React.FC = () => {
     else { toast('success', 'Airport deleted.'); fetchAirports(); }
   };
 
+  const filtered = airports.filter((a) =>
+    [a.iata_code, a.name, a.city, a.country].some((f) =>
+      (f ?? '').toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  );
+  const paginated = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+
   return (
     <div>
       <PageHeader
@@ -71,15 +84,18 @@ const Airports: React.FC = () => {
         breadcrumbs={[{ label: 'Resources' }, { label: 'Airports' }]}
         action={<button onClick={openCreate} className={btnPrimary}><Plus className="w-4 h-4" /> Add Airport</button>}
       />
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <SearchInput value={searchQuery} onChange={setSearchQuery} placeholder="Cari IATA, nama, kota..." />
+      </div>
       <TableCard>
         <table className="min-w-full">
           <THead>
             <Th>IATA</Th><Th>Airport Name</Th><Th>City</Th><Th>Country</Th><Th align="right">Actions</Th>
           </THead>
           <tbody className="divide-y divide-gray-100">
-            {loading ? <SkeletonRows cols={5} rows={5} /> : airports.length === 0 ? (
+            {loading ? <SkeletonRows cols={5} rows={5} /> : filtered.length === 0 ? (
               <tr><td colSpan={5}><EmptyState icon={<PlaneTakeoff className="w-7 h-7" />} title="No airports yet" description="Add airports to define flight route legs." action={<button onClick={openCreate} className={btnPrimary}><Plus className="w-4 h-4" /> Add Airport</button>} /></td></tr>
-            ) : airports.map((a) => (
+            ) : paginated.map((a) => (
               <tr key={a.id} className="hover:bg-gray-50/60 transition-colors group">
                 <Td><span className="font-mono font-bold text-primary">{a.iata_code}</span></Td>
                 <Td><span className="font-medium text-gray-900">{a.name}</span></Td>
@@ -96,6 +112,9 @@ const Airports: React.FC = () => {
           </tbody>
         </table>
       </TableCard>
+      {!loading && (
+        <Pagination page={page} totalItems={filtered.length} pageSize={PAGE_SIZE} onPageChange={setPage} />
+      )}
 
       <SlideOver isOpen={isFormOpen} onClose={() => setIsFormOpen(false)} title={editingId ? 'Edit Airport' : 'Add Airport'} subtitle="IATA code must be 3 uppercase letters."
         footer={<div className="flex gap-3"><button type="button" onClick={() => setIsFormOpen(false)} className={btnSecondary}>Cancel</button><button form="airport-form" type="submit" disabled={saving} className={btnPrimary}>{saving ? 'Saving...' : editingId ? 'Update' : 'Add Airport'}</button></div>}>
