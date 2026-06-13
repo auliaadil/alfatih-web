@@ -4,7 +4,7 @@ import { Plus, Edit2, Trash2, Building2, Star, X } from 'lucide-react';
 import {
     PageHeader, TableCard, THead, Th, Td, SkeletonRows, EmptyState, SlideOver,
     ConfirmDialog, FormField, inputClass, selectClass, btnPrimary, btnSecondary, btnGhost,
-    useToast,
+    useToast, SearchInput, Pagination,
 } from '../../components/admin/ui';
 
 // Catalogue-level room type (no price — pricing is set per-package in the wizard)
@@ -13,6 +13,8 @@ interface RoomTypeRow { name: string; capacity: number; }
 interface Hotel { id: string; name: string; location: string; stars: number; room_types: RoomTypeRow[]; }
 
 const EMPTY_FORM = { name: '', location: '', stars: 3, room_types: [] as RoomTypeRow[] };
+
+const PAGE_SIZE = 10;
 
 const StarRating: React.FC<{ count: number }> = ({ count }) => (
     <div className="flex items-center gap-0.5">
@@ -35,7 +37,11 @@ const Hotels: React.FC = () => {
     const [deleteId, setDeleteId] = useState<string | null>(null);
     const [deleting, setDeleting] = useState(false);
 
+    const [searchQuery, setSearchQuery] = useState('');
+    const [page, setPage] = useState(0);
+
     useEffect(() => { fetchHotels(); }, []);
+    useEffect(() => { setPage(0); }, [searchQuery]);
 
     const fetchHotels = async () => {
         setLoading(true);
@@ -70,6 +76,7 @@ const Hotels: React.FC = () => {
         } else {
             toast('success', editingId ? 'Hotel updated.' : 'Hotel added.');
             setIsFormOpen(false);
+            setPage(0);
             fetchHotels();
         }
     };
@@ -84,6 +91,7 @@ const Hotels: React.FC = () => {
             toast('error', 'Failed to delete hotel.');
         } else {
             toast('success', 'Hotel deleted.');
+            setPage(0);
             fetchHotels();
         }
     };
@@ -101,6 +109,13 @@ const Hotels: React.FC = () => {
     const removeRoomType = (i: number) =>
         setForm((f) => ({ ...f, room_types: f.room_types.filter((_, idx) => idx !== i) }));
 
+    const filtered = hotels.filter((h) =>
+        [h.name, h.location].some((f) =>
+            (f ?? '').toLowerCase().includes(searchQuery.toLowerCase())
+        )
+    );
+    const paginated = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+
     return (
         <div>
             <PageHeader
@@ -115,6 +130,10 @@ const Hotels: React.FC = () => {
                 }
             />
 
+            <div className="mb-4">
+                <SearchInput value={searchQuery} onChange={setSearchQuery} placeholder="Cari nama hotel atau lokasi..." />
+            </div>
+
             <TableCard>
                 <table className="min-w-full">
                     <THead>
@@ -126,23 +145,31 @@ const Hotels: React.FC = () => {
                     <tbody className="divide-y divide-gray-100">
                         {loading ? (
                             <SkeletonRows cols={4} rows={5} />
-                        ) : hotels.length === 0 ? (
+                        ) : filtered.length === 0 ? (
                             <tr>
                                 <td colSpan={4}>
-                                    <EmptyState
-                                        icon={<Building2 className="w-7 h-7" />}
-                                        title="No hotels yet"
-                                        description="Add your first hotel to start building packages."
-                                        action={
-                                            <button onClick={openCreate} className={btnPrimary}>
-                                                <Plus className="w-4 h-4" /> Add Hotel
-                                            </button>
-                                        }
-                                    />
+                                    {hotels.length === 0 ? (
+                                        <EmptyState
+                                            icon={<Building2 className="w-7 h-7" />}
+                                            title="No hotels yet"
+                                            description="Add your first hotel to start building packages."
+                                            action={
+                                                <button onClick={openCreate} className={btnPrimary}>
+                                                    <Plus className="w-4 h-4" /> Add Hotel
+                                                </button>
+                                            }
+                                        />
+                                    ) : (
+                                        <EmptyState
+                                            icon={<Building2 className="w-7 h-7" />}
+                                            title="Tidak ada hasil"
+                                            description={`Tidak ada hotel yang cocok dengan "${searchQuery}".`}
+                                        />
+                                    )}
                                 </td>
                             </tr>
                         ) : (
-                            hotels.map((hotel) => (
+                            paginated.map((hotel) => (
                                 <tr key={hotel.id} className="hover:bg-gray-50/60 transition-colors group">
                                     <Td>
                                         <div className="flex items-center gap-3">
@@ -178,6 +205,10 @@ const Hotels: React.FC = () => {
                     </tbody>
                 </table>
             </TableCard>
+
+            {!loading && (
+                <Pagination page={page} totalItems={filtered.length} pageSize={PAGE_SIZE} onPageChange={setPage} />
+            )}
 
             {/* Form Slide-Over */}
             <SlideOver
