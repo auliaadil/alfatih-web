@@ -9,6 +9,7 @@ import {
 import { Airport } from '../../../types';
 
 const EMPTY_FORM = { iata_code: '', name: '', city: '', country: '' };
+const PAGE_SIZE = 10;
 
 const Airports: React.FC = () => {
   const toast = useToast();
@@ -20,8 +21,6 @@ const Airports: React.FC = () => {
   const [form, setForm] = useState(EMPTY_FORM);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
-
-  const PAGE_SIZE = 10;
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(0);
 
@@ -55,7 +54,7 @@ const Airports: React.FC = () => {
       const msg = error.code === '23505' ? 'That IATA code already exists.' : 'Failed to save airport.';
       toast('error', msg);
     }
-    else { toast('success', editingId ? 'Airport updated.' : 'Airport added.'); setIsFormOpen(false); fetchAirports(); }
+    else { toast('success', editingId ? 'Airport updated.' : 'Airport added.'); setIsFormOpen(false); setPage(0); fetchAirports(); }
   };
 
   const handleDelete = async () => {
@@ -65,7 +64,7 @@ const Airports: React.FC = () => {
     setDeleting(false);
     setDeleteId(null);
     if (error) { toast('error', 'Failed to delete airport.'); }
-    else { toast('success', 'Airport deleted.'); fetchAirports(); }
+    else { toast('success', 'Airport deleted.'); setPage(0); fetchAirports(); }
   };
 
   const filtered = airports.filter((a) =>
@@ -94,7 +93,22 @@ const Airports: React.FC = () => {
           </THead>
           <tbody className="divide-y divide-gray-100">
             {loading ? <SkeletonRows cols={5} rows={5} /> : filtered.length === 0 ? (
-              <tr><td colSpan={5}><EmptyState icon={<PlaneTakeoff className="w-7 h-7" />} title="No airports yet" description="Add airports to define flight route legs." action={<button onClick={openCreate} className={btnPrimary}><Plus className="w-4 h-4" /> Add Airport</button>} /></td></tr>
+              <tr><td colSpan={5}>
+                {airports.length === 0 ? (
+                  <EmptyState
+                    icon={<PlaneTakeoff className="w-7 h-7" />}
+                    title="No airports yet"
+                    description="Add airports to define flight route legs."
+                    action={<button onClick={openCreate} className={btnPrimary}><Plus className="w-4 h-4" /> Add Airport</button>}
+                  />
+                ) : (
+                  <EmptyState
+                    icon={<PlaneTakeoff className="w-7 h-7" />}
+                    title="Tidak ada hasil"
+                    description={`Tidak ada bandara yang cocok dengan "${searchQuery}".`}
+                  />
+                )}
+              </td></tr>
             ) : paginated.map((a) => (
               <tr key={a.id} className="hover:bg-gray-50/60 transition-colors group">
                 <Td><span className="font-mono font-bold text-primary">{a.iata_code}</span></Td>
