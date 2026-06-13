@@ -6,11 +6,26 @@ import {
     ConfirmDialog, StatusBadge, btnPrimary, btnGhost, useToast,
 } from '../../components/admin/ui';
 import OrderForm from './OrderForm';
+import { useAuth } from '../../contexts/AuthContext';
+
+const BranchBanner: React.FC<{ branchIds: string[] }> = ({ branchIds }) => {
+    const [names, setNames] = useState<string[]>([]);
+    useEffect(() => {
+        if (!branchIds.length) return;
+        supabase.from('branches').select('name').in('id', branchIds)
+            .then(({ data }) => setNames(data?.map((b) => b.name) ?? []));
+    }, [branchIds]);
+    if (!names.length) return null;
+    return <>Showing orders for: <strong>{names.join(', ')}</strong></>;
+};
 
 const Orders: React.FC = () => {
     const toast = useToast();
     const [orders, setOrders] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+
+    const { profile, branchIds } = useAuth();
+    const isBranchAdmin = profile?.role === 'branch_admin';
 
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [editingOrder, setEditingOrder] = useState<any | null>(null);
@@ -24,7 +39,7 @@ const Orders: React.FC = () => {
         setLoading(true);
         const { data, error } = await supabase
             .from('orders')
-            .select('*, packages(title), participants(*)')
+            .select('*, packages(title), participants(*), branches(name)')
             .order('created_at', { ascending: false });
         if (!error && data) setOrders(data);
         setLoading(false);
@@ -69,11 +84,18 @@ const Orders: React.FC = () => {
                 }
             />
 
+            {isBranchAdmin && (
+                <div className="mb-4 px-4 py-3 bg-blue-50 border border-blue-100 rounded-xl text-sm text-blue-700">
+                    <BranchBanner branchIds={branchIds} />
+                </div>
+            )}
+
             <TableCard>
                 <table className="min-w-full">
                     <THead>
                         <Th>Customer</Th>
                         <Th>Package</Th>
+                        {!isBranchAdmin && <Th>Branch</Th>}
                         <Th align="center">Pax / Rooms</Th>
                         <Th>Total Price</Th>
                         <Th>Payment Status</Th>
@@ -81,10 +103,10 @@ const Orders: React.FC = () => {
                     </THead>
                     <tbody className="divide-y divide-gray-100">
                         {loading ? (
-                            <SkeletonRows cols={6} rows={5} />
+                            <SkeletonRows cols={isBranchAdmin ? 6 : 7} rows={5} />
                         ) : orders.length === 0 ? (
                             <tr>
-                                <td colSpan={6}>
+                                <td colSpan={isBranchAdmin ? 6 : 7}>
                                     <EmptyState
                                         icon={<ShoppingCart className="w-7 h-7" />}
                                         title="No orders yet"
@@ -114,6 +136,11 @@ const Orders: React.FC = () => {
                                             {order.packages?.title || '—'}
                                         </p>
                                     </Td>
+                                    {!isBranchAdmin && (
+                                        <Td>
+                                            <p className="text-gray-700 text-sm">{(order as any).branches?.name || <span className="text-gray-400">—</span>}</p>
+                                        </Td>
+                                    )}
                                     <Td className="text-center">
                                         <p className="font-semibold text-gray-900">{order.participant_count} <span className="font-normal text-gray-400 text-xs">pax</span></p>
                                         <p className="text-xs text-gray-400">{order.room_count_booked} rooms</p>

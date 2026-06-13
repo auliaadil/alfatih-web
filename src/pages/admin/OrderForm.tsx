@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { X, Plus, Trash2, Edit } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface ParticipantDraft {
     id?: string;
@@ -19,10 +20,17 @@ interface OrderFormProps {
 }
 
 const OrderForm: React.FC<OrderFormProps> = ({ initialData, onClose, onSuccess }) => {
+    const { profile, branchIds } = useAuth();
+    const isBranchAdmin = profile?.role === 'branch_admin';
+
     const [packages, setPackages] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
+
+    // Branch state
+    const [branches, setBranches] = useState<{ id: string; name: string }[]>([]);
+    const [selectedBranchId, setSelectedBranchId] = useState<string>(initialData?.branch_id || '');
 
     // Form State
     const [selectedPackageId, setSelectedPackageId] = useState(initialData?.package_id || '');
@@ -55,6 +63,21 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialData, onClose, onSuccess }
             if (data) {
                 setPackages(data);
             }
+
+            // Load branches
+            if (isBranchAdmin) {
+                if (branchIds.length === 1) {
+                    setSelectedBranchId(prev => prev || branchIds[0]);
+                } else if (branchIds.length > 1) {
+                    const { data: bData } = await supabase.from('branches').select('id, name').in('id', branchIds);
+                    if (bData) setBranches(bData);
+                    if (!initialData?.branch_id && bData?.[0]) setSelectedBranchId(bData[0].id);
+                }
+            } else {
+                const { data: bData } = await supabase.from('branches').select('id, name').order('name');
+                if (bData) setBranches(bData);
+            }
+
             setLoading(false);
         };
         loadPackages();
@@ -128,7 +151,8 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialData, onClose, onSuccess }
             participant_count: totalPax,
             total_price: totalPrice,
             payment_status: paymentStatus,
-            notes
+            notes,
+            branch_id: selectedBranchId || null
         };
 
         let error;
@@ -278,6 +302,26 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialData, onClose, onSuccess }
                                     ))}
                                 </select>
                             </div>
+
+                            {/* Branch selector */}
+                            {(branches.length > 1 || (!isBranchAdmin && branches.length > 0)) && (
+                                <div className="bg-gray-50 p-4 rounded-lg">
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Branch {isBranchAdmin ? <span className="text-red-500">*</span> : <span className="text-gray-400 font-normal">(Optional)</span>}
+                                    </label>
+                                    <select
+                                        required={isBranchAdmin}
+                                        className="w-full px-4 py-2 border rounded-md focus:ring-primary focus:border-primary bg-white"
+                                        value={selectedBranchId}
+                                        onChange={(e) => setSelectedBranchId(e.target.value)}
+                                    >
+                                        {!isBranchAdmin && <option value="">— No branch assigned —</option>}
+                                        {branches.map((b) => (
+                                            <option key={b.id} value={b.id}>{b.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            )}
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="col-span-2 md:col-span-1">
