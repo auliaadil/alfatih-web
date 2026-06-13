@@ -78,6 +78,7 @@ export interface TourPackage {
     name: string;
     location: string;
     stars: number;
+    maps_url?: string | null;
   }[];
   itinerary?: DayItinerary[];
   included?: string[];

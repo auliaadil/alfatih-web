@@ -283,10 +283,22 @@ const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
                             </div>
                           </div>
                           <h4 className="text-sm font-bold text-gray-900 mb-1.5 group-hover:text-primary transition-colors">{hotel.name}</h4>
-                          <p className="flex items-center gap-1.5 text-gray-500 text-xs">
-                            <MapPin className="w-3 h-3 text-primary" />
-                            {hotel.location}
-                          </p>
+                          {hotel.maps_url ? (
+                            <a
+                              href={hotel.maps_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-1.5 text-gray-500 text-xs hover:text-primary transition-colors"
+                            >
+                              <MapPin className="w-3 h-3 text-primary" />
+                              {hotel.location}
+                            </a>
+                          ) : (
+                            <p className="flex items-center gap-1.5 text-gray-500 text-xs">
+                              <MapPin className="w-3 h-3 text-primary" />
+                              {hotel.location}
+                            </p>
+                          )}
                         </div>
                       )) : (
                         <p className="col-span-2 text-gray-400 text-sm italic text-center py-8">Data hotel belum tersedia.</p>
