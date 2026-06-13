@@ -346,7 +346,7 @@ interface SearchInputProps {
     placeholder?: string;
 }
 
-export const SearchInput: React.FC<SearchInputProps> = ({ value, onChange, placeholder = 'Search...' }) => (
+export const SearchInput: React.FC<SearchInputProps> = ({ value, onChange, placeholder = 'Cari...' }) => (
     <div className="relative w-full max-w-xs">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
         <input
@@ -358,6 +358,8 @@ export const SearchInput: React.FC<SearchInputProps> = ({ value, onChange, place
         />
         {value && (
             <button
+                type="button"
+                aria-label="Clear search"
                 onClick={() => onChange('')}
                 className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 text-gray-400 hover:text-gray-600 transition-colors"
             >
