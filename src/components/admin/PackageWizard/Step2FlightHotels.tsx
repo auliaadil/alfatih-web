@@ -1,0 +1,336 @@
+import React, { useEffect, useState } from 'react';
+import { Plus, X, Loader2 } from 'lucide-react';
+import { FormField, SectionCard, inputClass, selectClass, textareaClass, btnPrimary, btnSecondary } from '../ui';
+import { supabase } from '../../../lib/supabase';
+import { Airport } from '../../../../types';
+import { WizardDraft } from '../../../pages/admin/PackageWizard';
+import {
+  generateDescription,
+  generateFeatures,
+  PackageContentContext,
+} from '../../../../services/packageContentService';
+
+interface Airline { id: string; name: string; logo_url?: string; iata_code?: string; }
+interface Hotel { id: string; name: string; location: string; stars: number; }
+
+interface Props {
+  draft: WizardDraft;
+  updateDraft: (p: Partial<WizardDraft>) => void;
+  onNext: () => void;
+  onBack: () => void;
+}
+
+const Step2FlightHotels: React.FC<Props> = ({ draft, updateDraft, onNext, onBack }) => {
+  const [airlines, setAirlines] = useState<Airline[]>([]);
+  const [hotels, setHotels] = useState<Hotel[]>([]);
+  const [airports, setAirports] = useState<Airport[]>([]);
+  const [airlineSearch, setAirlineSearch] = useState('');
+  const [hotelSearch, setHotelSearch] = useState('');
+  const [genDesc, setGenDesc] = useState(false);
+  const [genFeat, setGenFeat] = useState(false);
+
+  useEffect(() => {
+    Promise.all([
+      supabase.from('airlines').select('*').order('name'),
+      supabase.from('hotels').select('*').order('name'),
+      supabase.from('airports').select('*').order('iata_code'),
+    ]).then(([a, h, ap]) => {
+      if (a.data) setAirlines(a.data);
+      if (h.data) setHotels(h.data);
+      if (ap.data) setAirports(ap.data);
+    });
+  }, []);
+
+  const toggleAirline = (id: string) => {
+    const ids = draft.airline_ids.includes(id)
+      ? draft.airline_ids.filter((x) => x !== id)
+      : [...draft.airline_ids, id];
+    const routes = ids.map(
+      (aid) => draft.flight_routes.find((r) => r.airline_id === aid) ?? { airline_id: aid, legs: [] }
+    );
+    updateDraft({ airline_ids: ids, flight_routes: routes });
+  };
+
+  const toggleHotel = (id: string) => {
+    const ids = draft.hotel_ids.includes(id)
+      ? draft.hotel_ids.filter((x) => x !== id)
+      : [...draft.hotel_ids, id];
+    updateDraft({ hotel_ids: ids });
+  };
+
+  const addLeg = (airlineId: string) => {
+    const routes = draft.flight_routes.map((r) =>
+      r.airline_id === airlineId
+        ? { ...r, legs: [...r.legs, { from_airport_id: '', to_airport_id: '' }] }
+        : r
+    );
+    updateDraft({ flight_routes: routes });
+  };
+
+  const removeLeg = (airlineId: string, legIdx: number) => {
+    const routes = draft.flight_routes.map((r) =>
+      r.airline_id === airlineId ? { ...r, legs: r.legs.filter((_, i) => i !== legIdx) } : r
+    );
+    updateDraft({ flight_routes: routes });
+  };
+
+  const updateLeg = (
+    airlineId: string,
+    legIdx: number,
+    field: 'from_airport_id' | 'to_airport_id',
+    value: string
+  ) => {
+    const routes = draft.flight_routes.map((r) => {
+      if (r.airline_id !== airlineId) return r;
+      const legs = [...r.legs];
+      legs[legIdx] = { ...legs[legIdx], [field]: value };
+      return { ...r, legs };
+    });
+    updateDraft({ flight_routes: routes });
+  };
+
+  const buildContext = (): PackageContentContext => {
+    const airlineMap = Object.fromEntries(airlines.map((a) => [a.id, a.name]));
+    const hotelMap = Object.fromEntries(hotels.map((h) => [h.id, h.name]));
+    const airportMap = Object.fromEntries(airports.map((a) => [a.id, a.iata_code]));
+    const routes = draft.flight_routes
+      .map((r) => {
+        const name = airlineMap[r.airline_id] ?? '';
+        const legs = r.legs
+          .map((l) => `${airportMap[l.from_airport_id] ?? '?'} → ${airportMap[l.to_airport_id] ?? '?'}`)
+          .join(', ');
+        return legs ? `${name}: ${legs}` : name;
+      })
+      .join(' | ');
+    const daysCount =
+      draft.departure_date && draft.arrival_date
+        ? Math.round(
+            (new Date(draft.arrival_date).getTime() - new Date(draft.departure_date).getTime()) /
+              86400000
+          ) + 1
+        : 0;
+    return {
+      title: draft.title,
+      category: draft.category,
+      duration: daysCount > 0 ? `${daysCount} Hari` : '',
+      airline_names: draft.airline_ids.map((id) => airlineMap[id]).filter(Boolean) as string[],
+      hotel_names: draft.hotel_ids.map((id) => hotelMap[id]).filter(Boolean) as string[],
+      routes,
+      description: draft.description,
+    };
+  };
+
+  const handleGenDescription = async () => {
+    setGenDesc(true);
+    try {
+      updateDraft({ description: await generateDescription(buildContext()) });
+    } catch (err) {
+      console.error('Description generation failed:', err);
+    } finally {
+      setGenDesc(false);
+    }
+  };
+
+  const handleGenFeatures = async () => {
+    setGenFeat(true);
+    try {
+      updateDraft({ features: await generateFeatures(buildContext()) });
+    } catch (err) {
+      console.error('Features generation failed:', err);
+    } finally {
+      setGenFeat(false);
+    }
+  };
+
+  const filteredAirlines = airlines.filter((a) =>
+    a.name.toLowerCase().includes(airlineSearch.toLowerCase())
+  );
+  const filteredHotels = hotels.filter((h) =>
+    `${h.name} ${h.location}`.toLowerCase().includes(hotelSearch.toLowerCase())
+  );
+
+  return (
+    <div className="space-y-6">
+      <SectionCard title="Step 2 of 4 — Flight & Hotels">
+        <div className="space-y-6 p-6">
+
+          {/* Airlines */}
+          <div>
+            <h3 className="text-sm font-semibold text-gray-800 mb-3">Airlines</h3>
+            <input
+              type="text"
+              className={inputClass + ' mb-2'}
+              placeholder="Search airlines..."
+              value={airlineSearch}
+              onChange={(e) => setAirlineSearch(e.target.value)}
+            />
+            <div className="border border-gray-200 rounded-xl divide-y divide-gray-100 overflow-hidden">
+              {filteredAirlines.map((airline) => {
+                const checked = draft.airline_ids.includes(airline.id);
+                const route = draft.flight_routes.find((r) => r.airline_id === airline.id);
+                return (
+                  <div key={airline.id}>
+                    <label
+                      className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors ${
+                        checked ? 'bg-green-50' : 'hover:bg-gray-50'
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={() => toggleAirline(airline.id)}
+                        className="w-4 h-4 accent-green-500 shrink-0"
+                      />
+                      <span className="text-sm font-medium text-gray-800 flex-1">{airline.name}</span>
+                      {airline.iata_code && (
+                        <span className="text-xs text-gray-400">{airline.iata_code}</span>
+                      )}
+                    </label>
+                    {checked && route && (
+                      <div className="px-4 pb-3 pt-2 bg-gray-50 border-t border-gray-100">
+                        <p className="text-xs font-semibold text-gray-500 mb-2">Route legs</p>
+                        {route.legs.map((leg, i) => (
+                          <div key={i} className="flex items-center gap-2 mb-2">
+                            <select
+                              className={selectClass + ' flex-1'}
+                              value={leg.from_airport_id}
+                              onChange={(e) =>
+                                updateLeg(airline.id, i, 'from_airport_id', e.target.value)
+                              }
+                            >
+                              <option value="">From...</option>
+                              {airports.map((a) => (
+                                <option key={a.id} value={a.id}>
+                                  {a.iata_code} — {a.name}
+                                </option>
+                              ))}
+                            </select>
+                            <span className="text-gray-400">→</span>
+                            <select
+                              className={selectClass + ' flex-1'}
+                              value={leg.to_airport_id}
+                              onChange={(e) =>
+                                updateLeg(airline.id, i, 'to_airport_id', e.target.value)
+                              }
+                            >
+                              <option value="">To...</option>
+                              {airports.map((a) => (
+                                <option key={a.id} value={a.id}>
+                                  {a.iata_code} — {a.name}
+                                </option>
+                              ))}
+                            </select>
+                            <button
+                              type="button"
+                              onClick={() => removeLeg(airline.id, i)}
+                              className="text-red-400 hover:text-red-600"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ))}
+                        <button
+                          type="button"
+                          onClick={() => addLeg(airline.id)}
+                          className="text-xs text-green-600 font-medium flex items-center gap-1 hover:underline"
+                        >
+                          <Plus className="w-3 h-3" /> Add leg
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Hotels */}
+          <div>
+            <h3 className="text-sm font-semibold text-gray-800 mb-3">Hotels</h3>
+            <input
+              type="text"
+              className={inputClass + ' mb-2'}
+              placeholder="Search hotels..."
+              value={hotelSearch}
+              onChange={(e) => setHotelSearch(e.target.value)}
+            />
+            <div className="border border-gray-200 rounded-xl divide-y divide-gray-100 overflow-hidden">
+              {filteredHotels.map((hotel) => {
+                const checked = draft.hotel_ids.includes(hotel.id);
+                return (
+                  <label
+                    key={hotel.id}
+                    className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors ${
+                      checked ? 'bg-green-50' : 'hover:bg-gray-50'
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={() => toggleHotel(hotel.id)}
+                      className="w-4 h-4 accent-green-500 shrink-0"
+                    />
+                    <span className="text-sm font-medium text-gray-800 flex-1">{hotel.name}</span>
+                    <span className="text-xs text-amber-500">{'★'.repeat(hotel.stars)}</span>
+                    <span className="text-xs text-gray-400">{hotel.location}</span>
+                  </label>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Description */}
+          <FormField label="Description">
+            <div className="flex justify-end mb-1.5">
+              <button
+                type="button"
+                onClick={handleGenDescription}
+                disabled={genDesc}
+                className="text-xs text-green-700 bg-green-50 border border-green-200 px-3 py-1 rounded-lg flex items-center gap-1 hover:bg-green-100 disabled:opacity-50"
+              >
+                {genDesc ? <Loader2 className="w-3 h-3 animate-spin" /> : '✨'} Generate
+              </button>
+            </div>
+            <textarea
+              className={textareaClass}
+              rows={4}
+              placeholder="Package description..."
+              value={draft.description}
+              onChange={(e) => updateDraft({ description: e.target.value })}
+            />
+          </FormField>
+
+          {/* Features */}
+          <FormField label="Features">
+            <div className="flex justify-end mb-1.5">
+              <button
+                type="button"
+                onClick={handleGenFeatures}
+                disabled={genFeat}
+                className="text-xs text-green-700 bg-green-50 border border-green-200 px-3 py-1 rounded-lg flex items-center gap-1 hover:bg-green-100 disabled:opacity-50"
+              >
+                {genFeat ? <Loader2 className="w-3 h-3 animate-spin" /> : '✨'} Generate
+              </button>
+            </div>
+            <textarea
+              className={textareaClass}
+              rows={3}
+              placeholder="One feature per line..."
+              value={draft.features.join('\n')}
+              onChange={(e) => updateDraft({ features: e.target.value.split('\n').filter(Boolean) })}
+            />
+            <p className="text-xs text-gray-400 mt-1">One feature per line.</p>
+          </FormField>
+
+        </div>
+      </SectionCard>
+
+      <div className="flex justify-between">
+        <button type="button" onClick={onBack} className={btnSecondary}>← Back</button>
+        <button type="button" onClick={onNext} className={btnPrimary}>Next: Pricing & Rooms →</button>
+      </div>
+    </div>
+  );
+};
+
+export default Step2FlightHotels;
