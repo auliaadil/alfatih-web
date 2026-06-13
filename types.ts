@@ -20,6 +20,7 @@ export interface Category {
 }
 
 export interface FlightLeg {
+  id?: string;
   from_airport_id: string;
   to_airport_id: string;
 }

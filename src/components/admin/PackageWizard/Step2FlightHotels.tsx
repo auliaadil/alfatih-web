@@ -61,7 +61,7 @@ const Step2FlightHotels: React.FC<Props> = ({ draft, updateDraft, onNext, onBack
   const addLeg = (airlineId: string) => {
     const routes = draft.flight_routes.map((r) =>
       r.airline_id === airlineId
-        ? { ...r, legs: [...r.legs, { from_airport_id: '', to_airport_id: '' }] }
+        ? { ...r, legs: [...r.legs, { id: Date.now().toString(), from_airport_id: '', to_airport_id: '' }] }
         : r
     );
     updateDraft({ flight_routes: routes });
@@ -190,7 +190,7 @@ const Step2FlightHotels: React.FC<Props> = ({ draft, updateDraft, onNext, onBack
                       <div className="px-4 pb-3 pt-2 bg-gray-50 border-t border-gray-100">
                         <p className="text-xs font-semibold text-gray-500 mb-2">Route legs</p>
                         {route.legs.map((leg, i) => (
-                          <div key={i} className="flex items-center gap-2 mb-2">
+                          <div key={leg.id ?? i} className="flex items-center gap-2 mb-2">
                             <select
                               className={selectClass + ' flex-1'}
                               value={leg.from_airport_id}
@@ -288,7 +288,7 @@ const Step2FlightHotels: React.FC<Props> = ({ draft, updateDraft, onNext, onBack
                 disabled={genDesc}
                 className="text-xs text-green-700 bg-green-50 border border-green-200 px-3 py-1 rounded-lg flex items-center gap-1 hover:bg-green-100 disabled:opacity-50"
               >
-                {genDesc ? <Loader2 className="w-3 h-3 animate-spin" /> : '✨'} Generate
+                {genDesc ? <Loader2 className="w-3 h-3 animate-spin" /> : null} Generate
               </button>
             </div>
             <textarea
@@ -309,7 +309,7 @@ const Step2FlightHotels: React.FC<Props> = ({ draft, updateDraft, onNext, onBack
                 disabled={genFeat}
                 className="text-xs text-green-700 bg-green-50 border border-green-200 px-3 py-1 rounded-lg flex items-center gap-1 hover:bg-green-100 disabled:opacity-50"
               >
-                {genFeat ? <Loader2 className="w-3 h-3 animate-spin" /> : '✨'} Generate
+                {genFeat ? <Loader2 className="w-3 h-3 animate-spin" /> : null} Generate
               </button>
             </div>
             <textarea

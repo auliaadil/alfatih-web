@@ -158,7 +158,7 @@ const Step4ItineraryTerms: React.FC<Props> = ({ draft, updateDraft, onBack, onSa
       disabled={loading}
       className="text-xs text-green-700 bg-green-50 border border-green-200 px-3 py-1.5 rounded-lg flex items-center gap-1.5 hover:bg-green-100 disabled:opacity-50 whitespace-nowrap"
     >
-      {loading ? <Loader2 className="w-3 h-3 animate-spin" /> : '✨'} Generate
+      {loading ? <Loader2 className="w-3 h-3 animate-spin" /> : null} Generate
     </button>
   );
 
@@ -178,7 +178,7 @@ const Step4ItineraryTerms: React.FC<Props> = ({ draft, updateDraft, onBack, onSa
             </div>
             <div className="space-y-3">
               {draft.itinerary.map((day, di) => (
-                <div key={di} className="border border-gray-200 rounded-xl overflow-hidden">
+                <div key={day.day} className="border border-gray-200 rounded-xl overflow-hidden">
                   <div className="flex items-center gap-3 px-4 py-2.5 bg-gray-50 border-b border-gray-100">
                     <span className="bg-green-500 text-white text-xs font-bold px-2 py-0.5 rounded">
                       Hari {day.day}

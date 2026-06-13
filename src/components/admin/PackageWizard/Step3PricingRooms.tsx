@@ -31,7 +31,11 @@ const Step3PricingRooms: React.FC<Props> = ({ draft, updateDraft, onNext, onBack
       .from('hotels')
       .select('id, name, location, stars, room_types')
       .in('id', draft.hotel_ids)
-      .then(({ data }) => {
+      .then(({ data, error }) => {
+        if (error) {
+          console.error('Failed to load hotels:', error.message);
+          return;
+        }
         if (data) setHotels(data);
       });
   }, [draft.hotel_ids]);

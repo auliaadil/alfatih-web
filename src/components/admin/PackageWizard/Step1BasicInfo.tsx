@@ -33,12 +33,16 @@ const Step1BasicInfo: React.FC<Props> = ({ draft, updateDraft, onNext, categorie
     setUploading(true);
     const path = `packages/${Date.now()}-${file.name}`;
     const { data, error } = await supabase.storage.from('images').upload(path, file, { upsert: true });
-    if (!error && data) {
+    if (error) {
+      console.error('Upload failed:', error.message);
+      setUploading(false);
+      return;
+    }
+    if (data) {
       const { data: urlData } = supabase.storage.from('images').getPublicUrl(data.path);
       updateDraft({ image_url: urlData.publicUrl, image_credit: '' });
     }
     setUploading(false);
-    // Reset input so the same file can be re-selected
     e.target.value = '';
   };
 
