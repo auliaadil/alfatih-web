@@ -10,9 +10,9 @@ import {
 // Catalogue-level room type (no price — pricing is set per-package in the wizard)
 interface RoomTypeRow { name: string; capacity: number; }
 
-interface Hotel { id: string; name: string; location: string; stars: number; room_types: RoomTypeRow[]; }
+interface Hotel { id: string; name: string; location: string; stars: number; room_types: RoomTypeRow[]; maps_url: string | null; }
 
-const EMPTY_FORM = { name: '', location: '', stars: 3, room_types: [] as RoomTypeRow[] };
+const EMPTY_FORM = { name: '', location: '', stars: 3, room_types: [] as RoomTypeRow[], maps_url: '' };
 
 const PAGE_SIZE = 10;
 
@@ -58,14 +58,14 @@ const Hotels: React.FC = () => {
 
     const openEdit = (hotel: Hotel) => {
         setEditingId(hotel.id);
-        setForm({ name: hotel.name, location: hotel.location, stars: hotel.stars, room_types: hotel.room_types ?? [] });
+        setForm({ name: hotel.name, location: hotel.location, stars: hotel.stars, room_types: hotel.room_types ?? [], maps_url: hotel.maps_url || '' });
         setIsFormOpen(true);
     };
 
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
         setSaving(true);
-        const payload = { name: form.name, location: form.location, stars: form.stars, room_types: form.room_types };
+        const payload = { name: form.name, location: form.location, stars: form.stars, room_types: form.room_types, maps_url: form.maps_url || null };
         const { error } = editingId
             ? await supabase.from('hotels').update(payload).eq('id', editingId)
             : await supabase.from('hotels').insert([payload]);
@@ -246,6 +246,15 @@ const Hotels: React.FC = () => {
                             placeholder="e.g., Makkah"
                             value={form.location}
                             onChange={(e) => setForm({ ...form, location: e.target.value })}
+                        />
+                    </FormField>
+                    <FormField label="Google Maps Link" hint="Paste the share link from Google Maps. Shown as a clickable link on the public page.">
+                        <input
+                            type="url"
+                            className={inputClass}
+                            placeholder="https://maps.app.goo.gl/..."
+                            value={form.maps_url}
+                            onChange={(e) => setForm({ ...form, maps_url: e.target.value })}
                         />
                     </FormField>
                     <FormField label="Star Rating" required>
