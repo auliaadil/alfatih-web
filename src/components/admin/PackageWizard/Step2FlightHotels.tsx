@@ -57,6 +57,29 @@ const Step2FlightHotels: React.FC<Props> = ({ draft, updateDraft, onNext, onBack
     if (data) toggleAirline(data.id);
   };
 
+  const [hotelSlideOpen, setHotelSlideOpen] = useState(false);
+  const [newHotelForm, setNewHotelForm] = useState({ name: '', location: '', stars: 4 });
+  const [savingHotel, setSavingHotel] = useState(false);
+
+  const handleCreateHotel = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSavingHotel(true);
+    const { data, error } = await supabase
+      .from('hotels')
+      .insert([{ name: newHotelForm.name.trim(), location: newHotelForm.location.trim(), stars: newHotelForm.stars }])
+      .select()
+      .single();
+    setSavingHotel(false);
+    if (error) { toast('error', 'Failed to create hotel.'); return; }
+    const { data: fresh, error: refreshError } = await supabase.from('hotels').select('*').order('name');
+    if (refreshError) { toast('error', 'Hotel created but failed to refresh list. Please reload.'); return; }
+    if (fresh) setHotels(fresh);
+    toast('success', 'Hotel created.');
+    setHotelSlideOpen(false);
+    setNewHotelForm({ name: '', location: '', stars: 4 });
+    if (data) toggleHotel(data.id);
+  };
+
   useEffect(() => {
     Promise.all([
       supabase.from('airlines').select('*').order('name'),
@@ -283,7 +306,16 @@ const Step2FlightHotels: React.FC<Props> = ({ draft, updateDraft, onNext, onBack
 
           {/* Hotels */}
           <div>
-            <h3 className="text-sm font-semibold text-gray-800 mb-3">Hotels</h3>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-semibold text-gray-800">Hotels</h3>
+              <button
+                type="button"
+                onClick={() => setHotelSlideOpen(true)}
+                className="text-xs text-primary font-medium flex items-center gap-1 hover:underline"
+              >
+                <Plus className="w-3 h-3" /> New Hotel
+              </button>
+            </div>
             <input
               type="text"
               className={inputClass + ' mb-2'}
@@ -412,6 +444,57 @@ const Step2FlightHotels: React.FC<Props> = ({ draft, updateDraft, onNext, onBack
               value={newAirlineForm.logo_url}
               onChange={(e) => setNewAirlineForm({ ...newAirlineForm, logo_url: e.target.value })}
             />
+          </FormField>
+        </form>
+      </SlideOver>
+
+      <SlideOver
+        isOpen={hotelSlideOpen}
+        onClose={() => setHotelSlideOpen(false)}
+        title="New Hotel"
+        width="sm"
+        footer={
+          <div className="flex gap-3">
+            <button type="button" onClick={() => setHotelSlideOpen(false)} className={btnSecondary}>
+              Cancel
+            </button>
+            <button form="hotel-create-form" type="submit" disabled={savingHotel} className={btnPrimary}>
+              {savingHotel ? 'Saving...' : 'Add Hotel'}
+            </button>
+          </div>
+        }
+      >
+        <form id="hotel-create-form" onSubmit={handleCreateHotel} className="space-y-5">
+          <FormField label="Hotel Name" required>
+            <input
+              type="text"
+              required
+              className={inputClass}
+              placeholder="e.g., Hilton Makkah Convention"
+              value={newHotelForm.name}
+              onChange={(e) => setNewHotelForm({ ...newHotelForm, name: e.target.value })}
+            />
+          </FormField>
+          <FormField label="Location" required>
+            <input
+              type="text"
+              required
+              className={inputClass}
+              placeholder="e.g., Makkah"
+              value={newHotelForm.location}
+              onChange={(e) => setNewHotelForm({ ...newHotelForm, location: e.target.value })}
+            />
+          </FormField>
+          <FormField label="Stars">
+            <select
+              className={selectClass}
+              value={newHotelForm.stars}
+              onChange={(e) => setNewHotelForm({ ...newHotelForm, stars: Number(e.target.value) })}
+            >
+              {[1, 2, 3, 4, 5].map((n) => (
+                <option key={n} value={n}>{n} Star{n > 1 ? 's' : ''}</option>
+              ))}
+            </select>
           </FormField>
         </form>
       </SlideOver>
