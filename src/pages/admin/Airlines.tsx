@@ -6,10 +6,17 @@ import {
     ConfirmDialog, FormField, inputClass, btnPrimary, btnSecondary, btnGhost,
     useToast, SearchInput, Pagination, SortState, compareRows,
 } from '../../components/admin/ui';
+import CountrySelect from '../../components/admin/CountrySelect';
 
-interface Airline { id: string; name: string; logo_url: string | null; }
+interface Airline {
+  id: string;
+  name: string;
+  logo_url: string | null;
+  country_id: string | null;
+  countries: { name: string } | null;
+}
 
-const EMPTY_FORM = { name: '', logo_url: '' };
+const EMPTY_FORM = { name: '', logo_url: '', country_id: '' };
 
 const PAGE_SIZE = 10;
 
@@ -68,7 +75,7 @@ const Airlines: React.FC = () => {
 
     const fetchAirlines = async () => {
         setLoading(true);
-        const { data, error } = await supabase.from('airlines').select('*').order('name');
+        const { data, error } = await supabase.from('airlines').select('*, countries(name)').order('name');
         if (!error && data) setAirlines(data);
         setLoading(false);
     };
@@ -82,7 +89,7 @@ const Airlines: React.FC = () => {
 
     const openEdit = (airline: Airline) => {
         setEditingId(airline.id);
-        setForm({ name: airline.name, logo_url: airline.logo_url || '' });
+        setForm({ name: airline.name, logo_url: airline.logo_url || '', country_id: airline.country_id || '' });
         setLogoTab(airline.logo_url ? 'url' : 'upload');
         setIsFormOpen(true);
     };
@@ -90,7 +97,7 @@ const Airlines: React.FC = () => {
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
         setSaving(true);
-        const payload = { name: form.name, logo_url: form.logo_url || null };
+        const payload = { name: form.name, logo_url: form.logo_url || null, country_id: form.country_id || null };
         const { error } = editingId
             ? await supabase.from('airlines').update(payload).eq('id', editingId)
             : await supabase.from('airlines').insert([payload]);
@@ -130,7 +137,9 @@ const Airlines: React.FC = () => {
     };
 
     const filtered = airlines.filter((a) =>
-        (a.name ?? '').toLowerCase().includes(searchQuery.toLowerCase())
+        [a.name, a.countries?.name].some((f) =>
+            (f ?? '').toLowerCase().includes(searchQuery.toLowerCase())
+        )
     );
     const sorted = [...filtered].sort((a, b) => compareRows(a, b, sort.key, sort.dir));
     const paginated = sorted.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
@@ -158,6 +167,7 @@ const Airlines: React.FC = () => {
                     <THead>
                         <Th>Logo</Th>
                         <Th sortKey="name" currentSort={sort} onSort={handleSort}>Airline Name</Th>
+                        <Th>Country</Th>
                         <Th align="right">Actions</Th>
                     </THead>
                     <tbody className="divide-y divide-gray-100">
@@ -165,7 +175,7 @@ const Airlines: React.FC = () => {
                             <SkeletonRows cols={3} rows={4} />
                         ) : filtered.length === 0 ? (
                             <tr>
-                                <td colSpan={3}>
+                                <td colSpan={4}>
                                     {airlines.length === 0 ? (
                                         <EmptyState
                                             icon={<Plane className="w-7 h-7" />}
@@ -200,6 +210,9 @@ const Airlines: React.FC = () => {
                                     </Td>
                                     <Td>
                                         <span className="font-medium text-gray-900">{airline.name}</span>
+                                    </Td>
+                                    <Td>
+                                        <span className="text-gray-600">{airline.countries?.name ?? '—'}</span>
                                     </Td>
                                     <Td className="text-right">
                                         <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -257,6 +270,12 @@ const Airlines: React.FC = () => {
                             placeholder="e.g., Garuda Indonesia"
                             value={form.name}
                             onChange={(e) => setForm({ ...form, name: e.target.value })}
+                        />
+                    </FormField>
+                    <FormField label="Country">
+                        <CountrySelect
+                            value={form.country_id}
+                            onChange={(id) => setForm((f) => ({ ...f, country_id: id }))}
                         />
                     </FormField>
                     <FormField label="Logo">
