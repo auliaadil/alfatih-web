@@ -4,7 +4,7 @@ import { CheckCircle, Clock, Trash2, Map, Save, X, MessageCircle } from 'lucide-
 import {
     PageHeader, TableCard, THead, Th, Td, SkeletonRows, EmptyState, SlideOver,
     ConfirmDialog, StatusBadge, FormField, textareaClass, btnPrimary, btnSecondary, btnGhost,
-    useToast, SearchInput, Pagination,
+    useToast, SearchInput, Pagination, SortState, compareRows,
 } from '../../components/admin/ui';
 
 const PAGE_SIZE = 10;
@@ -23,10 +23,14 @@ const PrivateTrips: React.FC = () => {
 
     const [searchQuery, setSearchQuery] = useState('');
     const [page, setPage] = useState(0);
+    const [sort, setSort] = useState<SortState>({ key: 'created_at', dir: 'desc' });
+    const handleSort = (key: string) =>
+        setSort(prev => ({ key, dir: prev.key === key && prev.dir === 'asc' ? 'desc' : 'asc' }));
 
     useEffect(() => { fetchRequests(); }, []);
 
     useEffect(() => { setPage(0); }, [searchQuery]);
+    useEffect(() => { setPage(0); }, [sort]);
 
     const fetchRequests = async () => {
         setLoading(true);
@@ -89,7 +93,8 @@ const PrivateTrips: React.FC = () => {
             (f ?? '').toLowerCase().includes(searchQuery.toLowerCase())
         )
     );
-    const paginated = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+    const sorted = [...filtered].sort((a, b) => compareRows(a, b, sort.key, sort.dir));
+    const paginated = sorted.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
     return (
         <div>
@@ -107,10 +112,10 @@ const PrivateTrips: React.FC = () => {
             <TableCard>
                 <table className="min-w-full">
                     <THead>
-                        <Th>Submitter</Th>
+                        <Th sortKey="name" currentSort={sort} onSort={handleSort}>Submitter</Th>
                         <Th>Trip Details</Th>
-                        <Th>Budget</Th>
-                        <Th>Status</Th>
+                        <Th sortKey="budget" currentSort={sort} onSort={handleSort}>Budget</Th>
+                        <Th sortKey="status" currentSort={sort} onSort={handleSort}>Status</Th>
                         <Th align="right">Actions</Th>
                     </THead>
                     <tbody className="divide-y divide-gray-100">
