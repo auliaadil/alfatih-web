@@ -30,16 +30,17 @@ const Step1BasicInfo: React.FC<Props> = ({ draft, updateDraft, onNext, categorie
   const handleCreateCategory = async (e: React.FormEvent) => {
     e.preventDefault();
     setSavingCat(true);
-    const slug = catForm.slug || toSlug(catForm.name);
-    const { error } = await supabase.from('categories').insert([{ name: catForm.name, slug }]);
+    const trimmedName = catForm.name.trim();
+    const slug = catForm.slug.trim() || toSlug(trimmedName);
+    const { error } = await supabase.from('categories').insert([{ name: trimmedName, slug }]);
     setSavingCat(false);
     if (error) {
       toast('error', error.code === '23505' ? 'Category already exists.' : 'Failed to save category.');
       return;
     }
-    onCategoryCreated(catForm.name);
+    onCategoryCreated(trimmedName);
     toast('success', 'Category created.');
-    updateDraft({ category: catForm.name });
+    updateDraft({ category: trimmedName });
     setCatSlideOpen(false);
     setCatForm({ name: '', slug: '' });
   };
