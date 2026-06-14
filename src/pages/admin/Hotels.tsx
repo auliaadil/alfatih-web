@@ -4,7 +4,7 @@ import { Plus, Edit2, Trash2, Building2, Star, X } from 'lucide-react';
 import {
     PageHeader, TableCard, THead, Th, Td, SkeletonRows, EmptyState, SlideOver,
     ConfirmDialog, FormField, inputClass, selectClass, btnPrimary, btnSecondary, btnGhost,
-    useToast, SearchInput, Pagination,
+    useToast, SearchInput, Pagination, SortState, compareRows,
 } from '../../components/admin/ui';
 
 // Catalogue-level room type (no price — pricing is set per-package in the wizard)
@@ -39,9 +39,13 @@ const Hotels: React.FC = () => {
 
     const [searchQuery, setSearchQuery] = useState('');
     const [page, setPage] = useState(0);
+    const [sort, setSort] = useState<SortState>({ key: 'name', dir: 'asc' });
+    const handleSort = (key: string) =>
+        setSort(prev => ({ key, dir: prev.key === key && prev.dir === 'asc' ? 'desc' : 'asc' }));
 
     useEffect(() => { fetchHotels(); }, []);
     useEffect(() => { setPage(0); }, [searchQuery]);
+    useEffect(() => { setPage(0); }, [sort]);
 
     const fetchHotels = async () => {
         setLoading(true);
@@ -114,7 +118,8 @@ const Hotels: React.FC = () => {
             (f ?? '').toLowerCase().includes(searchQuery.toLowerCase())
         )
     );
-    const paginated = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+    const sorted = [...filtered].sort((a, b) => compareRows(a, b, sort.key, sort.dir));
+    const paginated = sorted.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
     return (
         <div>
@@ -137,9 +142,9 @@ const Hotels: React.FC = () => {
             <TableCard>
                 <table className="min-w-full">
                     <THead>
-                        <Th>Hotel Name</Th>
-                        <Th>Location</Th>
-                        <Th>Rating</Th>
+                        <Th sortKey="name" currentSort={sort} onSort={handleSort}>Hotel Name</Th>
+                        <Th sortKey="location" currentSort={sort} onSort={handleSort}>Location</Th>
+                        <Th sortKey="stars" currentSort={sort} onSort={handleSort}>Rating</Th>
                         <Th align="right">Actions</Th>
                     </THead>
                     <tbody className="divide-y divide-gray-100">
