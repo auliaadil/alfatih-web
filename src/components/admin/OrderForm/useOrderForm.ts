@@ -10,10 +10,28 @@ export function useOrderForm(
 ) {
   const [participants, setParticipants] = useState<ParticipantDraft[]>(initialParticipants);
   const [deletedIds, setDeletedIds] = useState<string[]>([]);
-  // Manual rooms overrides keyed by tier name; cleared by re-deriving when empty.
+  // Manual rooms overrides keyed by tier name. An override is dropped whenever
+  // that tier's participants change, so the gender-aware auto estimate takes
+  // over again instead of a stale manual value silently sticking.
   const [roomOverrides, setRoomOverrides] = useState<Record<string, number>>({});
 
+  const clearOverrides = (affectedTiers: string[]) =>
+    setRoomOverrides((prev) => {
+      const next = { ...prev };
+      let changed = false;
+      for (const tier of affectedTiers) {
+        if (tier in next) { delete next[tier]; changed = true; }
+      }
+      return changed ? next : prev;
+    });
+
   const upsertParticipant = (draft: ParticipantDraft, index: number | null) => {
+    const affected = [draft.room_type];
+    if (index !== null) {
+      const prevTier = participants[index]?.room_type;
+      if (prevTier) affected.push(prevTier);
+    }
+    clearOverrides(affected);
     setParticipants((prev) => {
       if (index === null) return [...prev, draft];
       const next = [...prev];
@@ -23,11 +41,10 @@ export function useOrderForm(
   };
 
   const removeParticipant = (index: number) => {
-    setParticipants((prev) => {
-      const target = prev[index];
-      if (target?.id) setDeletedIds((d) => [...d, target.id!]);
-      return prev.filter((_, i) => i !== index);
-    });
+    const target = participants[index];
+    if (target?.id) setDeletedIds((d) => [...d, target.id!]);
+    if (target?.room_type) clearOverrides([target.room_type]);
+    setParticipants((prev) => prev.filter((_, i) => i !== index));
   };
 
   const setRoomOverride = (tier: string, rooms: number) =>

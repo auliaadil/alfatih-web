@@ -12,8 +12,8 @@ import OrderSummaryFooter from './OrderSummaryFooter';
 interface PackageRow {
   id: string;
   title: string;
-  quotas: number;
-  available_quotas: number | null;
+  quotas: number;          // live remaining quota (decremented by the orders INSERT trigger)
+  initial_quotas: number | null;
   room_options: RoomOption[];
 }
 
@@ -67,7 +67,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialData, onClose, onSuccess }
     const load = async () => {
       const { data: pkgs } = await supabase
         .from('packages')
-        .select('id, title, quotas, available_quotas, room_options');
+        .select('id, title, quotas, initial_quotas, room_options');
       if (pkgs) setPackages(pkgs as PackageRow[]);
 
       if (isBranchAdmin) {
@@ -87,11 +87,15 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialData, onClose, onSuccess }
     load();
   }, []);
 
+  // `quotas` is the live remaining quota (decremented only on order INSERT).
+  // When editing, this order's pax were already deducted at insert time, so add
+  // them back to avoid falsely blocking an edit that just reshuffles people.
   const quotaRemaining = selectedPackage
-    ? (selectedPackage.available_quotas ?? selectedPackage.quotas ?? 0)
+    ? (selectedPackage.quotas ?? 0) + (initialData?.participant_count ?? 0)
     : null;
 
   const unsetGender = form.participants.some((p) => p.gender !== 'male' && p.gender !== 'female');
+  const incompleteRoom = form.participants.some((p) => !p.room_type);
   const canSave =
     !!selectedPackageId &&
     !!customerName.trim() &&
@@ -99,6 +103,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialData, onClose, onSuccess }
     form.participants.length > 0 &&
     form.orphans.length === 0 &&
     !unsetGender &&
+    !incompleteRoom &&
     (!isBranchAdmin || !!selectedBranchId);
 
   const handleSubmit = async () => {
@@ -146,7 +151,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialData, onClose, onSuccess }
           phone: p.phone,
           address: p.address,
         }));
-        const { error: upErr } = await supabase.from('participants').upsert(partsPayload);
+        const { error: upErr } = await supabase.from('participants').upsert(partsPayload, { onConflict: 'id' });
         if (upErr) { setErrorMsg('Order saved, but participants failed: ' + upErr.message); setSaving(false); return; }
       }
     }
@@ -241,6 +246,9 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialData, onClose, onSuccess }
 
           {unsetGender && (
             <p className="text-xs text-amber-600">Some participants have no gender set — required before saving.</p>
+          )}
+          {incompleteRoom && (
+            <p className="text-xs text-amber-600">Some participants have no room tier assigned — required before saving.</p>
           )}
 
           <FormField label="Internal notes">

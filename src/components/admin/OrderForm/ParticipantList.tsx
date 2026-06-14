@@ -72,9 +72,9 @@ const ParticipantList: React.FC<Props> = ({
                   {p.identity_number || 'No NIK'} · {p.passport_number || 'No passport'}
                 </p>
               </div>
-              {orphans.includes(p.room_type) ? (
+              {!p.room_type || orphans.includes(p.room_type) ? (
                 <span className="text-xs bg-red-50 text-red-600 px-2 py-1 rounded-md">
-                  {p.room_type || 'No tier'} — unavailable
+                  {p.room_type ? `${p.room_type} — unavailable` : 'No tier'}
                 </span>
               ) : (
                 <span className="text-xs bg-blue-50 text-primary px-2 py-1 rounded-md">{p.room_type}</span>
