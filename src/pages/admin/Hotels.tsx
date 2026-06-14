@@ -12,7 +12,14 @@ interface RoomTypeRow { name: string; capacity: number; }
 
 interface Hotel { id: string; name: string; location: string; stars: number; room_types: RoomTypeRow[]; maps_url: string | null; }
 
-const EMPTY_FORM = { name: '', location: '', stars: 3, room_types: [] as RoomTypeRow[], maps_url: '' };
+// New hotels default to the standard room type config (mirrors the DB column default).
+const DEFAULT_ROOM_TYPES: RoomTypeRow[] = [
+    { name: 'Quad', capacity: 4 },
+    { name: 'Triple', capacity: 3 },
+    { name: 'Double', capacity: 2 },
+];
+
+const EMPTY_FORM = { name: '', location: '', stars: 3, room_types: DEFAULT_ROOM_TYPES, maps_url: '' };
 
 const PAGE_SIZE = 10;
 
