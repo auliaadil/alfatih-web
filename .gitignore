@@ -32,3 +32,6 @@ dist-ssr
 # Supabase CLI cache
 supabase/.temp
 .superpowers/
+
+# Claude Code local state (worktrees, settings)
+.claude/
