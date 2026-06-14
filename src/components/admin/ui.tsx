@@ -310,6 +310,35 @@ export const THead: React.FC<{ children: ReactNode }> = ({ children }) => (
     </thead>
 );
 
+export const Td: React.FC<{ children: ReactNode; className?: string }> = ({ children, className = '' }) => (
+    <td className={`px-6 py-4 text-sm text-gray-700 ${className}`}>
+        {children}
+    </td>
+);
+
+// ── Sort Utilities ─────────────────────────────────────────
+
+export type SortDir = 'asc' | 'desc';
+export interface SortState { key: string; dir: SortDir; }
+
+export function compareRows(a: any, b: any, key: string, dir: SortDir): number {
+    const get = (obj: any, k: string): any => k.split('.').reduce((o: any, part) => o?.[part], obj);
+    const valA = get(a, key);
+    const valB = get(b, key);
+    const aNull = valA == null;
+    const bNull = valB == null;
+    if (aNull && bNull) return 0;
+    if (aNull) return 1;
+    if (bNull) return -1;
+    let cmp: number;
+    if (typeof valA === 'number' && typeof valB === 'number') {
+        cmp = valA - valB;
+    } else {
+        cmp = String(valA).toLowerCase().localeCompare(String(valB).toLowerCase());
+    }
+    return dir === 'asc' ? cmp : -cmp;
+}
+
 interface ThProps {
     children: ReactNode;
     align?: 'left' | 'right' | 'center';
@@ -330,13 +359,6 @@ export const Th: React.FC<ThProps> = ({ children, align = 'left', sortKey, curre
             : <ChevronDown className="w-3 h-3 shrink-0" />
         : <ChevronsUpDown className="w-3 h-3 shrink-0 text-gray-300" />;
 
-    const inner = (
-        <span className={`inline-flex items-center gap-1 ${isActive ? 'text-primary' : ''}`}>
-            {children}
-            {SortIcon}
-        </span>
-    );
-
     return (
         <th className={`px-6 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wide text-${align}`}>
             {isSortable ? (
@@ -345,36 +367,15 @@ export const Th: React.FC<ThProps> = ({ children, align = 'left', sortKey, curre
                     onClick={() => onSort!(sortKey!)}
                     className="hover:text-gray-700 transition-colors cursor-pointer"
                 >
-                    {inner}
+                    <span className={`inline-flex items-center gap-1${isActive ? ' text-primary' : ''}`}>
+                        {children}
+                        {SortIcon}
+                    </span>
                 </button>
-            ) : inner}
+            ) : children}
         </th>
     );
 };
-
-export const Td: React.FC<{ children: ReactNode; className?: string }> = ({ children, className = '' }) => (
-    <td className={`px-6 py-4 text-sm text-gray-700 ${className}`}>
-        {children}
-    </td>
-);
-
-// ── Sort Utilities ─────────────────────────────────────────
-
-export type SortDir = 'asc' | 'desc';
-export interface SortState { key: string; dir: SortDir; }
-
-export function compareRows(a: any, b: any, key: string, dir: SortDir): number {
-    const get = (obj: any, k: string): any => k.split('.').reduce((o, part) => o?.[part], obj);
-    const valA = get(a, key);
-    const valB = get(b, key);
-    let cmp: number;
-    if (typeof valA === 'number' && typeof valB === 'number') {
-        cmp = valA - valB;
-    } else {
-        cmp = String(valA ?? '').toLowerCase().localeCompare(String(valB ?? '').toLowerCase());
-    }
-    return dir === 'asc' ? cmp : -cmp;
-}
 
 // ── Section Card ───────────────────────────────────────────
 
