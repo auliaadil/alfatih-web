@@ -38,6 +38,7 @@ const Step1BasicInfo: React.FC<Props> = ({ draft, updateDraft, onNext, categorie
       return;
     }
     onCategoryCreated(catForm.name);
+    toast('success', 'Category created.');
     updateDraft({ category: catForm.name });
     setCatSlideOpen(false);
     setCatForm({ name: '', slug: '' });
