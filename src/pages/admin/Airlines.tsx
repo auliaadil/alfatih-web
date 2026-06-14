@@ -4,7 +4,7 @@ import { Plus, Edit2, Trash2, Plane, Upload, Link } from 'lucide-react';
 import {
     PageHeader, TableCard, THead, Th, Td, SkeletonRows, EmptyState, SlideOver,
     ConfirmDialog, FormField, inputClass, btnPrimary, btnSecondary, btnGhost,
-    useToast, SearchInput, Pagination,
+    useToast, SearchInput, Pagination, SortState, compareRows,
 } from '../../components/admin/ui';
 
 interface Airline { id: string; name: string; logo_url: string | null; }
@@ -30,9 +30,13 @@ const Airlines: React.FC = () => {
     const [page, setPage] = useState(0);
     const [logoTab, setLogoTab] = useState<'upload' | 'url'>('upload');
     const [uploading, setUploading] = useState(false);
+    const [sort, setSort] = useState<SortState>({ key: 'name', dir: 'asc' });
+    const handleSort = (key: string) =>
+        setSort(prev => ({ key, dir: prev.key === key && prev.dir === 'asc' ? 'desc' : 'asc' }));
 
     useEffect(() => { fetchAirlines(); }, []);
     useEffect(() => { setPage(0); }, [searchQuery]);
+    useEffect(() => { setPage(0); }, [sort]);
 
     const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -128,7 +132,8 @@ const Airlines: React.FC = () => {
     const filtered = airlines.filter((a) =>
         (a.name ?? '').toLowerCase().includes(searchQuery.toLowerCase())
     );
-    const paginated = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+    const sorted = [...filtered].sort((a, b) => compareRows(a, b, sort.key, sort.dir));
+    const paginated = sorted.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
     return (
         <div>
@@ -152,7 +157,7 @@ const Airlines: React.FC = () => {
                 <table className="min-w-full">
                     <THead>
                         <Th>Logo</Th>
-                        <Th>Airline Name</Th>
+                        <Th sortKey="name" currentSort={sort} onSort={handleSort}>Airline Name</Th>
                         <Th align="right">Actions</Th>
                     </THead>
                     <tbody className="divide-y divide-gray-100">
