@@ -37,6 +37,7 @@ const CountrySelect: React.FC<CountrySelectProps> = ({ value, onChange, required
 
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     setSaving(true);
     const { data, error } = await supabase
       .from('countries')
