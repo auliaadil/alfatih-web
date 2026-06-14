@@ -365,7 +365,7 @@ export const Th: React.FC<ThProps> = ({ children, align = 'left', sortKey, curre
                 <button
                     type="button"
                     onClick={() => onSort!(sortKey!)}
-                    className="hover:text-gray-700 transition-colors cursor-pointer"
+                    className="w-full text-left hover:text-gray-700 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 rounded"
                 >
                     <span className={`inline-flex items-center gap-1${isActive ? ' text-primary' : ''}`}>
                         {children}
