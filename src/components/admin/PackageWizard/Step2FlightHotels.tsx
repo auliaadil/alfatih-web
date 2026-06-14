@@ -80,6 +80,35 @@ const Step2FlightHotels: React.FC<Props> = ({ draft, updateDraft, onNext, onBack
     if (data) toggleHotel(data.id);
   };
 
+  const [airportSlideOpen, setAirportSlideOpen] = useState(false);
+  const [newAirportForm, setNewAirportForm] = useState({ iata_code: '', name: '', city: '', country: '' });
+  const [savingAirport, setSavingAirport] = useState(false);
+
+  const handleCreateAirport = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSavingAirport(true);
+    const { error } = await supabase
+      .from('airports')
+      .insert([{
+        iata_code: newAirportForm.iata_code.trim().toUpperCase(),
+        name: newAirportForm.name.trim(),
+        city: newAirportForm.city.trim() || null,
+        country: newAirportForm.country.trim() || null,
+      }]);
+    setSavingAirport(false);
+    if (error) {
+      toast('error', error.code === '23505' ? 'Airport code already exists.' : 'Failed to create airport.');
+      return;
+    }
+    const { data: fresh, error: refreshError } = await supabase.from('airports').select('*').order('iata_code');
+    if (refreshError) { toast('error', 'Airport created but failed to refresh list. Please reload.'); return; }
+    if (fresh) setAirports(fresh);
+    toast('success', 'Airport created. Select it in a route leg below.');
+    setAirportSlideOpen(false);
+    setNewAirportForm({ iata_code: '', name: '', city: '', country: '' });
+    // No auto-select: airport appears in all leg dropdowns; user places it in the correct leg/direction.
+  };
+
   useEffect(() => {
     Promise.all([
       supabase.from('airlines').select('*').order('name'),
@@ -248,7 +277,16 @@ const Step2FlightHotels: React.FC<Props> = ({ draft, updateDraft, onNext, onBack
                     </label>
                     {checked && route && (
                       <div className="px-4 pb-3 pt-2 bg-gray-50 border-t border-gray-100">
-                        <p className="text-xs font-semibold text-gray-500 mb-2">Route legs</p>
+                        <div className="flex items-center justify-between mb-2">
+                          <p className="text-xs font-semibold text-gray-500">Route legs</p>
+                          <button
+                            type="button"
+                            onClick={() => setAirportSlideOpen(true)}
+                            className="text-xs text-primary font-medium flex items-center gap-1 hover:underline"
+                          >
+                            <Plus className="w-3 h-3" /> New Airport
+                          </button>
+                        </div>
                         {route.legs.map((leg, i) => (
                           <div key={leg.id ?? i} className="flex items-center gap-2 mb-2">
                             <select
@@ -495,6 +533,66 @@ const Step2FlightHotels: React.FC<Props> = ({ draft, updateDraft, onNext, onBack
                 <option key={n} value={n}>{n} Star{n > 1 ? 's' : ''}</option>
               ))}
             </select>
+          </FormField>
+        </form>
+      </SlideOver>
+
+      <SlideOver
+        isOpen={airportSlideOpen}
+        onClose={() => setAirportSlideOpen(false)}
+        title="New Airport"
+        subtitle="After saving, the airport appears in all leg dropdowns."
+        width="sm"
+        footer={
+          <div className="flex gap-3">
+            <button type="button" onClick={() => setAirportSlideOpen(false)} className={btnSecondary}>
+              Cancel
+            </button>
+            <button form="airport-create-form" type="submit" disabled={savingAirport} className={btnPrimary}>
+              {savingAirport ? 'Saving...' : 'Add Airport'}
+            </button>
+          </div>
+        }
+      >
+        <form id="airport-create-form" onSubmit={handleCreateAirport} className="space-y-5">
+          <FormField label="IATA Code" required hint="3-letter code, e.g. CGK">
+            <input
+              type="text"
+              required
+              maxLength={3}
+              className={inputClass}
+              placeholder="e.g., CGK"
+              value={newAirportForm.iata_code}
+              onChange={(e) => setNewAirportForm({ ...newAirportForm, iata_code: e.target.value.toUpperCase() })}
+            />
+          </FormField>
+          <FormField label="Airport Name" required>
+            <input
+              type="text"
+              required
+              className={inputClass}
+              placeholder="e.g., Soekarno-Hatta International Airport"
+              value={newAirportForm.name}
+              onChange={(e) => setNewAirportForm({ ...newAirportForm, name: e.target.value })}
+            />
+          </FormField>
+          <FormField label="City">
+            <input
+              type="text"
+              className={inputClass}
+              placeholder="e.g., Tangerang"
+              value={newAirportForm.city}
+              onChange={(e) => setNewAirportForm({ ...newAirportForm, city: e.target.value })}
+            />
+          </FormField>
+          <FormField label="Country">
+            <input
+              type="text"
+              className={inputClass}
+              placeholder="e.g., Indonesia"
+              value={newAirportForm.country}
+              onChange={(e) => setNewAirportForm({ ...newAirportForm, country: e.target.value })}
+            />
           </FormField>
         </form>
       </SlideOver>
