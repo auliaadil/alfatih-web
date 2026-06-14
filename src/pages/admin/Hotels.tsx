@@ -6,11 +6,21 @@ import {
     ConfirmDialog, FormField, inputClass, selectClass, btnPrimary, btnSecondary, btnGhost,
     useToast, SearchInput, Pagination, SortState, compareRows,
 } from '../../components/admin/ui';
+import CountrySelect from '../../components/admin/CountrySelect';
 
 // Catalogue-level room type (no price — pricing is set per-package in the wizard)
 interface RoomTypeRow { name: string; capacity: number; }
 
-interface Hotel { id: string; name: string; location: string; stars: number; room_types: RoomTypeRow[]; maps_url: string | null; }
+interface Hotel {
+  id: string;
+  name: string;
+  location: string;
+  stars: number;
+  room_types: RoomTypeRow[];
+  maps_url: string | null;
+  country_id: string | null;
+  countries: { name: string } | null;
+}
 
 // New hotels default to the standard room type config (mirrors the DB column default).
 const DEFAULT_ROOM_TYPES: RoomTypeRow[] = [
@@ -19,7 +29,7 @@ const DEFAULT_ROOM_TYPES: RoomTypeRow[] = [
     { name: 'Double', capacity: 2 },
 ];
 
-const EMPTY_FORM = { name: '', location: '', stars: 3, room_types: DEFAULT_ROOM_TYPES, maps_url: '' };
+const EMPTY_FORM = { name: '', location: '', stars: 3, room_types: DEFAULT_ROOM_TYPES, maps_url: '', country_id: '' };
 
 const PAGE_SIZE = 10;
 
@@ -56,7 +66,7 @@ const Hotels: React.FC = () => {
 
     const fetchHotels = async () => {
         setLoading(true);
-        const { data, error } = await supabase.from('hotels').select('*').order('name');
+        const { data, error } = await supabase.from('hotels').select('*, countries(name)').order('name');
         if (!error && data) setHotels(data);
         setLoading(false);
     };
@@ -69,14 +79,14 @@ const Hotels: React.FC = () => {
 
     const openEdit = (hotel: Hotel) => {
         setEditingId(hotel.id);
-        setForm({ name: hotel.name, location: hotel.location, stars: hotel.stars, room_types: hotel.room_types ?? [], maps_url: hotel.maps_url || '' });
+        setForm({ name: hotel.name, location: hotel.location, stars: hotel.stars, room_types: hotel.room_types ?? [], maps_url: hotel.maps_url || '', country_id: hotel.country_id || '' });
         setIsFormOpen(true);
     };
 
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
         setSaving(true);
-        const payload = { name: form.name, location: form.location, stars: form.stars, room_types: form.room_types, maps_url: form.maps_url || null };
+        const payload = { name: form.name, location: form.location, stars: form.stars, room_types: form.room_types, maps_url: form.maps_url || null, country_id: form.country_id || null };
         const { error } = editingId
             ? await supabase.from('hotels').update(payload).eq('id', editingId)
             : await supabase.from('hotels').insert([payload]);
@@ -121,7 +131,7 @@ const Hotels: React.FC = () => {
         setForm((f) => ({ ...f, room_types: f.room_types.filter((_, idx) => idx !== i) }));
 
     const filtered = hotels.filter((h) =>
-        [h.name, h.location].some((f) =>
+        [h.name, h.location, h.countries?.name].some((f) =>
             (f ?? '').toLowerCase().includes(searchQuery.toLowerCase())
         )
     );
@@ -151,6 +161,7 @@ const Hotels: React.FC = () => {
                     <THead>
                         <Th sortKey="name" currentSort={sort} onSort={handleSort}>Hotel Name</Th>
                         <Th sortKey="location" currentSort={sort} onSort={handleSort}>Location</Th>
+                        <Th>Country</Th>
                         <Th sortKey="stars" currentSort={sort} onSort={handleSort}>Rating</Th>
                         <Th align="right">Actions</Th>
                     </THead>
@@ -159,7 +170,7 @@ const Hotels: React.FC = () => {
                             <SkeletonRows cols={4} rows={5} />
                         ) : filtered.length === 0 ? (
                             <tr>
-                                <td colSpan={4}>
+                                <td colSpan={5}>
                                     {hotels.length === 0 ? (
                                         <EmptyState
                                             icon={<Building2 className="w-7 h-7" />}
@@ -193,6 +204,9 @@ const Hotels: React.FC = () => {
                                     </Td>
                                     <Td>
                                         <span className="text-gray-600">{hotel.location}</span>
+                                    </Td>
+                                    <Td>
+                                        <span className="text-gray-600">{hotel.countries?.name ?? '—'}</span>
                                     </Td>
                                     <Td>
                                         <StarRating count={hotel.stars} />
@@ -258,6 +272,12 @@ const Hotels: React.FC = () => {
                             placeholder="e.g., Makkah"
                             value={form.location}
                             onChange={(e) => setForm({ ...form, location: e.target.value })}
+                        />
+                    </FormField>
+                    <FormField label="Country">
+                        <CountrySelect
+                            value={form.country_id}
+                            onChange={(id) => setForm((f) => ({ ...f, country_id: id }))}
                         />
                     </FormField>
                     <FormField label="Google Maps Link" hint="Paste the share link from Google Maps. Shown as a clickable link on the public page.">
