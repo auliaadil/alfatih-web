@@ -4,7 +4,7 @@ import { Plus, Edit2, Trash2, Tag } from 'lucide-react';
 import {
   PageHeader, TableCard, THead, Th, Td, SkeletonRows, EmptyState, SlideOver,
   ConfirmDialog, FormField, inputClass, btnPrimary, btnSecondary, btnGhost, useToast,
-  SearchInput, Pagination,
+  SearchInput, Pagination, SortState, compareRows,
 } from '../../components/admin/ui';
 import { Category } from '../../../types';
 
@@ -27,10 +27,14 @@ const Categories: React.FC = () => {
   const [deleting, setDeleting] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(0);
+  const [sort, setSort] = useState<SortState>({ key: 'name', dir: 'asc' });
+  const handleSort = (key: string) =>
+    setSort(prev => ({ key, dir: prev.key === key && prev.dir === 'asc' ? 'desc' : 'asc' }));
 
   useEffect(() => { fetchCategories(); }, []);
 
   useEffect(() => { setPage(0); }, [searchQuery]);
+  useEffect(() => { setPage(0); }, [sort]);
 
   const fetchCategories = async () => {
     setLoading(true);
@@ -73,7 +77,8 @@ const Categories: React.FC = () => {
       (f ?? '').toLowerCase().includes(searchQuery.toLowerCase())
     )
   );
-  const paginated = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+  const sorted = [...filtered].sort((a, b) => compareRows(a, b, sort.key, sort.dir));
+  const paginated = sorted.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
   return (
     <div>
@@ -89,7 +94,11 @@ const Categories: React.FC = () => {
       </div>
       <TableCard>
         <table className="min-w-full">
-          <THead><Th>Name</Th><Th>Slug</Th><Th align="right">Actions</Th></THead>
+          <THead>
+            <Th sortKey="name" currentSort={sort} onSort={handleSort}>Name</Th>
+            <Th sortKey="slug" currentSort={sort} onSort={handleSort}>Slug</Th>
+            <Th align="right">Actions</Th>
+          </THead>
           <tbody className="divide-y divide-gray-100">
             {loading ? <SkeletonRows cols={3} rows={5} /> : filtered.length === 0 ? (
               <tr><td colSpan={3}>
