@@ -7,8 +7,9 @@ import {
   SearchInput, Pagination, SortState, compareRows,
 } from '../../components/admin/ui';
 import { Airport } from '../../../types';
+import CountrySelect from '../../components/admin/CountrySelect';
 
-const EMPTY_FORM = { iata_code: '', name: '', city: '', country: '' };
+const EMPTY_FORM = { iata_code: '', name: '', city: '', country_id: '' };
 const PAGE_SIZE = 10;
 
 const Airports: React.FC = () => {
@@ -33,7 +34,7 @@ const Airports: React.FC = () => {
 
   const fetchAirports = async () => {
     setLoading(true);
-    const { data, error } = await supabase.from('airports').select('*').order('iata_code');
+    const { data, error } = await supabase.from('airports').select('*, countries(name)').order('iata_code');
     if (error) toast('error', 'Failed to load airports.');
     else if (data) setAirports(data);
     setLoading(false);
@@ -42,7 +43,7 @@ const Airports: React.FC = () => {
   const openCreate = () => { setEditingId(null); setForm(EMPTY_FORM); setIsFormOpen(true); };
   const openEdit = (a: Airport) => {
     setEditingId(a.id);
-    setForm({ iata_code: a.iata_code, name: a.name, city: a.city, country: a.country });
+    setForm({ iata_code: a.iata_code, name: a.name, city: a.city, country_id: a.country_id });
     setIsFormOpen(true);
   };
 
@@ -72,7 +73,7 @@ const Airports: React.FC = () => {
   };
 
   const filtered = airports.filter((a) =>
-    [a.iata_code, a.name, a.city, a.country].some((f) =>
+    [a.iata_code, a.name, a.city, a.countries?.name].some((f) =>
       (f ?? '').toLowerCase().includes(searchQuery.toLowerCase())
     )
   );
@@ -123,7 +124,7 @@ const Airports: React.FC = () => {
                 <Td><span className="font-mono font-bold text-primary">{a.iata_code}</span></Td>
                 <Td><span className="font-medium text-gray-900">{a.name}</span></Td>
                 <Td><span className="text-gray-600">{a.city}</span></Td>
-                <Td><span className="text-gray-600">{a.country}</span></Td>
+                <Td><span className="text-gray-600">{a.countries?.name ?? ''}</span></Td>
                 <Td className="text-right">
                   <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button onClick={() => openEdit(a)} className={btnGhost}><Edit2 className="w-4 h-4" /></button>
@@ -145,7 +146,13 @@ const Airports: React.FC = () => {
           <FormField label="IATA Code" required><input type="text" required maxLength={3} pattern="[A-Za-z]{3}" className={inputClass} placeholder="e.g., CGK" value={form.iata_code} onChange={(e) => setForm({ ...form, iata_code: e.target.value })} /></FormField>
           <FormField label="Airport Name" required><input type="text" required className={inputClass} placeholder="e.g., Soekarno-Hatta International" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></FormField>
           <FormField label="City" required><input type="text" required className={inputClass} placeholder="e.g., Jakarta" value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} /></FormField>
-          <FormField label="Country" required><input type="text" required className={inputClass} placeholder="e.g., Indonesia" value={form.country} onChange={(e) => setForm({ ...form, country: e.target.value })} /></FormField>
+          <FormField label="Country" required>
+            <CountrySelect
+              value={form.country_id}
+              onChange={(id) => setForm({ ...form, country_id: id })}
+              required
+            />
+          </FormField>
         </form>
       </SlideOver>
 
