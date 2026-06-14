@@ -4,7 +4,7 @@ import { Plus, Edit2, Trash2, ShoppingCart } from 'lucide-react';
 import {
     PageHeader, TableCard, THead, Th, Td, SkeletonRows, EmptyState,
     ConfirmDialog, StatusBadge, btnPrimary, btnGhost, useToast,
-    SearchInput, Pagination,
+    SearchInput, Pagination, SortState, compareRows,
 } from '../../components/admin/ui';
 import OrderForm from './OrderForm';
 import { useAuth } from '../../contexts/AuthContext';
@@ -38,10 +38,15 @@ const Orders: React.FC = () => {
 
     const [searchQuery, setSearchQuery] = useState('');
     const [page, setPage] = useState(0);
+    const [sort, setSort] = useState<SortState>({ key: 'created_at', dir: 'desc' });
+    const handleSort = (key: string) =>
+        setSort(prev => ({ key, dir: prev.key === key && prev.dir === 'asc' ? 'desc' : 'asc' }));
 
     useEffect(() => { fetchOrders(); }, []);
 
     useEffect(() => { setPage(0); }, [searchQuery]);
+
+    useEffect(() => { setPage(0); }, [sort]);
 
     const fetchOrders = async () => {
         setLoading(true);
@@ -81,7 +86,8 @@ const Orders: React.FC = () => {
             (f ?? '').toLowerCase().includes(searchQuery.toLowerCase())
         )
     );
-    const paginated = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+    const sorted = [...filtered].sort((a, b) => compareRows(a, b, sort.key, sort.dir));
+    const paginated = sorted.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
     return (
         <div>
@@ -113,12 +119,12 @@ const Orders: React.FC = () => {
             <TableCard>
                 <table className="min-w-full">
                     <THead>
-                        <Th>Customer</Th>
-                        <Th>Package</Th>
+                        <Th sortKey="customer_name" currentSort={sort} onSort={handleSort}>Customer</Th>
+                        <Th sortKey="packages.title" currentSort={sort} onSort={handleSort}>Package</Th>
                         {!isBranchAdmin && <Th>Branch</Th>}
                         <Th align="center">Pax / Rooms</Th>
-                        <Th>Total Price</Th>
-                        <Th>Payment Status</Th>
+                        <Th sortKey="total_price" currentSort={sort} onSort={handleSort}>Total Price</Th>
+                        <Th sortKey="payment_status" currentSort={sort} onSort={handleSort}>Payment Status</Th>
                         <Th align="right">Actions</Th>
                     </THead>
                     <tbody className="divide-y divide-gray-100">
