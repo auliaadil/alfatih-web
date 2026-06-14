@@ -40,16 +40,18 @@ const Step2FlightHotels: React.FC<Props> = ({ draft, updateDraft, onNext, onBack
     const { data, error } = await supabase
       .from('airlines')
       .insert([{
-        name: newAirlineForm.name,
-        iata_code: newAirlineForm.iata_code.toUpperCase() || null,
+        name: newAirlineForm.name.trim(),
+        iata_code: newAirlineForm.iata_code.trim().toUpperCase() || null,
         logo_url: newAirlineForm.logo_url || null,
       }])
       .select()
       .single();
     setSavingAirline(false);
     if (error) { toast('error', 'Failed to create airline.'); return; }
-    const { data: fresh } = await supabase.from('airlines').select('*').order('name');
+    const { data: fresh, error: refreshError } = await supabase.from('airlines').select('*').order('name');
+    if (refreshError) { toast('error', 'Airline created but failed to refresh list. Please reload.'); return; }
     if (fresh) setAirlines(fresh);
+    toast('success', 'Airline created.');
     setAirlineSlideOpen(false);
     setNewAirlineForm({ name: '', iata_code: '', logo_url: '' });
     if (data) toggleAirline(data.id);
