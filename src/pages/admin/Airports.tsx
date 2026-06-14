@@ -4,7 +4,7 @@ import { Plus, Edit2, Trash2, PlaneTakeoff } from 'lucide-react';
 import {
   PageHeader, TableCard, THead, Th, Td, SkeletonRows, EmptyState, SlideOver,
   ConfirmDialog, FormField, inputClass, btnPrimary, btnSecondary, btnGhost, useToast,
-  SearchInput, Pagination,
+  SearchInput, Pagination, SortState, compareRows,
 } from '../../components/admin/ui';
 import { Airport } from '../../../types';
 
@@ -23,9 +23,13 @@ const Airports: React.FC = () => {
   const [deleting, setDeleting] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(0);
+  const [sort, setSort] = useState<SortState>({ key: 'iata_code', dir: 'asc' });
+  const handleSort = (key: string) =>
+    setSort(prev => ({ key, dir: prev.key === key && prev.dir === 'asc' ? 'desc' : 'asc' }));
 
   useEffect(() => { fetchAirports(); }, []);
   useEffect(() => { setPage(0); }, [searchQuery]);
+  useEffect(() => { setPage(0); }, [sort]);
 
   const fetchAirports = async () => {
     setLoading(true);
@@ -72,7 +76,8 @@ const Airports: React.FC = () => {
       (f ?? '').toLowerCase().includes(searchQuery.toLowerCase())
     )
   );
-  const paginated = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+  const sorted = [...filtered].sort((a, b) => compareRows(a, b, sort.key, sort.dir));
+  const paginated = sorted.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
   return (
     <div>
@@ -89,7 +94,11 @@ const Airports: React.FC = () => {
       <TableCard>
         <table className="min-w-full">
           <THead>
-            <Th>IATA</Th><Th>Airport Name</Th><Th>City</Th><Th>Country</Th><Th align="right">Actions</Th>
+            <Th sortKey="iata_code" currentSort={sort} onSort={handleSort}>IATA</Th>
+            <Th sortKey="name" currentSort={sort} onSort={handleSort}>Airport Name</Th>
+            <Th sortKey="city" currentSort={sort} onSort={handleSort}>City</Th>
+            <Th sortKey="country" currentSort={sort} onSort={handleSort}>Country</Th>
+            <Th align="right">Actions</Th>
           </THead>
           <tbody className="divide-y divide-gray-100">
             {loading ? <SkeletonRows cols={5} rows={5} /> : filtered.length === 0 ? (
