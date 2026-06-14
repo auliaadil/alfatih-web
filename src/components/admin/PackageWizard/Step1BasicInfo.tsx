@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
-import { Upload, Search as SearchIcon } from 'lucide-react';
-import { FormField, inputClass, selectClass, SectionCard, btnPrimary } from '../ui';
+import { Upload, Search as SearchIcon, Plus } from 'lucide-react';
+import { FormField, inputClass, selectClass, SectionCard, btnPrimary, btnSecondary, SlideOver, useToast } from '../ui';
 import ImagePickerModal from './ImagePickerModal';
 import { WizardDraft } from '../../../pages/admin/PackageWizard';
 import { supabase } from '../../../lib/supabase';
@@ -10,13 +10,38 @@ interface Props {
   updateDraft: (p: Partial<WizardDraft>) => void;
   onNext: () => void;
   categories: string[];
+  onCategoryCreated: (name: string) => void;
 }
 
-const Step1BasicInfo: React.FC<Props> = ({ draft, updateDraft, onNext, categories }) => {
+const Step1BasicInfo: React.FC<Props> = ({ draft, updateDraft, onNext, categories, onCategoryCreated }) => {
   const [imageTab, setImageTab] = useState<'upload' | 'search'>('upload');
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+
+  const toast = useToast();
+  const [catSlideOpen, setCatSlideOpen] = useState(false);
+  const [catForm, setCatForm] = useState({ name: '', slug: '' });
+  const [savingCat, setSavingCat] = useState(false);
+
+  const toSlug = (name: string) =>
+    name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+
+  const handleCreateCategory = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSavingCat(true);
+    const slug = catForm.slug || toSlug(catForm.name);
+    const { error } = await supabase.from('categories').insert([{ name: catForm.name, slug }]);
+    setSavingCat(false);
+    if (error) {
+      toast('error', error.code === '23505' ? 'Category already exists.' : 'Failed to save category.');
+      return;
+    }
+    onCategoryCreated(catForm.name);
+    updateDraft({ category: catForm.name });
+    setCatSlideOpen(false);
+    setCatForm({ name: '', slug: '' });
+  };
 
   const duration = (() => {
     if (!draft.departure_date || !draft.arrival_date) return null;
@@ -63,7 +88,19 @@ const Step1BasicInfo: React.FC<Props> = ({ draft, updateDraft, onNext, categorie
             />
           </FormField>
 
-          <FormField label="Category" required>
+          <div>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="text-sm font-medium text-gray-700">
+                Category <span className="text-red-500">*</span>
+              </label>
+              <button
+                type="button"
+                onClick={() => setCatSlideOpen(true)}
+                className="text-xs text-primary font-medium flex items-center gap-1 hover:underline"
+              >
+                <Plus className="w-3 h-3" /> New
+              </button>
+            </div>
             <select
               required
               className={selectClass}
@@ -75,7 +112,7 @@ const Step1BasicInfo: React.FC<Props> = ({ draft, updateDraft, onNext, categorie
                 <option key={c} value={c}>{c}</option>
               ))}
             </select>
-          </FormField>
+          </div>
 
           <div className="grid grid-cols-2 gap-4">
             <FormField label="Departure Date" required>
@@ -205,6 +242,46 @@ const Step1BasicInfo: React.FC<Props> = ({ draft, updateDraft, onNext, categorie
         onClose={() => setIsPickerOpen(false)}
         onSelect={(url, credit) => updateDraft({ image_url: url, image_credit: credit })}
       />
+
+      <SlideOver
+        isOpen={catSlideOpen}
+        onClose={() => setCatSlideOpen(false)}
+        title="New Category"
+        subtitle="Slug is auto-generated from name."
+        width="sm"
+        footer={
+          <div className="flex gap-3">
+            <button type="button" onClick={() => setCatSlideOpen(false)} className={btnSecondary}>
+              Cancel
+            </button>
+            <button form="cat-create-form" type="submit" disabled={savingCat} className={btnPrimary}>
+              {savingCat ? 'Saving...' : 'Add Category'}
+            </button>
+          </div>
+        }
+      >
+        <form id="cat-create-form" onSubmit={handleCreateCategory} className="space-y-5">
+          <FormField label="Category Name" required>
+            <input
+              type="text"
+              required
+              className={inputClass}
+              placeholder="e.g., Umrah Plus"
+              value={catForm.name}
+              onChange={(e) => setCatForm({ name: e.target.value, slug: toSlug(e.target.value) })}
+            />
+          </FormField>
+          <FormField label="Slug" hint="Auto-generated. Edit if needed.">
+            <input
+              type="text"
+              className={inputClass}
+              placeholder="e.g., umrah-plus"
+              value={catForm.slug}
+              onChange={(e) => setCatForm({ ...catForm, slug: e.target.value })}
+            />
+          </FormField>
+        </form>
+      </SlideOver>
     </div>
   );
 };

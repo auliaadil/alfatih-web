@@ -167,6 +167,7 @@ const PackageWizard: React.FC = () => {
             updateDraft={updateDraft}
             onNext={() => setStep(2)}
             categories={categories}
+            onCategoryCreated={(name) => setCategories((prev) => [...prev, name].sort())}
           />
         )}
         {step === 2 && (
