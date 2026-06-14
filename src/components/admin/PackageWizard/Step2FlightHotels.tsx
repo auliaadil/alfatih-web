@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Plus, X, Loader2 } from 'lucide-react';
-import { FormField, SectionCard, inputClass, selectClass, textareaClass, btnPrimary, btnSecondary } from '../ui';
+import { FormField, SectionCard, inputClass, selectClass, textareaClass, btnPrimary, btnSecondary, SlideOver, useToast } from '../ui';
 import { supabase } from '../../../lib/supabase';
 import { Airport } from '../../../../types';
 import { WizardDraft } from '../../../pages/admin/PackageWizard';
@@ -28,6 +28,32 @@ const Step2FlightHotels: React.FC<Props> = ({ draft, updateDraft, onNext, onBack
   const [hotelSearch, setHotelSearch] = useState('');
   const [genDesc, setGenDesc] = useState(false);
   const [genFeat, setGenFeat] = useState(false);
+
+  const toast = useToast();
+  const [airlineSlideOpen, setAirlineSlideOpen] = useState(false);
+  const [newAirlineForm, setNewAirlineForm] = useState({ name: '', iata_code: '', logo_url: '' });
+  const [savingAirline, setSavingAirline] = useState(false);
+
+  const handleCreateAirline = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSavingAirline(true);
+    const { data, error } = await supabase
+      .from('airlines')
+      .insert([{
+        name: newAirlineForm.name,
+        iata_code: newAirlineForm.iata_code.toUpperCase() || null,
+        logo_url: newAirlineForm.logo_url || null,
+      }])
+      .select()
+      .single();
+    setSavingAirline(false);
+    if (error) { toast('error', 'Failed to create airline.'); return; }
+    const { data: fresh } = await supabase.from('airlines').select('*').order('name');
+    if (fresh) setAirlines(fresh);
+    setAirlineSlideOpen(false);
+    setNewAirlineForm({ name: '', iata_code: '', logo_url: '' });
+    if (data) toggleAirline(data.id);
+  };
 
   useEffect(() => {
     Promise.all([
@@ -156,7 +182,16 @@ const Step2FlightHotels: React.FC<Props> = ({ draft, updateDraft, onNext, onBack
 
           {/* Airlines */}
           <div>
-            <h3 className="text-sm font-semibold text-gray-800 mb-3">Airlines</h3>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-semibold text-gray-800">Airlines</h3>
+              <button
+                type="button"
+                onClick={() => setAirlineSlideOpen(true)}
+                className="text-xs text-primary font-medium flex items-center gap-1 hover:underline"
+              >
+                <Plus className="w-3 h-3" /> New Airline
+              </button>
+            </div>
             <input
               type="text"
               className={inputClass + ' mb-2'}
@@ -329,6 +364,55 @@ const Step2FlightHotels: React.FC<Props> = ({ draft, updateDraft, onNext, onBack
         <button type="button" onClick={onBack} className={btnSecondary}>← Back</button>
         <button type="button" onClick={onNext} className={btnPrimary}>Next: Pricing & Rooms →</button>
       </div>
+
+      <SlideOver
+        isOpen={airlineSlideOpen}
+        onClose={() => setAirlineSlideOpen(false)}
+        title="New Airline"
+        width="sm"
+        footer={
+          <div className="flex gap-3">
+            <button type="button" onClick={() => setAirlineSlideOpen(false)} className={btnSecondary}>
+              Cancel
+            </button>
+            <button form="airline-create-form" type="submit" disabled={savingAirline} className={btnPrimary}>
+              {savingAirline ? 'Saving...' : 'Add Airline'}
+            </button>
+          </div>
+        }
+      >
+        <form id="airline-create-form" onSubmit={handleCreateAirline} className="space-y-5">
+          <FormField label="Airline Name" required>
+            <input
+              type="text"
+              required
+              className={inputClass}
+              placeholder="e.g., Garuda Indonesia"
+              value={newAirlineForm.name}
+              onChange={(e) => setNewAirlineForm({ ...newAirlineForm, name: e.target.value })}
+            />
+          </FormField>
+          <FormField label="IATA Code" hint="2–3 letter code, e.g. GA">
+            <input
+              type="text"
+              maxLength={3}
+              className={inputClass}
+              placeholder="e.g., GA"
+              value={newAirlineForm.iata_code}
+              onChange={(e) => setNewAirlineForm({ ...newAirlineForm, iata_code: e.target.value })}
+            />
+          </FormField>
+          <FormField label="Logo URL" hint="Optional. Paste a direct image URL.">
+            <input
+              type="url"
+              className={inputClass}
+              placeholder="https://..."
+              value={newAirlineForm.logo_url}
+              onChange={(e) => setNewAirlineForm({ ...newAirlineForm, logo_url: e.target.value })}
+            />
+          </FormField>
+        </form>
+      </SlideOver>
     </div>
   );
 };
