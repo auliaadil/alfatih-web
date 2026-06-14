@@ -10,7 +10,8 @@ export interface Airport {
   iata_code: string;
   name: string;
   city: string;
-  country: string;
+  country_id: string;
+  countries?: { name: string };
 }
 
 export interface Category {
