@@ -84,6 +84,8 @@ export interface TourPackage {
   itinerary?: DayItinerary[];
   included?: string[];
   not_included?: string[];
+  brochure_url?: string;
+  gallery?: string[];
 }
 
 export interface AIPlannerInput {

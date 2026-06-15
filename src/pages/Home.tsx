@@ -12,10 +12,11 @@ import { Quote, ShieldCheck, Users, Star } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useSiteSettings } from '../contexts/SiteSettingsContext';
 import { useLanguage } from '../contexts/LanguageContext';
+import { formatDate, formatMonthYear } from '../lib/formatDate';
 
 const Home: React.FC = () => {
     const settings = useSiteSettings();
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
     const [packages, setPackages] = useState<TourPackage[]>([]);
     const [loading, setLoading] = useState(true);
     const [activeCategory, setActiveCategory] = useState<TourCategory | 'All'>('All');
@@ -63,15 +64,10 @@ const Home: React.FC = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    // Extract unique months from packages for the dropdown (e.g., "Maret 2024")
-    const availableMonths = Array.from(new Set(packages.map(p => {
-        // Simple extraction assuming format "DD MMMM YYYY" or similar, just grouping for Demo.
-        // If they just type string dates, we'll just show the raw string unless parsed.
-        // For now, let's just group by the exact departure_date string or month part
-        const parts = p.departure_date.split(' ');
-        if (parts.length >= 2) return `${parts[1]} ${parts[2] || ''}`.trim();
-        return p.departure_date;
-    }))).filter(Boolean).sort();
+    const dateLocale = language === 'en' ? 'en-GB' : 'id-ID';
+    const availableMonths = Array.from(new Set(packages.map(p =>
+        formatMonthYear(p.departure_date, dateLocale)
+    ))).filter(Boolean).sort();
 
     const filteredTours = packages.filter(tour => {
         const matchesCategory = activeCategory === 'All' || tour.category === activeCategory;
@@ -80,9 +76,7 @@ const Home: React.FC = () => {
 
         let matchesMonth = true;
         if (selectedMonth !== 'All') {
-            const parts = tour.departure_date.split(' ');
-            const tourMonthCode = parts.length >= 2 ? `${parts[1]} ${parts[2] || ''}`.trim() : tour.departure_date;
-            matchesMonth = tourMonthCode === selectedMonth;
+            matchesMonth = formatMonthYear(tour.departure_date, dateLocale) === selectedMonth;
         }
 
         return matchesCategory && matchesSearch && matchesMonth;

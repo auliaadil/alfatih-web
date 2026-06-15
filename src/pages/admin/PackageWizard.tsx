@@ -17,7 +17,7 @@ export interface WizardDraft {
   arrival_date: string;
   image_url: string;
   image_credit: string;
-  gallery_urls: string[];
+  gallery: string[];
   is_popular: boolean;
 
   // Step 2
@@ -29,7 +29,6 @@ export interface WizardDraft {
 
   // Step 3
   quotas: number;
-  available_quotas: number;
   room_options: RoomOption[];
 
   // Step 4
@@ -40,10 +39,10 @@ export interface WizardDraft {
 
 const EMPTY_DRAFT: WizardDraft = {
   title: '', category: '', departure_date: '', arrival_date: '',
-  image_url: '', image_credit: '', gallery_urls: [], is_popular: false,
+  image_url: '', image_credit: '', gallery: [], is_popular: false,
   airline_ids: [], hotel_ids: [], flight_routes: [],
   description: '', features: [],
-  quotas: 0, available_quotas: 0, room_options: [],
+  quotas: 0, room_options: [],
   itinerary: [], included: [], not_included: [],
 };
 
@@ -53,6 +52,17 @@ const STEPS: WizardStep[] = [
   { number: 3, label: 'Pricing & Rooms', description: 'Quota, room options' },
   { number: 4, label: 'Itinerary & Terms', description: 'Days, included, excluded' },
 ];
+
+function dedupeRoomOptions(options: RoomOption[]): RoomOption[] {
+  const seen = new Map<string, RoomOption>();
+  for (const opt of options) {
+    const existing = seen.get(opt.name);
+    if (!existing || opt.price > existing.price) {
+      seen.set(opt.name, { name: opt.name, capacity: opt.capacity, price: opt.price, original_price: opt.original_price });
+    }
+  }
+  return [...seen.values()];
+}
 
 const PackageWizard: React.FC = () => {
   const { id } = useParams<{ id?: string }>();
@@ -82,7 +92,7 @@ const PackageWizard: React.FC = () => {
           arrival_date: data.arrival_date ?? '',
           image_url: data.image_url ?? '',
           image_credit: data.image_credit ?? '',
-          gallery_urls: data.gallery_urls ?? [],
+          gallery: data.gallery ?? [],
           is_popular: data.is_popular ?? false,
           airline_ids: data.airline_ids ?? [],
           hotel_ids: data.hotel_ids ?? [],
@@ -90,8 +100,7 @@ const PackageWizard: React.FC = () => {
           description: data.description ?? '',
           features: data.features ?? [],
           quotas: data.quotas ?? 0,
-          available_quotas: data.available_quotas ?? data.quotas ?? 0,
-          room_options: data.room_options ?? [],
+          room_options: dedupeRoomOptions(data.room_options ?? []),
           itinerary: data.itinerary ?? [],
           included: data.included ?? [],
           not_included: data.not_included ?? [],
@@ -121,7 +130,7 @@ const PackageWizard: React.FC = () => {
       duration: computedDuration(),
       image_url: draft.image_url,
       image_credit: draft.image_credit || null,
-      gallery_urls: draft.gallery_urls,
+      gallery: draft.gallery,
       is_popular: draft.is_popular,
       airline_ids: draft.airline_ids,
       hotel_ids: draft.hotel_ids,
@@ -129,8 +138,8 @@ const PackageWizard: React.FC = () => {
       description: draft.description,
       features: draft.features,
       quotas: draft.quotas,
-      available_quotas: id ? draft.available_quotas : draft.quotas,
-      room_options: draft.room_options,
+      ...(id ? {} : { initial_quotas: draft.quotas }),
+      room_options: dedupeRoomOptions(draft.room_options),
       itinerary: draft.itinerary,
       included: draft.included,
       not_included: draft.not_included,

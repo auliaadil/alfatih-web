@@ -1,13 +1,16 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Clock, CheckCircle, Star, User, Calendar } from 'lucide-react';
+import { Clock, CheckCircle, Star, Calendar } from 'lucide-react';
 import { TourPackage } from '../types';
+import { useLanguage } from '../src/contexts/LanguageContext';
+import { formatDate } from '../src/lib/formatDate';
 
 interface TourCardProps {
   tour: TourPackage;
 }
 
 const TourCard: React.FC<TourCardProps> = ({ tour }) => {
+  const { language } = useLanguage();
   const cheapestRoom = tour.room_options?.length > 0
     ? tour.room_options.reduce((min, curr) => curr.price < min.price ? curr : min)
     : null;
@@ -48,7 +51,7 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
         <div className="flex items-center gap-3 text-xs text-gray-500 mb-3 flex-wrap">
           <div className="flex items-center gap-1">
             <Calendar className="w-3.5 h-3.5" />
-            <span>{tour.departure_date}</span>
+            <span>{formatDate(tour.departure_date, language === 'en' ? 'en-GB' : 'id-ID')}</span>
           </div>
           <span className="text-gray-300">·</span>
           <div className="flex items-center gap-1">

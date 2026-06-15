@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSiteSettings } from '../src/contexts/SiteSettingsContext';
+import { useLanguage } from '../src/contexts/LanguageContext';
 import {
   ArrowLeft,
   Calendar,
@@ -15,11 +16,13 @@ import {
   Users,
   Share2,
   Info,
-  FileText
+  FileText,
+  Check,
 } from 'lucide-react';
 import { TourPackage, Airport } from '../types';
 import { supabase } from '../src/lib/supabase';
 import { formatFlightRoutes } from '../src/lib/formatFlightRoutes';
+import { formatDate } from '../src/lib/formatDate';
 
 interface TourDetailProps {
   tour: TourPackage;
@@ -28,17 +31,19 @@ interface TourDetailProps {
 
 const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
   const settings = useSiteSettings();
+  const { t, language } = useLanguage();
   const [activeTab, setActiveTab] = useState<'itinerary' | 'logistics' | 'inclusions'>('itinerary');
   const [selectedRoomIndex, setSelectedRoomIndex] = useState(0);
   const [airports, setAirports] = useState<Airport[]>([]);
   const [airlineNames, setAirlineNames] = useState<Record<string, string>>({});
+  const [shareCopied, setShareCopied] = useState(false);
 
   useEffect(() => {
     const airlineIds = (tour.flight_routes ?? []).map((r) => r.airline_id).filter(Boolean);
 
     const fetchData = async () => {
       const [airportsResult, airlinesResult] = await Promise.all([
-        supabase.from('airports').select('id, iata_code, name, city, country'),
+        supabase.from('airports').select('id, iata_code, name, city'),
         airlineIds.length > 0
           ? supabase.from('airlines').select('id, name').in('id', airlineIds)
           : Promise.resolve({ data: [], error: null }),
@@ -59,8 +64,8 @@ const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
   }, [tour.id]);
 
   const flightDisplay = formatFlightRoutes(tour.flight_routes, airlineNames, airports);
-
   const selectedRoom = tour.room_options?.[selectedRoomIndex];
+  const dateLocale = language === 'en' ? 'en-GB' : 'id-ID';
 
   const getPrice = () => {
     if (!selectedRoom) return 'TBA';
@@ -76,15 +81,33 @@ const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
 
   const handleWhatsAppBooking = () => {
     const message = encodeURIComponent(
-      `Assalamualaikum Alfatih Dunia Wisata, saya tertarik dengan paket "${tour.title}" untuk keberangkatan ${tour.departure_date}. Tipe kamar: ${selectedRoom?.name || 'TBA'}. Mohon info detailnya.`
+      `${t('detail_book_wa_message')} "${tour.title}" ${t('detail_book_wa_departure')} ${formatDate(tour.departure_date, dateLocale)}. ${t('detail_book_wa_room')}: ${selectedRoom?.name || 'TBA'}. ${t('detail_book_wa_suffix')}`
     );
     window.open(`https://wa.me/${settings.whatsapp}?text=${message}`, '_blank');
   };
 
+  const handleHelpWhatsApp = () => {
+    const message = encodeURIComponent(t('detail_help_wa_message'));
+    window.open(`https://wa.me/${settings.whatsapp}?text=${message}`, '_blank');
+  };
+
+  const handleShare = async () => {
+    const url = window.location.href;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: tour.title, url });
+      } catch (_) {}
+    } else {
+      await navigator.clipboard.writeText(url);
+      setShareCopied(true);
+      setTimeout(() => setShareCopied(false), 2000);
+    }
+  };
+
   const tabs = [
-    { id: 'itinerary' as const, label: 'Itinerary', icon: Calendar },
-    { id: 'logistics' as const, label: 'Fasilitas', icon: Plane },
-    { id: 'inclusions' as const, label: 'Syarat & Ketentuan', icon: Info },
+    { id: 'itinerary' as const, label: t('detail_tab_itinerary'), icon: Calendar },
+    { id: 'logistics' as const, label: t('detail_tab_facilities'), icon: Plane },
+    { id: 'inclusions' as const, label: t('detail_tab_terms'), icon: Info },
   ];
 
   return (
@@ -107,11 +130,22 @@ const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
             className="bg-black/30 backdrop-blur-md hover:bg-black/50 text-white px-4 py-2 rounded-full transition-all flex items-center gap-2 group text-sm font-semibold"
           >
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
-            Kembali
+            {t('detail_back')}
           </button>
-          <button className="bg-black/30 backdrop-blur-md hover:bg-black/50 text-white p-2 rounded-full transition-all">
-            <Share2 className="w-4 h-4" />
-          </button>
+          <div className="relative">
+            <button
+              onClick={handleShare}
+              className="bg-black/30 backdrop-blur-md hover:bg-black/50 text-white p-2 rounded-full transition-all"
+              title={t('detail_share_copied')}
+            >
+              {shareCopied ? <Check className="w-4 h-4 text-green-400" /> : <Share2 className="w-4 h-4" />}
+            </button>
+            {shareCopied && (
+              <span className="absolute right-0 top-10 bg-gray-900 text-white text-xs px-2.5 py-1 rounded-lg whitespace-nowrap shadow-lg">
+                {t('detail_share_copied')}
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Bottom metadata */}
@@ -131,9 +165,9 @@ const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
           </h1>
           <div className="flex flex-wrap gap-2">
             {[
-              { icon: Calendar, label: tour.departure_date },
+              { icon: Calendar, label: formatDate(tour.departure_date, dateLocale) },
               { icon: Clock, label: tour.duration },
-              { icon: Users, label: `Sisa ${tour.quotas ?? 0} Pax` },
+              { icon: Users, label: `${t('detail_quota_remaining')} ${tour.quotas ?? 0} ${t('detail_quota_unit')}` },
             ].map(({ icon: Icon, label }) => (
               <div key={label} className="flex items-center gap-1.5 bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded-full text-white text-xs font-semibold border border-white/10">
                 <Icon className="w-3.5 h-3.5" />
@@ -147,9 +181,9 @@ const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
         <p className="text-xs text-gray-400 mt-1 text-center">{tour.image_credit}</p>
       )}
 
-      {/* Features strip — overlaps hero */}
+      {/* Features strip */}
       {(tour.features?.length ?? 0) > 0 && (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-5 relative z-20 mb-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 relative z-20 mb-6">
           <div className="bg-white rounded-2xl shadow-md border border-gray-100 px-4 py-3 flex flex-wrap gap-2">
             {tour.features.slice(0, 7).map((feature, i) => (
               <span key={i} className="flex items-center gap-1.5 text-xs font-semibold text-gray-700 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100 whitespace-nowrap">
@@ -229,7 +263,7 @@ const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
                       </div>
                     </div>
                   )) : (
-                    <p className="text-gray-400 text-sm italic text-center py-10">Itinerary belum tersedia.</p>
+                    <p className="text-gray-400 text-sm italic text-center py-10">{t('detail_itinerary_empty')}</p>
                   )}
                 </div>
               )}
@@ -242,7 +276,7 @@ const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
                       <div className="bg-primary/10 p-1.5 rounded-lg">
                         <Plane className="w-5 h-5 text-primary" />
                       </div>
-                      <h3 className="text-base font-bold text-gray-900">Maskapai Penerbangan</h3>
+                      <h3 className="text-base font-bold text-gray-900">{t('detail_flights_title')}</h3>
                     </div>
                     <div className="bg-gray-50 rounded-xl p-5 border border-gray-100 flex items-center gap-5">
                       <div className="bg-white p-3.5 rounded-xl shadow-sm border border-gray-100 w-16 h-16 flex items-center justify-center flex-shrink-0">
@@ -253,7 +287,7 @@ const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
                         )}
                       </div>
                       <div>
-                        <p className="text-base font-bold text-gray-900">{tour.airlines?.[0]?.name || 'Airline TBA'}</p>
+                        <p className="text-base font-bold text-gray-900">{tour.airlines?.[0]?.name || t('detail_airline_tba')}</p>
                         <p className="text-gray-500 text-sm flex items-center gap-1.5 mt-1">
                           <MapPin className="w-3.5 h-3.5" />
                           {flightDisplay}
@@ -267,7 +301,7 @@ const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
                       <div className="bg-primary/10 p-1.5 rounded-lg">
                         <Hotel className="w-5 h-5 text-primary" />
                       </div>
-                      <h3 className="text-base font-bold text-gray-900">Akomodasi Hotel</h3>
+                      <h3 className="text-base font-bold text-gray-900">{t('detail_hotels_title')}</h3>
                     </div>
                     <div className="grid md:grid-cols-2 gap-4">
                       {(tour.hotels?.length ?? 0) > 0 ? tour.hotels!.map((hotel, i) => (
@@ -301,7 +335,7 @@ const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
                           )}
                         </div>
                       )) : (
-                        <p className="col-span-2 text-gray-400 text-sm italic text-center py-8">Data hotel belum tersedia.</p>
+                        <p className="col-span-2 text-gray-400 text-sm italic text-center py-8">{t('detail_hotel_empty')}</p>
                       )}
                     </div>
                   </section>
@@ -316,7 +350,7 @@ const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
                       <div className="bg-primary p-1.5 rounded-lg shadow-sm shadow-primary/20">
                         <CheckCircle2 className="w-4 h-4 text-white" />
                       </div>
-                      <h3 className="text-sm font-bold text-gray-900">Harga Termasuk</h3>
+                      <h3 className="text-sm font-bold text-gray-900">{t('detail_included')}</h3>
                     </div>
                     <ul className="space-y-2.5">
                       {(tour.included?.length ?? 0) > 0 ? tour.included!.map((item, i) => (
@@ -325,7 +359,7 @@ const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
                           <span className="text-gray-700 text-sm leading-snug">{item}</span>
                         </li>
                       )) : (
-                        <p className="text-gray-400 text-xs italic">Belum ada data.</p>
+                        <p className="text-gray-400 text-xs italic">{t('detail_no_data')}</p>
                       )}
                     </ul>
                   </section>
@@ -334,7 +368,7 @@ const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
                       <div className="bg-red-500 p-1.5 rounded-lg shadow-sm shadow-red-500/20">
                         <XCircle className="w-4 h-4 text-white" />
                       </div>
-                      <h3 className="text-sm font-bold text-gray-900">Tidak Termasuk</h3>
+                      <h3 className="text-sm font-bold text-gray-900">{t('detail_not_included')}</h3>
                     </div>
                     <ul className="space-y-2.5">
                       {(tour.not_included?.length ?? 0) > 0 ? tour.not_included!.map((item, i) => (
@@ -343,7 +377,7 @@ const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
                           <span className="text-gray-700 text-sm leading-snug">{item}</span>
                         </li>
                       )) : (
-                        <p className="text-gray-400 text-xs italic">Belum ada data.</p>
+                        <p className="text-gray-400 text-xs italic">{t('detail_no_data')}</p>
                       )}
                     </ul>
                   </section>
@@ -363,7 +397,7 @@ const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
 
                 <h3 className="text-base font-black mb-5 relative z-10 flex items-center gap-2">
                   <span className="w-1 h-5 bg-primary rounded-full inline-block" />
-                  Pilih Tipe Kamar
+                  {t('detail_room_title')}
                 </h3>
 
                 {/* Room options */}
@@ -388,10 +422,10 @@ const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
                         </div>
                         <div className="text-left">
                           <p className={`font-bold text-sm capitalize ${selectedRoomIndex === idx ? 'text-white' : 'text-gray-300'}`}>
-                            Kamar {room.name}
+                            {t('detail_room_prefix')} {room.name}
                           </p>
                           <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">
-                            {room.capacity} Orang
+                            {room.capacity} {t('detail_room_people')}
                           </p>
                         </div>
                       </div>
@@ -404,14 +438,14 @@ const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
                     </button>
                   )) : (
                     <div className="p-4 bg-white/5 rounded-xl text-xs text-gray-400 text-center italic border border-white/5">
-                      Tipe kamar belum dikonfigurasi.
+                      {t('detail_room_empty')}
                     </div>
                   )}
                 </div>
 
                 {/* Price summary + quota */}
                 <div className="p-4 rounded-xl bg-white/5 border border-white/10 mb-5 relative z-10">
-                  <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest mb-1.5">Total Harga per Orang</p>
+                  <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest mb-1.5">{t('detail_price_label')}</p>
                   <span className="text-3xl font-black text-white block">{getPrice()}</span>
                   {selectedRoom?.original_price && selectedRoom.original_price > selectedRoom.price && (
                     <span className="text-sm font-bold text-gray-500 line-through block mt-0.5">
@@ -423,9 +457,9 @@ const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
                   {quotaFilled !== null && (
                     <div className="mt-3 pt-3 border-t border-white/10">
                       <div className="flex justify-between text-[10px] font-bold mb-1.5 uppercase tracking-wide">
-                        <span className="text-gray-500">Kursi Terisi</span>
+                        <span className="text-gray-500">{t('detail_seats_filled')}</span>
                         <span className={quotaLow ? 'text-red-400' : quotaWarn ? 'text-secondary' : 'text-gray-500'}>
-                          Sisa {tour.quotas} Pax
+                          {t('detail_quota_remaining')} {tour.quotas} {t('detail_quota_unit')}
                         </span>
                       </div>
                       <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
@@ -439,7 +473,7 @@ const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
 
                   <div className="mt-3 flex items-center gap-1.5 text-[10px] text-gray-500 font-bold uppercase">
                     <Info className="w-3 h-3" />
-                    Termasuk tiket pesawat & hotel
+                    {t('detail_includes_note')}
                   </div>
                 </div>
 
@@ -450,7 +484,7 @@ const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
                     className="w-full bg-primary hover:bg-accent text-white font-bold py-4 rounded-xl shadow-xl shadow-primary/30 transition-all flex items-center justify-center gap-2.5 transform hover:-translate-y-0.5 active:scale-95"
                   >
                     <MessageCircle className="w-5 h-5" />
-                    Booking via WhatsApp
+                    {t('detail_book_wa')}
                   </button>
                   {tour.brochure_url && (
                     <button
@@ -458,13 +492,13 @@ const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
                       className="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 text-sm"
                     >
                       <FileText className="w-4 h-4 text-secondary" />
-                      Brosur Lengkap (PDF)
+                      {t('detail_brochure')}
                     </button>
                   )}
                 </div>
 
                 <p className="text-center text-[10px] text-gray-600 mt-5 font-medium relative z-10">
-                  *Harga sewaktu-waktu dapat berubah mengikuti kebijakan maskapai & hotel.
+                  {t('detail_price_note')}
                 </p>
               </div>
 
@@ -474,16 +508,14 @@ const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
                   <Info className="w-4 h-4 text-primary" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-gray-900 text-sm mb-1">Butuh Bantuan?</h4>
-                  <p className="text-xs text-gray-500 mb-2.5 leading-relaxed">Tim konsultan kami siap membantu Anda 24/7 untuk perencanaan ibadah.</p>
-                  <a
-                    href={`https://wa.me/${settings.whatsapp}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <h4 className="font-bold text-gray-900 text-sm mb-1">{t('detail_help_title')}</h4>
+                  <p className="text-xs text-gray-500 mb-2.5 leading-relaxed">{t('detail_help_desc')}</p>
+                  <button
+                    onClick={handleHelpWhatsApp}
                     className="text-primary font-bold text-xs hover:underline"
                   >
-                    Hubungi Konsultan →
-                  </a>
+                    {t('detail_help_cta')} →
+                  </button>
                 </div>
               </div>
             </div>
