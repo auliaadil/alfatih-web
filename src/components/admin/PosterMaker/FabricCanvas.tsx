@@ -56,6 +56,7 @@ export interface FabricCanvasRef {
     addDivider: () => void;
     setFreehandMode: (enabled: boolean) => void;
     isFreehandMode: () => boolean;
+    cancelDraw: () => void;
 }
 
 interface FabricCanvasProps {
@@ -65,13 +66,14 @@ interface FabricCanvasProps {
     onHistoryChange?: (canUndo: boolean, canRedo: boolean) => void;
     onZoomChange?: (zoom: number) => void;
     onObjectTransforming?: (obj: FabricObject) => void;
+    onDrawModeChange?: (mode: string | null) => void;
 }
 
 // Module-level clipboard so copy/paste works across renders
 let clipboard: FabricObject | null = null;
 
 const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
-    ({ canvasSize, onSelectionChange, onCanvasModified, onHistoryChange, onZoomChange, onObjectTransforming }, ref) => {
+    ({ canvasSize, onSelectionChange, onCanvasModified, onHistoryChange, onZoomChange, onObjectTransforming, onDrawModeChange }, ref) => {
         const canvasEl = useRef<HTMLCanvasElement>(null);
         const wrapperRef = useRef<HTMLDivElement>(null);
         const fabricRef = useRef<Canvas | null>(null);
@@ -84,6 +86,9 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
         const isHistoryProcessing = useRef(false);
         const freehandRef = useRef(false);
         const textPlacementRef = useRef(false);
+        const drawModeRef    = useRef<'rect' | 'circle' | 'line' | 'arrow' | 'divider' | null>(null);
+        const drawStartRef   = useRef<{ x: number; y: number } | null>(null);
+        const previewObjectRef = useRef<FabricObject | null>(null);
 
         const updateHistoryState = () => {
             if (onHistoryChange) {
@@ -133,8 +138,16 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
             canvas.on('selection:updated', (e) => onSelectionChange?.(e.selected?.[0] || null));
             canvas.on('selection:cleared', () => onSelectionChange?.(null));
             canvas.on('object:modified', () => { onCanvasModified?.(); saveHistory(canvas); });
-            canvas.on('object:added', () => { onCanvasModified?.(); saveHistory(canvas); });
-            canvas.on('object:removed', () => { onCanvasModified?.(); saveHistory(canvas); });
+            canvas.on('object:added', (e) => {
+                if ((e.target as any).isPreview) return;
+                onCanvasModified?.();
+                saveHistory(canvas);
+            });
+            canvas.on('object:removed', (e) => {
+                if ((e.target as any).isPreview) return;
+                onCanvasModified?.();
+                saveHistory(canvas);
+            });
             canvas.on('object:scaling', (e) => { if (e.target) onObjectTransforming?.(e.target as FabricObject); });
             canvas.on('object:moving', (e) => { if (e.target) onObjectTransforming?.(e.target as FabricObject); });
 
@@ -230,7 +243,34 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
             };
             canvas.on('text:editing:entered', onEditEntered);
 
+            const handleEscape = (ev: KeyboardEvent) => {
+                if (ev.key !== 'Escape') return;
+                const c = fabricRef.current;
+                if (!c) return;
+                // Cancel text placement
+                if (textPlacementRef.current) {
+                    textPlacementRef.current = false;
+                    c.defaultCursor = 'default';
+                    c.hoverCursor = 'move';
+                }
+                // Cancel draw mode
+                if (drawModeRef.current) {
+                    if (previewObjectRef.current) {
+                        c.remove(previewObjectRef.current);
+                        previewObjectRef.current = null;
+                    }
+                    drawStartRef.current = null;
+                    drawModeRef.current = null;
+                    c.selection = true;
+                    c.defaultCursor = 'default';
+                    c.hoverCursor = 'move';
+                    onDrawModeChange?.(null);
+                }
+            };
+            document.addEventListener('keydown', handleEscape);
+
             return () => {
+                document.removeEventListener('keydown', handleEscape);
                 canvas.off('text:editing:entered', onEditEntered);
                 if (caretProto.__caretClampPatched) {
                     delete caretProto._calcTextareaPosition; // restore inherited IText method
@@ -378,6 +418,21 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
             },
 
             isFreehandMode: () => freehandRef.current,
+
+            cancelDraw: () => {
+                const c = fabricRef.current;
+                if (!c || !drawModeRef.current) return;
+                if (previewObjectRef.current) {
+                    c.remove(previewObjectRef.current);
+                    previewObjectRef.current = null;
+                }
+                drawStartRef.current = null;
+                drawModeRef.current = null;
+                c.selection = true;
+                c.defaultCursor = 'default';
+                c.hoverCursor = 'move';
+                onDrawModeChange?.(null);
+            },
 
             addImageFromUrl: (url: string) => {
                 const c = fabricRef.current;
