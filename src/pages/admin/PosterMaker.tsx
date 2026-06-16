@@ -275,6 +275,7 @@ const PosterMaker: React.FC = () => {
     const [canvasSize, setCanvasSize] = useState<CanvasSize>('post');
     const [isNewDesignModalOpen, setIsNewDesignModalOpen] = useState(true);
     const [isFreehandActive, setIsFreehandActive] = useState(false);
+    const [activeDrawTool, setActiveDrawTool] = useState<'rect' | 'circle' | 'line' | 'arrow' | 'divider' | null>(null);
     const [brushColor, setBrushColor] = useState('#1a1a1a');
     const [brushWidth, setBrushWidth] = useState(4);
     const [isExporting, setIsExporting] = useState(false);
@@ -411,6 +412,8 @@ const PosterMaker: React.FC = () => {
                 if (canvasRef.current?.isFreehandMode()) {
                     canvasRef.current.setFreehandMode(false);
                     setIsFreehandActive(false);
+                    canvasRef.current?.cancelDraw();
+                    setActiveDrawTool(null);
                 } else if (canvasRef.current?.isTextPlacementMode()) {
                     canvasRef.current.cancelTextPlacement();
                 }
@@ -469,6 +472,8 @@ const PosterMaker: React.FC = () => {
     const handlePickBlank = (size: CanvasSize) => {
         canvasRef.current?.setFreehandMode(false);
         setIsFreehandActive(false);
+        canvasRef.current?.cancelDraw();
+        setActiveDrawTool(null);
         setLoadedTemplate(null);
         setEditingTemplateId(null);
         setEditingTemplateName('');
@@ -490,6 +495,8 @@ const PosterMaker: React.FC = () => {
         setIsFreehandActive(next);
         canvasRef.current?.setFreehandMode(next);
         if (next) {
+            canvasRef.current?.cancelDraw();
+            setActiveDrawTool(null);
             const canvas = canvasRef.current?.getCanvas();
             if (canvas?.freeDrawingBrush) {
                 (canvas.freeDrawingBrush as any).color = brushColor;
@@ -551,6 +558,8 @@ const PosterMaker: React.FC = () => {
     const handleLoadDraft = (json: any) => {
         canvasRef.current?.setFreehandMode(false);
         setIsFreehandActive(false);
+        canvasRef.current?.cancelDraw();
+        setActiveDrawTool(null);
         if (json.width === 1080 && json.height === 1350) setCanvasSize('post');
         else if (json.width === 1080 && json.height === 1920) setCanvasSize('story');
         setTimeout(() => canvasRef.current?.loadTemplate(json), 200);
@@ -819,6 +828,7 @@ const PosterMaker: React.FC = () => {
                 onAddDivider={() => canvasRef.current?.addDivider()}
                 onAddImage={handleAddImage}
                 isFreehandActive={isFreehandActive}
+                activeDrawTool={activeDrawTool}
                 onDelete={() => canvasRef.current?.deleteSelected()}
                 onAlignLeft={() => canvasRef.current?.alignLeft()}
                 onAlignCenter={() => canvasRef.current?.alignCenter()}
@@ -892,6 +902,13 @@ const PosterMaker: React.FC = () => {
                             onHistoryChange={handleHistoryChange}
                             onZoomChange={setZoom}
                             onObjectTransforming={handleObjectTransforming}
+                            onDrawModeChange={(mode) => {
+                                setActiveDrawTool(mode as 'rect' | 'circle' | 'line' | 'arrow' | 'divider' | null);
+                                if (mode !== null) {
+                                    setIsFreehandActive(false);
+                                    canvasRef.current?.setFreehandMode(false);
+                                }
+                            }}
                         />
                     </div>
                     <CanvasZoom
