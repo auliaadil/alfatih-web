@@ -265,6 +265,7 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
                     c.defaultCursor = 'default';
                     c.hoverCursor = 'move';
                     onDrawModeChange?.(null);
+                    c.requestRenderAll();
                 }
             };
             document.addEventListener('keydown', handleEscape);
