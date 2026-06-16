@@ -152,28 +152,185 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
             canvas.on('object:moving', (e) => { if (e.target) onObjectTransforming?.(e.target as FabricObject); });
 
             canvas.on('mouse:down', (e) => {
-                if (!textPlacementRef.current) return;
-                if (e.target) return; // clicked an existing object — don't place
-                textPlacementRef.current = false;
-                canvas.defaultCursor = 'default';
-                canvas.hoverCursor = 'move';
                 const { x, y } = e.scenePoint;
-                const tb = new Textbox('', {
-                    left: x, top: y, originX: 'left', originY: 'top',
-                    width: 400, fontSize: 48,
-                    fontFamily: 'Plus Jakarta Sans, sans-serif',
-                    fill: '#1a1a1a', fontWeight: 'normal', editable: true,
-                });
-                canvas.add(tb);
-                canvas.setActiveObject(tb);
+
+                // --- Text placement mode ---
+                if (textPlacementRef.current) {
+                    if (e.target) return;
+                    textPlacementRef.current = false;
+                    canvas.defaultCursor = 'default';
+                    canvas.hoverCursor = 'move';
+                    const tb = new Textbox('', {
+                        left: x, top: y, originX: 'left', originY: 'top',
+                        width: 400, fontSize: 48,
+                        fontFamily: 'Plus Jakarta Sans, sans-serif',
+                        fill: '#1a1a1a', fontWeight: 'normal', editable: true,
+                    });
+                    canvas.add(tb);
+                    canvas.setActiveObject(tb);
+                    canvas.requestRenderAll();
+                    tb.enterEditing();
+                    tb.on('editing:exited', () => {
+                        if (!tb.text || tb.text.trim() === '') {
+                            canvas.remove(tb);
+                            canvas.requestRenderAll();
+                        }
+                    });
+                    return;
+                }
+
+                // --- Draw mode ---
+                if (!drawModeRef.current) return;
+                if (e.target) return; // ignore clicks on existing objects
+
+                drawStartRef.current = { x, y };
+                canvas.selection = false;
+
+                const mode = drawModeRef.current;
+                let preview: FabricObject;
+
+                if (mode === 'rect') {
+                    preview = new Rect({
+                        left: x, top: y, originX: 'left', originY: 'top',
+                        width: 1, height: 1, fill: '#10b981', rx: 12, ry: 12,
+                    });
+                } else if (mode === 'circle') {
+                    preview = new Circle({
+                        left: x, top: y, originX: 'left', originY: 'top',
+                        radius: 1, fill: '#f59e0b',
+                    });
+                } else {
+                    // line, arrow, divider — Line as lightweight preview
+                    preview = new Line([x, y, x, y], {
+                        stroke: '#1a1a1a', strokeWidth: 4,
+                    });
+                }
+
+                (preview as any).isPreview = true;
+                preview.set({ selectable: false, evented: false, opacity: 0.5 });
+                previewObjectRef.current = preview;
+                canvas.add(preview);
+            });
+
+            canvas.on('mouse:move', (e) => {
+                if (!drawModeRef.current || !drawStartRef.current || !previewObjectRef.current) return;
+                const { x: cx, y: cy } = e.scenePoint;
+                const { x: sx, y: sy } = drawStartRef.current;
+                const mode = drawModeRef.current;
+                const preview = previewObjectRef.current;
+
+                if (mode === 'rect') {
+                    (preview as Rect).set({
+                        left: Math.min(sx, cx),
+                        top:  Math.min(sy, cy),
+                        width:  Math.abs(cx - sx),
+                        height: Math.abs(cy - sy),
+                    });
+                } else if (mode === 'circle') {
+                    const radius  = Math.min(Math.abs(cx - sx), Math.abs(cy - sy)) / 2;
+                    const centerX = (sx + cx) / 2;
+                    const centerY = (sy + cy) / 2;
+                    (preview as Circle).set({ left: centerX - radius, top: centerY - radius, radius });
+                } else {
+                    // line / arrow / divider — update the preview Line endpoint
+                    (preview as Line).set({ x2: cx, y2: cy });
+                }
+
+                preview.setCoords();
                 canvas.requestRenderAll();
-                tb.enterEditing();
-                tb.on('editing:exited', () => {
-                    if (!tb.text || tb.text.trim() === '') {
-                        canvas.remove(tb);
-                        canvas.requestRenderAll();
-                    }
-                });
+            });
+
+            canvas.on('mouse:up', (e) => {
+                if (!drawModeRef.current || !drawStartRef.current || !previewObjectRef.current) return;
+                const { x: ex, y: ey } = e.scenePoint;
+                const { x: sx, y: sy } = drawStartRef.current;
+                const dx = ex - sx;
+                const dy = ey - sy;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                const mode = drawModeRef.current;
+                const preview = previewObjectRef.current;
+
+                if (distance < 5) {
+                    // Too small — remove preview, stay in draw mode so user can retry
+                    canvas.remove(preview);
+                    previewObjectRef.current = null;
+                    drawStartRef.current = null;
+                    canvas.selection = true;
+                    return;
+                }
+
+                if (mode === 'rect') {
+                    delete (preview as any).isPreview;
+                    preview.set({ selectable: true, evented: true, opacity: 0.9 });
+                    preview.setCoords();
+                    canvas.setActiveObject(preview);
+                    canvas.requestRenderAll();
+                    saveHistory(canvas);
+                    onCanvasModified?.();
+                } else if (mode === 'circle') {
+                    delete (preview as any).isPreview;
+                    preview.set({ selectable: true, evented: true, opacity: 0.9 });
+                    preview.setCoords();
+                    canvas.setActiveObject(preview);
+                    canvas.requestRenderAll();
+                    saveHistory(canvas);
+                    onCanvasModified?.();
+                } else if (mode === 'line') {
+                    delete (preview as any).isPreview;
+                    preview.set({ selectable: true, evented: true, opacity: 1 });
+                    preview.setCoords();
+                    canvas.setActiveObject(preview);
+                    canvas.requestRenderAll();
+                    saveHistory(canvas);
+                    onCanvasModified?.();
+                } else if (mode === 'arrow') {
+                    canvas.remove(preview); // isPreview flag → skipped by history handler
+                    const length  = distance;
+                    const angle   = Math.atan2(dy, dx) * (180 / Math.PI);
+                    const headLen = Math.min(55, length * 0.35);
+                    const half    = length / 2;
+                    const bodyEnd = half - headLen;
+                    const arrowPath = bodyEnd > 0
+                        ? `M ${-half} -8 L ${bodyEnd} -8 L ${bodyEnd} -18 L ${half} 0 L ${bodyEnd} 18 L ${bodyEnd} 8 L ${-half} 8 Z`
+                        : `M ${-half} -18 L ${half} 0 L ${-half} 18 Z`;
+                    const arrow = new Path(arrowPath, {
+                        left: (sx + ex) / 2,
+                        top:  (sy + ey) / 2,
+                        originX: 'center',
+                        originY: 'center',
+                        angle,
+                        fill: '#1a1a1a',
+                    });
+                    canvas.add(arrow);
+                    canvas.setActiveObject(arrow);
+                    canvas.requestRenderAll();
+                } else if (mode === 'divider') {
+                    canvas.remove(preview);
+                    const width = Math.max(80, distance);
+                    const divider = new Path(buildWavyPath(width), {
+                        left: Math.min(sx, ex),
+                        top:  Math.min(sy, ey),
+                        originX: 'left',
+                        originY: 'top',
+                        stroke: '#1a1a1a',
+                        strokeWidth: 4,
+                        fill: '',
+                        strokeLineCap: 'round',
+                        strokeLineJoin: 'round',
+                    });
+                    canvas.add(divider);
+                    canvas.setActiveObject(divider);
+                    canvas.requestRenderAll();
+                }
+
+                // Exit draw mode
+                previewObjectRef.current = null;
+                drawStartRef.current     = null;
+                drawModeRef.current      = null;
+                canvas.selection         = true;
+                canvas.defaultCursor     = 'default';
+                canvas.hoverCursor       = 'move';
+                onDrawModeChange?.(null);
             });
 
             // Fabric appends a hidden <textarea> (the keystroke sink for text editing)
