@@ -104,7 +104,7 @@ const EditorToolbar: React.FC<EditorToolbarProps> = ({
             <ToolBtn
                 onClick={onToggleFreehand}
                 title="Gambar Bebas (Freehand)"
-                active={isFreehandActive}
+                active={isFreehandActive || undefined}
             >
                 <Pencil className="w-4 h-4" />
             </ToolBtn>
