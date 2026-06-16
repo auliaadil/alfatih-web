@@ -497,7 +497,10 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
                     if (previewObjectRef.current) { c.remove(previewObjectRef.current); previewObjectRef.current = null; }
                     drawStartRef.current = null; drawModeRef.current = null;
                     c.selection = true; c.defaultCursor = 'default'; c.hoverCursor = 'move';
+                    c.isDrawingMode = false; freehandRef.current = false;
+                    textPlacementRef.current = false;
                     onDrawModeChange?.(null);
+                    c.requestRenderAll();
                     return;
                 }
                 // Cancel any in-progress preview from another mode
@@ -507,6 +510,7 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
                 textPlacementRef.current = false;
                 c.isDrawingMode = false; freehandRef.current = false;
                 // Enter draw mode
+                c.selection = false;
                 drawModeRef.current = 'rect';
                 c.defaultCursor = 'crosshair'; c.hoverCursor = 'crosshair';
                 onDrawModeChange?.('rect');
@@ -519,13 +523,17 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
                     if (previewObjectRef.current) { c.remove(previewObjectRef.current); previewObjectRef.current = null; }
                     drawStartRef.current = null; drawModeRef.current = null;
                     c.selection = true; c.defaultCursor = 'default'; c.hoverCursor = 'move';
+                    c.isDrawingMode = false; freehandRef.current = false;
+                    textPlacementRef.current = false;
                     onDrawModeChange?.(null);
+                    c.requestRenderAll();
                     return;
                 }
                 if (previewObjectRef.current) { c.remove(previewObjectRef.current); previewObjectRef.current = null; }
                 drawStartRef.current = null;
                 textPlacementRef.current = false;
                 c.isDrawingMode = false; freehandRef.current = false;
+                c.selection = false;
                 drawModeRef.current = 'circle';
                 c.defaultCursor = 'crosshair'; c.hoverCursor = 'crosshair';
                 onDrawModeChange?.('circle');
@@ -538,13 +546,17 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
                     if (previewObjectRef.current) { c.remove(previewObjectRef.current); previewObjectRef.current = null; }
                     drawStartRef.current = null; drawModeRef.current = null;
                     c.selection = true; c.defaultCursor = 'default'; c.hoverCursor = 'move';
+                    c.isDrawingMode = false; freehandRef.current = false;
+                    textPlacementRef.current = false;
                     onDrawModeChange?.(null);
+                    c.requestRenderAll();
                     return;
                 }
                 if (previewObjectRef.current) { c.remove(previewObjectRef.current); previewObjectRef.current = null; }
                 drawStartRef.current = null;
                 textPlacementRef.current = false;
                 c.isDrawingMode = false; freehandRef.current = false;
+                c.selection = false;
                 drawModeRef.current = 'line';
                 c.defaultCursor = 'crosshair'; c.hoverCursor = 'crosshair';
                 onDrawModeChange?.('line');
@@ -557,13 +569,17 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
                     if (previewObjectRef.current) { c.remove(previewObjectRef.current); previewObjectRef.current = null; }
                     drawStartRef.current = null; drawModeRef.current = null;
                     c.selection = true; c.defaultCursor = 'default'; c.hoverCursor = 'move';
+                    c.isDrawingMode = false; freehandRef.current = false;
+                    textPlacementRef.current = false;
                     onDrawModeChange?.(null);
+                    c.requestRenderAll();
                     return;
                 }
                 if (previewObjectRef.current) { c.remove(previewObjectRef.current); previewObjectRef.current = null; }
                 drawStartRef.current = null;
                 textPlacementRef.current = false;
                 c.isDrawingMode = false; freehandRef.current = false;
+                c.selection = false;
                 drawModeRef.current = 'arrow';
                 c.defaultCursor = 'crosshair'; c.hoverCursor = 'crosshair';
                 onDrawModeChange?.('arrow');
@@ -576,13 +592,17 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
                     if (previewObjectRef.current) { c.remove(previewObjectRef.current); previewObjectRef.current = null; }
                     drawStartRef.current = null; drawModeRef.current = null;
                     c.selection = true; c.defaultCursor = 'default'; c.hoverCursor = 'move';
+                    c.isDrawingMode = false; freehandRef.current = false;
+                    textPlacementRef.current = false;
                     onDrawModeChange?.(null);
+                    c.requestRenderAll();
                     return;
                 }
                 if (previewObjectRef.current) { c.remove(previewObjectRef.current); previewObjectRef.current = null; }
                 drawStartRef.current = null;
                 textPlacementRef.current = false;
                 c.isDrawingMode = false; freehandRef.current = false;
+                c.selection = false;
                 drawModeRef.current = 'divider';
                 c.defaultCursor = 'crosshair'; c.hoverCursor = 'crosshair';
                 onDrawModeChange?.('divider');
