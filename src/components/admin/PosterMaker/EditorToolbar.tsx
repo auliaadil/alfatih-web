@@ -4,7 +4,8 @@ import {
     AlignLeft, AlignCenter, AlignRight,
     ChevronUp, ChevronDown, ChevronsUp, ChevronsDown,
     Download, Loader2, RectangleHorizontal, RectangleVertical,
-    Undo, Redo, Copy, Clipboard, CopyPlus
+    Undo, Redo, Copy, Clipboard, CopyPlus,
+    MoveRight, Pencil, Waves
 } from 'lucide-react';
 import { CanvasSize } from './FabricCanvas';
 
@@ -33,6 +34,10 @@ interface EditorToolbarProps {
     onRedo: () => void;
     canUndo: boolean;
     canRedo: boolean;
+    onAddArrow: () => void;
+    onToggleFreehand: () => void;
+    onAddDivider: () => void;
+    isFreehandActive: boolean;
 }
 
 const ToolBtn: React.FC<{
@@ -68,7 +73,8 @@ const EditorToolbar: React.FC<EditorToolbarProps> = ({
     onBringForward, onSendBackward, onSendToFront, onSendToBack,
     onCopy, onPaste, onDuplicate,
     onExport, onSetCanvasSize,
-    onUndo, onRedo, canUndo, canRedo
+    onUndo, onRedo, canUndo, canRedo,
+    onAddArrow, onToggleFreehand, onAddDivider, isFreehandActive
 }) => {
     return (
         <div className="bg-white border border-gray-200 rounded-xl shadow-sm px-3 py-2 flex items-center gap-1 flex-wrap flex-shrink-0">
@@ -94,6 +100,15 @@ const EditorToolbar: React.FC<EditorToolbarProps> = ({
             <ToolBtn onClick={onAddRect} title="Add Rectangle"><Square className="w-4 h-4" /></ToolBtn>
             <ToolBtn onClick={onAddCircle} title="Add Circle"><Circle className="w-4 h-4" /></ToolBtn>
             <ToolBtn onClick={onAddLine} title="Add Line"><Minus className="w-4 h-4" /></ToolBtn>
+            <ToolBtn onClick={onAddArrow} title="Tambah Panah"><MoveRight className="w-4 h-4" /></ToolBtn>
+            <ToolBtn
+                onClick={onToggleFreehand}
+                title="Gambar Bebas (Freehand)"
+                active={isFreehandActive}
+            >
+                <Pencil className="w-4 h-4" />
+            </ToolBtn>
+            <ToolBtn onClick={onAddDivider} title="Tambah Divider Dekoratif"><Waves className="w-4 h-4" /></ToolBtn>
             <ToolBtn onClick={onAddImage} title="Add Image"><ImagePlus className="w-4 h-4" /></ToolBtn>
 
             <Divider />
