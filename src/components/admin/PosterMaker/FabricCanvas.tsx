@@ -249,7 +249,7 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
                     strokeLineCap: 'round',
                     strokeLineJoin: 'round',
                     originX: 'left',
-                    originY: 'center',
+                    originY: 'top',
                 });
                 c.add(divider);
                 c.setActiveObject(divider);
