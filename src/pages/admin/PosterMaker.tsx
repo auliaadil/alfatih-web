@@ -157,7 +157,13 @@ const NewDesignModal: React.FC<NewDesignModalProps> = ({
     const visibleCustom = customTemplates.filter(t => t.aspect_ratio === size);
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
+        <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Buat Desain Baru"
+            onKeyDown={e => { if (e.key === 'Escape' && canDismiss) onClose(); }}
+        >
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl p-6 max-h-[90vh] flex flex-col">
                 <div className="flex items-center justify-between mb-5 flex-shrink-0">
                     <h2 className="text-lg font-bold text-gray-900">Buat Desain Baru</h2>
@@ -459,6 +465,8 @@ const PosterMaker: React.FC = () => {
     const handleSizeChange = (size: CanvasSize) => setCanvasSize(size);
 
     const handlePickBlank = (size: CanvasSize) => {
+        canvasRef.current?.setFreehandMode(false);
+        setIsFreehandActive(false);
         setLoadedTemplate(null);
         setEditingTemplateId(null);
         setEditingTemplateName('');
@@ -479,6 +487,13 @@ const PosterMaker: React.FC = () => {
         const next = !isFreehandActive;
         setIsFreehandActive(next);
         canvasRef.current?.setFreehandMode(next);
+        if (next) {
+            const canvas = canvasRef.current?.getCanvas();
+            if (canvas?.freeDrawingBrush) {
+                (canvas.freeDrawingBrush as any).color = brushColor;
+                (canvas.freeDrawingBrush as any).width = brushWidth;
+            }
+        }
     };
 
     const handleBrushColorChange = (color: string) => {
@@ -532,6 +547,8 @@ const PosterMaker: React.FC = () => {
     };
 
     const handleLoadDraft = (json: any) => {
+        canvasRef.current?.setFreehandMode(false);
+        setIsFreehandActive(false);
         if (json.width === 1080 && json.height === 1350) setCanvasSize('post');
         else if (json.width === 1080 && json.height === 1920) setCanvasSize('story');
         setTimeout(() => canvasRef.current?.loadTemplate(json), 200);
@@ -832,8 +849,9 @@ const PosterMaker: React.FC = () => {
                                 ✏️ Mode Gambar Bebas
                             </span>
                             <div className="flex items-center gap-2">
-                                <label className="text-xs text-violet-600">Warna</label>
+                                <label htmlFor="freehand-color" className="text-xs text-violet-600">Warna</label>
                                 <input
+                                    id="freehand-color"
                                     type="color"
                                     value={brushColor}
                                     onChange={e => handleBrushColorChange(e.target.value)}
@@ -841,8 +859,9 @@ const PosterMaker: React.FC = () => {
                                 />
                             </div>
                             <div className="flex items-center gap-2">
-                                <label className="text-xs text-violet-600">Ukuran: {brushWidth}px</label>
+                                <label htmlFor="freehand-width" className="text-xs text-violet-600">Ukuran: {brushWidth}px</label>
                                 <input
+                                    id="freehand-width"
                                     type="range" min={2} max={40} value={brushWidth}
                                     onChange={e => handleBrushWidthChange(parseInt(e.target.value))}
                                     className="w-24 accent-violet-600"
