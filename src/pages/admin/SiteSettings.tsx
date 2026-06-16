@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
-import { Save, X, Plus, Phone, Globe, MessageSquare } from 'lucide-react';
+import { Save, X, Plus, Phone, Globe, MessageSquare, FileText } from 'lucide-react';
 import {
     PageHeader, SectionCard, FormField, inputClass, textareaClass, btnPrimary, useToast,
 } from '../../components/admin/ui';
@@ -11,6 +11,8 @@ interface SiteSettingsData {
     instagram: string; tiktok: string; facebook: string;
     planner_destinations: string[]; planner_interests: string[];
     planner_traveler_types: TravelerType[];
+    izin_ppiu: string; izin_bpw: string;
+    siskopatuh_logo_url: string; pasti_umrah_logo_url: string;
 }
 
 const TagEditor: React.FC<{ label: string; tags: string[]; onChange: (tags: string[]) => void }> = ({ label, tags, onChange }) => {
@@ -71,6 +73,10 @@ const SiteSettings: React.FC = () => {
                 planner_destinations: data.planner_destinations || [],
                 planner_interests: data.planner_interests || [],
                 planner_traveler_types: data.planner_traveler_types || [],
+                izin_ppiu: data.izin_ppiu || '',
+                izin_bpw: data.izin_bpw || '',
+                siskopatuh_logo_url: data.siskopatuh_logo_url || '',
+                pasti_umrah_logo_url: data.pasti_umrah_logo_url || '',
             } as SiteSettingsData);
         }
         setLoading(false);
@@ -87,6 +93,10 @@ const SiteSettings: React.FC = () => {
             planner_destinations: settings.planner_destinations,
             planner_interests: settings.planner_interests,
             planner_traveler_types: settings.planner_traveler_types,
+            izin_ppiu: settings.izin_ppiu,
+            izin_bpw: settings.izin_bpw,
+            siskopatuh_logo_url: settings.siskopatuh_logo_url,
+            pasti_umrah_logo_url: settings.pasti_umrah_logo_url,
             updated_at: new Date().toISOString(),
         }).eq('id', 1);
         setSaving(false);
@@ -161,6 +171,47 @@ const SiteSettings: React.FC = () => {
                                 </div>
                             </FormField>
                         ))}
+                    </div>
+                </SectionCard>
+
+                {/* Legal & Certification */}
+                <SectionCard
+                    title="Izin & Sertifikasi"
+                    description="Nomor izin resmi dan logo sertifikasi yang ditampilkan di footer brosur poster."
+                >
+                    <div className="space-y-5">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                            <FormField label="Izin PPIU" hint="Nomor izin untuk paket umrah">
+                                <div className="relative">
+                                    <FileText className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                    <input type="text" className={`${inputClass} pl-10`} value={settings?.izin_ppiu || ''} onChange={e => set('izin_ppiu', e.target.value)} placeholder="16032300890440001" />
+                                </div>
+                            </FormField>
+                            <FormField label="Izin BPW" hint="Nomor izin untuk paket wisata muslim">
+                                <div className="relative">
+                                    <FileText className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                    <input type="text" className={`${inputClass} pl-10`} value={settings?.izin_bpw || ''} onChange={e => set('izin_bpw', e.target.value)} placeholder="16032300890440002" />
+                                </div>
+                            </FormField>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                            <FormField label="URL Logo Siskopatuh" hint="URL gambar logo Siskopatuh">
+                                <div className="space-y-2">
+                                    <input type="url" className={inputClass} value={settings?.siskopatuh_logo_url || ''} onChange={e => set('siskopatuh_logo_url', e.target.value)} placeholder="https://..." />
+                                    {settings?.siskopatuh_logo_url && (
+                                        <img src={settings.siskopatuh_logo_url} alt="Siskopatuh" className="h-10 object-contain rounded border border-gray-100 bg-gray-50 p-1" />
+                                    )}
+                                </div>
+                            </FormField>
+                            <FormField label="URL Logo 5 Pasti Umrah" hint="URL gambar logo 5 Pasti Umrah">
+                                <div className="space-y-2">
+                                    <input type="url" className={inputClass} value={settings?.pasti_umrah_logo_url || ''} onChange={e => set('pasti_umrah_logo_url', e.target.value)} placeholder="https://..." />
+                                    {settings?.pasti_umrah_logo_url && (
+                                        <img src={settings.pasti_umrah_logo_url} alt="5 Pasti Umrah" className="h-10 object-contain rounded border border-gray-100 bg-gray-50 p-1" />
+                                    )}
+                                </div>
+                            </FormField>
+                        </div>
                     </div>
                 </SectionCard>
 

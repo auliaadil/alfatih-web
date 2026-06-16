@@ -27,6 +27,8 @@ function buildWavyPath(w: number): string {
 export interface FabricCanvasRef {
     getCanvas: () => Canvas | null;
     addText: (text?: string) => void;
+    isTextPlacementMode: () => boolean;
+    cancelTextPlacement: () => void;
     addRect: () => void;
     addCircle: () => void;
     addLine: () => void;
@@ -71,6 +73,7 @@ let clipboard: FabricObject | null = null;
 const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
     ({ canvasSize, onSelectionChange, onCanvasModified, onHistoryChange, onZoomChange, onObjectTransforming }, ref) => {
         const canvasEl = useRef<HTMLCanvasElement>(null);
+        const wrapperRef = useRef<HTMLDivElement>(null);
         const fabricRef = useRef<Canvas | null>(null);
         const [scale, setScale] = useState(0.35);
         const scaleRef = useRef(0.35);
@@ -80,6 +83,7 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
         const historyIndex = useRef<number>(-1);
         const isHistoryProcessing = useRef(false);
         const freehandRef = useRef(false);
+        const textPlacementRef = useRef(false);
 
         const updateHistoryState = () => {
             if (onHistoryChange) {
@@ -134,21 +138,104 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
             canvas.on('object:scaling', (e) => { if (e.target) onObjectTransforming?.(e.target as FabricObject); });
             canvas.on('object:moving', (e) => { if (e.target) onObjectTransforming?.(e.target as FabricObject); });
 
-            // When Fabric focuses its hidden textarea for text editing, Chrome silently
-            // scrolls overflow:hidden ancestors to bring the element into view. Reset
-            // any such scroll in the next frame (after Chrome's auto-scroll fires).
-            canvas.on('text:editing:entered', () => {
-                requestAnimationFrame(() => {
-                    let el: HTMLElement | null = canvasEl.current?.parentElement ?? null;
-                    while (el && el !== document.body) {
-                        if (el.scrollTop !== 0) el.scrollTop = 0;
-                        if (el.scrollLeft !== 0) el.scrollLeft = 0;
-                        el = el.parentElement;
+            canvas.on('mouse:down', (e) => {
+                if (!textPlacementRef.current) return;
+                if (e.target) return; // clicked an existing object — don't place
+                textPlacementRef.current = false;
+                canvas.defaultCursor = 'default';
+                canvas.hoverCursor = 'move';
+                const { x, y } = e.scenePoint;
+                const tb = new Textbox('', {
+                    left: x, top: y, originX: 'left', originY: 'top',
+                    width: 400, fontSize: 48,
+                    fontFamily: 'Plus Jakarta Sans, sans-serif',
+                    fill: '#1a1a1a', fontWeight: 'normal', editable: true,
+                });
+                canvas.add(tb);
+                canvas.setActiveObject(tb);
+                canvas.requestRenderAll();
+                tb.enterEditing();
+                tb.on('editing:exited', () => {
+                    if (!tb.text || tb.text.trim() === '') {
+                        canvas.remove(tb);
+                        canvas.requestRenderAll();
                     }
                 });
             });
 
+            // Fabric appends a hidden <textarea> (the keystroke sink for text editing)
+            // and positions it via _calcTextareaPosition. That math mixes UNSCALED
+            // in-canvas coords (clientWidth/Height ignore our ancestor `transform:
+            // scale`) with the SCALED canvas offset from getBoundingClientRect, so the
+            // returned document position lands far below the visible caret. On focus —
+            // and again on every keystroke (updateTextareaPosition) — the browser
+            // scroll-into-views that offscreen textarea, scrolling the window and
+            // revealing blank space below the layout.
+            //
+            // Fix at the source: clamp the returned position into the current viewport.
+            // If the (invisible, 1px, opacity:0) textarea is already on-screen, the
+            // browser has nothing to scroll to — independent of scroll-into-view quirks
+            // for any particular container. _calcTextareaPosition is used for both the
+            // initial placement and every per-keystroke update, so patching it covers
+            // all cases. Textbox extends IText (where the method lives) and is the only
+            // editable text class used here, incl. objects rehydrated by loadFromJSON.
+            type CaretProto = {
+                _calcTextareaPosition?: () => { top: string; left: string; [k: string]: unknown };
+                __caretClampPatched?: boolean;
+            };
+            const caretProto = Textbox.prototype as unknown as CaretProto;
+            if (!caretProto.__caretClampPatched) {
+                const original = caretProto._calcTextareaPosition!;
+                caretProto.__caretClampPatched = true;
+                caretProto._calcTextareaPosition = function (this: unknown) {
+                    const r = original.call(this);
+                    const top = parseFloat(r.top);
+                    const left = parseFloat(r.left);
+                    const clampedTop = Math.min(
+                        Math.max(top, window.scrollY + 2),
+                        window.scrollY + window.innerHeight - 6,
+                    );
+                    const clampedLeft = Math.min(
+                        Math.max(left, window.scrollX + 2),
+                        window.scrollX + window.innerWidth - 6,
+                    );
+                    return { ...r, top: `${clampedTop}px`, left: `${clampedLeft}px` };
+                };
+            }
+
+            // TEMP DIAGNOSTIC — remove once verified. Silent on success: only logs if
+            // the page still scrolls during text editing, reporting which element moved
+            // and where Fabric's textarea actually is, so the real culprit is unambiguous.
+            const onEditEntered = () => {
+                const startY = window.scrollY;
+                const startX = window.scrollX;
+                const onScroll = (ev: Event) => {
+                    const ta = document.querySelector('textarea[data-fabric="textarea"]') as HTMLElement | null;
+                    const tgt = ev.target === document ? document.scrollingElement : (ev.target as HTMLElement);
+                    // eslint-disable-next-line no-console
+                    console.warn('[poster-caret-scroll] page scrolled during text edit', {
+                        scrolledEl: tgt ? `${tgt.tagName}.${(tgt as HTMLElement).className || ''}` : String(ev.target),
+                        windowScroll: { x: window.scrollX, y: window.scrollY, wasX: startX, wasY: startY },
+                        textarea: ta
+                            ? { parent: ta.parentElement?.tagName, top: ta.style.top, left: ta.style.left, rect: ta.getBoundingClientRect() }
+                            : 'NOT FOUND',
+                    });
+                };
+                document.addEventListener('scroll', onScroll, { capture: true, once: true });
+                const cleanup = () => {
+                    document.removeEventListener('scroll', onScroll, true);
+                    canvas.off('text:editing:exited', cleanup);
+                };
+                canvas.on('text:editing:exited', cleanup);
+            };
+            canvas.on('text:editing:entered', onEditEntered);
+
             return () => {
+                canvas.off('text:editing:entered', onEditEntered);
+                if (caretProto.__caretClampPatched) {
+                    delete caretProto._calcTextareaPosition; // restore inherited IText method
+                    delete caretProto.__caretClampPatched;
+                }
                 canvas.dispose();
                 fabricRef.current = null;
             };
@@ -173,14 +260,33 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
             addText: (text?: string) => {
                 const c = fabricRef.current;
                 if (!c) return;
-                const tb = new Textbox(text || 'Edit this text', {
-                    left: 100, top: 100, originX: 'left', originY: 'top',
-                    width: 500, fontSize: 48, fontFamily: 'Plus Jakarta Sans, sans-serif',
-                    fill: '#1a1a1a', fontWeight: '700', editable: true,
-                });
-                c.add(tb);
-                c.setActiveObject(tb);
-                c.requestRenderAll();
+                if (text !== undefined) {
+                    // Programmatic: place at center with provided text
+                    const tb = new Textbox(text, {
+                        left: (c.width ?? 1080) / 2 - 200,
+                        top: (c.height ?? 1350) / 2 - 24,
+                        originX: 'left', originY: 'top',
+                        width: 400, fontSize: 48,
+                        fontFamily: 'Plus Jakarta Sans, sans-serif',
+                        fill: '#1a1a1a', fontWeight: 'normal', editable: true,
+                    });
+                    c.add(tb);
+                    c.setActiveObject(tb);
+                    c.requestRenderAll();
+                } else {
+                    // Interactive: wait for click to place
+                    textPlacementRef.current = true;
+                    c.defaultCursor = 'text';
+                    c.hoverCursor = 'text';
+                }
+            },
+
+            isTextPlacementMode: () => textPlacementRef.current,
+
+            cancelTextPlacement: () => {
+                const c = fabricRef.current;
+                textPlacementRef.current = false;
+                if (c) { c.defaultCursor = 'default'; c.hoverCursor = 'move'; }
             },
 
             addRect: () => {
@@ -466,6 +572,7 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
 
         return (
             <div
+                ref={wrapperRef}
                 className="flex-1 flex items-start justify-center py-6 bg-gray-100 rounded-lg border border-gray-200"
                 style={{ overflow: 'clip' }}
             >

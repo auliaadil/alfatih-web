@@ -9,6 +9,10 @@ interface SiteSettings {
     instagram: string;
     tiktok: string;
     facebook: string;
+    izin_ppiu: string;
+    izin_bpw: string;
+    siskopatuh_logo_url: string;
+    pasti_umrah_logo_url: string;
 }
 
 const defaultSettings: SiteSettings = {
@@ -19,6 +23,10 @@ const defaultSettings: SiteSettings = {
     instagram: 'https://instagram.com/alfatihduniawisata',
     tiktok: 'https://tiktok.com/@alfatihduniawisata',
     facebook: 'https://facebook.com/alfatihduniawisata',
+    izin_ppiu: '',
+    izin_bpw: '',
+    siskopatuh_logo_url: '',
+    pasti_umrah_logo_url: '',
 };
 
 const SiteSettingsContext = createContext<SiteSettings>(defaultSettings);
@@ -44,6 +52,10 @@ export const SiteSettingsProvider: React.FC<{ children: React.ReactNode }> = ({ 
                     instagram: data.instagram || defaultSettings.instagram,
                     tiktok: data.tiktok || defaultSettings.tiktok,
                     facebook: data.facebook || defaultSettings.facebook,
+                    izin_ppiu: data.izin_ppiu || '',
+                    izin_bpw: data.izin_bpw || '',
+                    siskopatuh_logo_url: data.siskopatuh_logo_url || '',
+                    pasti_umrah_logo_url: data.pasti_umrah_logo_url || '',
                 });
             }
         };

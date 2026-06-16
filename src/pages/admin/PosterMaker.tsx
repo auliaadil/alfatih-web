@@ -411,6 +411,8 @@ const PosterMaker: React.FC = () => {
                 if (canvasRef.current?.isFreehandMode()) {
                     canvasRef.current.setFreehandMode(false);
                     setIsFreehandActive(false);
+                } else if (canvasRef.current?.isTextPlacementMode()) {
+                    canvasRef.current.cancelTextPlacement();
                 }
             }
         };
