@@ -492,74 +492,100 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
             addRect: () => {
                 const c = fabricRef.current;
                 if (!c) return;
-                const rect = new Rect({
-                    left: 150, top: 150, originX: 'left', originY: 'top',
-                    width: 300, height: 200, fill: '#10b981', rx: 12, ry: 12, opacity: 0.9,
-                });
-                c.add(rect);
-                c.setActiveObject(rect);
-                c.requestRenderAll();
+                if (drawModeRef.current === 'rect') {
+                    // Toggle off
+                    if (previewObjectRef.current) { c.remove(previewObjectRef.current); previewObjectRef.current = null; }
+                    drawStartRef.current = null; drawModeRef.current = null;
+                    c.selection = true; c.defaultCursor = 'default'; c.hoverCursor = 'move';
+                    onDrawModeChange?.(null);
+                    return;
+                }
+                // Cancel any in-progress preview from another mode
+                if (previewObjectRef.current) { c.remove(previewObjectRef.current); previewObjectRef.current = null; }
+                drawStartRef.current = null;
+                // Cancel conflicting modes
+                textPlacementRef.current = false;
+                c.isDrawingMode = false; freehandRef.current = false;
+                // Enter draw mode
+                drawModeRef.current = 'rect';
+                c.defaultCursor = 'crosshair'; c.hoverCursor = 'crosshair';
+                onDrawModeChange?.('rect');
             },
 
             addCircle: () => {
                 const c = fabricRef.current;
                 if (!c) return;
-                const circle = new Circle({
-                    left: 200, top: 200, originX: 'left', originY: 'top',
-                    radius: 100, fill: '#f59e0b', opacity: 0.9,
-                });
-                c.add(circle);
-                c.setActiveObject(circle);
-                c.requestRenderAll();
+                if (drawModeRef.current === 'circle') {
+                    if (previewObjectRef.current) { c.remove(previewObjectRef.current); previewObjectRef.current = null; }
+                    drawStartRef.current = null; drawModeRef.current = null;
+                    c.selection = true; c.defaultCursor = 'default'; c.hoverCursor = 'move';
+                    onDrawModeChange?.(null);
+                    return;
+                }
+                if (previewObjectRef.current) { c.remove(previewObjectRef.current); previewObjectRef.current = null; }
+                drawStartRef.current = null;
+                textPlacementRef.current = false;
+                c.isDrawingMode = false; freehandRef.current = false;
+                drawModeRef.current = 'circle';
+                c.defaultCursor = 'crosshair'; c.hoverCursor = 'crosshair';
+                onDrawModeChange?.('circle');
             },
 
             addLine: () => {
                 const c = fabricRef.current;
                 if (!c) return;
-                const line = new Line([100, 300, 500, 300], {
-                    stroke: '#1a1a1a', strokeWidth: 4, originX: 'left', originY: 'top',
-                });
-                c.add(line);
-                c.setActiveObject(line);
-                c.requestRenderAll();
+                if (drawModeRef.current === 'line') {
+                    if (previewObjectRef.current) { c.remove(previewObjectRef.current); previewObjectRef.current = null; }
+                    drawStartRef.current = null; drawModeRef.current = null;
+                    c.selection = true; c.defaultCursor = 'default'; c.hoverCursor = 'move';
+                    onDrawModeChange?.(null);
+                    return;
+                }
+                if (previewObjectRef.current) { c.remove(previewObjectRef.current); previewObjectRef.current = null; }
+                drawStartRef.current = null;
+                textPlacementRef.current = false;
+                c.isDrawingMode = false; freehandRef.current = false;
+                drawModeRef.current = 'line';
+                c.defaultCursor = 'crosshair'; c.hoverCursor = 'crosshair';
+                onDrawModeChange?.('line');
             },
 
             addArrow: () => {
                 const c = fabricRef.current;
                 if (!c) return;
-                const arrowPath = 'M 0 15 L 250 15 L 250 0 L 300 20 L 250 40 L 250 25 L 0 25 Z';
-                const arrow = new Path(arrowPath, {
-                    left: (c.width ?? 1080) / 2 - 150,
-                    top: (c.height ?? 1350) / 2 - 20,
-                    fill: '#1a1a1a',
-                    stroke: '',
-                    strokeWidth: 0,
-                    originX: 'left',
-                    originY: 'top',
-                });
-                c.add(arrow);
-                c.setActiveObject(arrow);
-                c.requestRenderAll();
+                if (drawModeRef.current === 'arrow') {
+                    if (previewObjectRef.current) { c.remove(previewObjectRef.current); previewObjectRef.current = null; }
+                    drawStartRef.current = null; drawModeRef.current = null;
+                    c.selection = true; c.defaultCursor = 'default'; c.hoverCursor = 'move';
+                    onDrawModeChange?.(null);
+                    return;
+                }
+                if (previewObjectRef.current) { c.remove(previewObjectRef.current); previewObjectRef.current = null; }
+                drawStartRef.current = null;
+                textPlacementRef.current = false;
+                c.isDrawingMode = false; freehandRef.current = false;
+                drawModeRef.current = 'arrow';
+                c.defaultCursor = 'crosshair'; c.hoverCursor = 'crosshair';
+                onDrawModeChange?.('arrow');
             },
 
             addDivider: () => {
                 const c = fabricRef.current;
                 if (!c) return;
-                const w = (c.width ?? 1080) * 0.8;
-                const divider = new Path(buildWavyPath(w), {
-                    left: (c.width ?? 1080) * 0.1,
-                    top: (c.height ?? 1350) / 2,
-                    stroke: '#1a1a1a',
-                    strokeWidth: 4,
-                    fill: '',
-                    strokeLineCap: 'round',
-                    strokeLineJoin: 'round',
-                    originX: 'left',
-                    originY: 'top',
-                });
-                c.add(divider);
-                c.setActiveObject(divider);
-                c.requestRenderAll();
+                if (drawModeRef.current === 'divider') {
+                    if (previewObjectRef.current) { c.remove(previewObjectRef.current); previewObjectRef.current = null; }
+                    drawStartRef.current = null; drawModeRef.current = null;
+                    c.selection = true; c.defaultCursor = 'default'; c.hoverCursor = 'move';
+                    onDrawModeChange?.(null);
+                    return;
+                }
+                if (previewObjectRef.current) { c.remove(previewObjectRef.current); previewObjectRef.current = null; }
+                drawStartRef.current = null;
+                textPlacementRef.current = false;
+                c.isDrawingMode = false; freehandRef.current = false;
+                drawModeRef.current = 'divider';
+                c.defaultCursor = 'crosshair'; c.hoverCursor = 'crosshair';
+                onDrawModeChange?.('divider');
             },
 
             setFreehandMode: (enabled: boolean) => {
