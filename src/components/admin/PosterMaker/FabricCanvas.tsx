@@ -302,6 +302,7 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
                         fill: '#1a1a1a',
                     });
                     canvas.add(arrow);
+                    arrow.setCoords();
                     canvas.setActiveObject(arrow);
                     canvas.requestRenderAll();
                 } else if (mode === 'divider') {
@@ -319,6 +320,7 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
                         strokeLineJoin: 'round',
                     });
                     canvas.add(divider);
+                    divider.setCoords();
                     canvas.setActiveObject(divider);
                     canvas.requestRenderAll();
                 }
