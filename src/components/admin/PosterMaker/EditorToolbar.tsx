@@ -38,7 +38,7 @@ interface EditorToolbarProps {
     onToggleFreehand: () => void;
     onAddDivider: () => void;
     isFreehandActive: boolean;
-    activeDrawTool: string | null;
+    activeDrawTool: 'rect' | 'circle' | 'line' | 'arrow' | 'divider' | null;
 }
 
 const ToolBtn: React.FC<{
