@@ -412,8 +412,6 @@ const PosterMaker: React.FC = () => {
                 if (canvasRef.current?.isFreehandMode()) {
                     canvasRef.current.setFreehandMode(false);
                     setIsFreehandActive(false);
-                    canvasRef.current?.cancelDraw();
-                    setActiveDrawTool(null);
                 } else if (canvasRef.current?.isTextPlacementMode()) {
                     canvasRef.current.cancelTextPlacement();
                 }
@@ -492,11 +490,13 @@ const PosterMaker: React.FC = () => {
 
     const handleToggleFreehand = () => {
         const next = !isFreehandActive;
-        setIsFreehandActive(next);
-        canvasRef.current?.setFreehandMode(next);
         if (next) {
             canvasRef.current?.cancelDraw();
             setActiveDrawTool(null);
+        }
+        setIsFreehandActive(next);
+        canvasRef.current?.setFreehandMode(next);
+        if (next) {
             const canvas = canvasRef.current?.getCanvas();
             if (canvas?.freeDrawingBrush) {
                 (canvas.freeDrawingBrush as any).color = brushColor;
@@ -903,7 +903,7 @@ const PosterMaker: React.FC = () => {
                             onZoomChange={setZoom}
                             onObjectTransforming={handleObjectTransforming}
                             onDrawModeChange={(mode) => {
-                                setActiveDrawTool(mode as 'rect' | 'circle' | 'line' | 'arrow' | 'divider' | null);
+                                setActiveDrawTool(mode);
                                 if (mode !== null) {
                                     setIsFreehandActive(false);
                                     canvasRef.current?.setFreehandMode(false);

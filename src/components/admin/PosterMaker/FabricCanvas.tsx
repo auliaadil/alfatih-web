@@ -66,7 +66,7 @@ interface FabricCanvasProps {
     onHistoryChange?: (canUndo: boolean, canRedo: boolean) => void;
     onZoomChange?: (zoom: number) => void;
     onObjectTransforming?: (obj: FabricObject) => void;
-    onDrawModeChange?: (mode: string | null) => void;
+    onDrawModeChange?: (mode: 'rect' | 'circle' | 'line' | 'arrow' | 'divider' | null) => void;
 }
 
 // Module-level clipboard so copy/paste works across renders
