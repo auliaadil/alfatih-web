@@ -74,6 +74,8 @@ const FontPicker: React.FC<{ value: string; onChange: (font: string) => void }> 
     <div ref={containerRef} className="relative">
       <button
         onClick={() => setOpen(v => !v)}
+        aria-expanded={open}
+        aria-haspopup="listbox"
         className="w-full flex items-center justify-between border border-gray-300 rounded-lg px-2 py-1.5 bg-white hover:border-primary transition text-sm focus:outline-none focus:ring-1 focus:ring-primary"
         style={{ fontFamily: value }}
       >
@@ -134,6 +136,7 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ canvas, selectedObjec
     const [sizeH, setSizeH] = useState('0');
     const [lockAspect, setLockAspect] = useState(false);
     const aspectRatio = useRef(1);
+    const fontTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     // Text
     const [fontFamily, setFontFamily] = useState('Plus Jakarta Sans');
@@ -239,10 +242,19 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ canvas, selectedObjec
     };
 
     const handleFontChange = (font: string) => {
-        loadGoogleFont(font);
         setFontFamily(font);
-        setTimeout(() => applyProp({ fontFamily: font }), 300);
+        loadGoogleFont(font);
+        if (fontTimerRef.current) clearTimeout(fontTimerRef.current);
+        fontTimerRef.current = setTimeout(() => {
+            applyProp({ fontFamily: font });
+        }, 300);
     };
+
+    useEffect(() => {
+        return () => {
+            if (fontTimerRef.current) clearTimeout(fontTimerRef.current);
+        };
+    }, []);
 
     const handleFontSizeChange = (size: number) => {
         const clamped = Math.max(8, Math.min(200, size));
