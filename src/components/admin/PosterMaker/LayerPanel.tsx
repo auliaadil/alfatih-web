@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Canvas, FabricObject } from 'fabric';
-import { Eye, EyeOff, Lock, Unlock, Trash2, Type, Square, Image, Circle as CircleIcon, Minus, ChevronUp, ChevronDown, ChevronsUp, ChevronsDown } from 'lucide-react';
+import { Eye, EyeOff, Lock, Unlock, Trash2, Type, Square, Image, Circle as CircleIcon, Minus } from 'lucide-react';
 
 interface LayerPanelProps {
     canvas: Canvas | null;
@@ -79,32 +79,8 @@ const LayerPanel: React.FC<LayerPanelProps> = ({ canvas, refreshKey }) => {
         setObjects([...canvas.getObjects().slice().reverse()]);
     };
 
-    const handleSendToFront = (obj: FabricObject) => {
-        canvas.bringObjectToFront(obj);
-        canvas.requestRenderAll();
-        setObjects([...canvas.getObjects().slice().reverse()]);
-    };
-
-    const handleSendToBack = (obj: FabricObject) => {
-        canvas.sendObjectToBack(obj);
-        canvas.requestRenderAll();
-        setObjects([...canvas.getObjects().slice().reverse()]);
-    };
-
     const handleDelete = (obj: FabricObject) => {
         canvas.remove(obj);
-        canvas.requestRenderAll();
-        setObjects([...canvas.getObjects().slice().reverse()]);
-    };
-
-    const handleMoveUp = (obj: FabricObject) => {
-        canvas.bringObjectForward(obj);
-        canvas.requestRenderAll();
-        setObjects([...canvas.getObjects().slice().reverse()]);
-    };
-
-    const handleMoveDown = (obj: FabricObject) => {
-        canvas.sendObjectBackwards(obj);
         canvas.requestRenderAll();
         setObjects([...canvas.getObjects().slice().reverse()]);
     };
@@ -162,80 +138,52 @@ const LayerPanel: React.FC<LayerPanelProps> = ({ canvas, refreshKey }) => {
                 const isVisible = obj.visible !== false;
 
                 return (
-                    <div
-                        key={idx}
-                        draggable
-                        onDragStart={(e) => handleDragStart(e, idx)}
-                        onDragOver={(e) => handleDragOver(e, idx)}
-                        onDragLeave={() => setDragOverIdx(null)}
-                        onDrop={(e) => handleDrop(e, idx)}
-                        onDragEnd={handleDragEnd}
-                        onClick={() => handleSelect(obj)}
-                        className={`flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer transition-all text-sm border-2 
-                            ${dragOverIdx === idx ? 'border-t-primary border-transparent' : 'border-transparent'} 
-                            ${draggedIdx === idx ? 'opacity-50 scale-95' : 'opacity-100'} 
-                            ${isActive && draggedIdx !== idx
-                                ? 'bg-emerald-50 border-primary/30 text-primary font-medium'
-                                : 'hover:bg-gray-50 text-gray-700'
-                            }`}
-                    >
-                        <span className={`shrink-0 ${isActive ? 'text-primary' : 'text-gray-400'}`}>
-                            {getObjectIcon(obj)}
-                        </span>
-                        <span className="truncate flex-1 text-xs font-medium">
-                            {getObjectLabel(obj, objects.length - 1 - idx)}
-                        </span>
+                  <div
+                    key={idx}
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, idx)}
+                    onDragOver={(e) => handleDragOver(e, idx)}
+                    onDragLeave={() => setDragOverIdx(null)}
+                    onDrop={(e) => handleDrop(e, idx)}
+                    onDragEnd={handleDragEnd}
+                    onClick={() => handleSelect(obj)}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer transition-all text-sm border-2
+                      ${dragOverIdx === idx ? 'border-t-primary border-transparent' : 'border-transparent'}
+                      ${draggedIdx === idx ? 'opacity-50 scale-95' : 'opacity-100'}
+                      ${isActive && draggedIdx !== idx
+                        ? 'bg-emerald-50 border-primary/30 text-primary font-medium'
+                        : 'hover:bg-gray-50 text-gray-700'
+                      }`}
+                  >
+                    <span className={`shrink-0 ${isActive ? 'text-primary' : 'text-gray-400'}`}>
+                      {getObjectIcon(obj)}
+                    </span>
+                    <span className="truncate flex-1 min-w-0 text-xs font-medium">
+                      {getObjectLabel(obj, objects.length - 1 - idx)}
+                    </span>
 
-                        <button
-                            onClick={(e) => { e.stopPropagation(); handleSendToFront(obj); }}
-                            className="p-1 hover:bg-gray-200 rounded text-gray-400 hover:text-gray-600"
-                            title="Send to Front"
-                        >
-                            <ChevronsUp className="w-3 h-3" />
-                        </button>
-                        <button
-                            onClick={(e) => { e.stopPropagation(); handleMoveUp(obj); }}
-                            className="p-1 hover:bg-gray-200 rounded text-gray-400 hover:text-gray-600"
-                            title="Bring Forward"
-                        >
-                            <ChevronUp className="w-3 h-3" />
-                        </button>
-                        <button
-                            onClick={(e) => { e.stopPropagation(); handleMoveDown(obj); }}
-                            className="p-1 hover:bg-gray-200 rounded text-gray-400 hover:text-gray-600"
-                            title="Send Backward"
-                        >
-                            <ChevronDown className="w-3 h-3" />
-                        </button>
-                        <button
-                            onClick={(e) => { e.stopPropagation(); handleSendToBack(obj); }}
-                            className="p-1 hover:bg-gray-200 rounded text-gray-400 hover:text-gray-600"
-                            title="Send to Back"
-                        >
-                            <ChevronsDown className="w-3 h-3" />
-                        </button>
-                        <button
-                            onClick={(e) => { e.stopPropagation(); handleToggleVisible(obj); }}
-                            className="p-1 hover:bg-gray-200 rounded text-gray-400 hover:text-gray-600"
-                            title={isVisible ? 'Hide' : 'Show'}
-                        >
-                            {isVisible ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
-                        </button>
-                        <button
-                            onClick={(e) => { e.stopPropagation(); handleToggleLock(obj); }}
-                            className="p-1 hover:bg-gray-200 rounded text-gray-400 hover:text-gray-600"
-                            title={isLocked ? 'Unlock' : 'Lock'}
-                        >
-                            {isLocked ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
-                        </button>
-                        <button
-                            onClick={(e) => { e.stopPropagation(); handleDelete(obj); }}
-                            className="p-1 hover:bg-red-100 rounded text-gray-400 hover:text-red-500"
-                            title="Delete"
-                        >
-                            <Trash2 className="w-3 h-3" />
-                        </button>
-                    </div>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleToggleVisible(obj); }}
+                      className="p-1 hover:bg-gray-200 rounded text-gray-400 hover:text-gray-600 flex-shrink-0"
+                      title={isVisible ? 'Sembunyikan' : 'Tampilkan'}
+                    >
+                      {isVisible ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
+                    </button>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleToggleLock(obj); }}
+                      className="p-1 hover:bg-gray-200 rounded text-gray-400 hover:text-gray-600 flex-shrink-0"
+                      title={isLocked ? 'Buka Kunci' : 'Kunci'}
+                    >
+                      {isLocked ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
+                    </button>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleDelete(obj); }}
+                      className="p-1 hover:bg-red-100 rounded text-gray-400 hover:text-red-500 flex-shrink-0"
+                      title="Hapus"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </button>
+                  </div>
                 );
             })}
         </div>
