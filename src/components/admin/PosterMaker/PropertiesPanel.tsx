@@ -5,10 +5,18 @@ import { ShadowState, DEFAULT_SHADOW, readShadowState, applyShadow } from './fab
 import { getCornerRadius, setCornerRadius } from './fabricCornerRadius';
 
 const GOOGLE_FONTS = [
-    'Inter', 'Roboto', 'Open Sans', 'Montserrat', 'Poppins', 'Lato', 'Oswald',
-    'Raleway', 'Playfair Display', 'Merriweather', 'Nunito', 'Ubuntu', 'Rubik',
-    'Work Sans', 'Outfit', 'DM Sans', 'Bebas Neue', 'Anton', 'Pacifico',
-    'Dancing Script', 'Amiri', 'Noto Sans Arabic', 'Cairo', 'Tajawal',
+    // Sans-serif
+    'Plus Jakarta Sans', 'Inter', 'Poppins', 'Montserrat', 'Raleway',
+    'Work Sans', 'DM Sans', 'Nunito', 'Rubik', 'Outfit', 'Lato',
+    'Open Sans', 'Ubuntu', 'Figtree',
+    // Serif
+    'Playfair Display', 'Merriweather', 'Lora', 'Source Serif 4',
+    // Display / Bold
+    'Bebas Neue', 'Anton', 'Oswald',
+    // Decorative / Script
+    'Pacifico', 'Dancing Script', 'Caveat',
+    // Arabic
+    'Amiri', 'Noto Sans Arabic', 'Cairo', 'Tajawal',
 ];
 
 const loadedFonts = new Set<string>();
@@ -20,7 +28,7 @@ const loadGoogleFont = (fontName: string) => {
     link.rel = 'stylesheet';
     document.head.appendChild(link);
 };
-GOOGLE_FONTS.slice(0, 10).forEach(loadGoogleFont);
+['Plus Jakarta Sans', ...GOOGLE_FONTS.slice(0, 9)].forEach(loadGoogleFont);
 
 interface PropertiesPanelProps {
     canvas: Canvas | null;
@@ -38,6 +46,80 @@ const SectionHeader: React.FC<{ label: string; open: boolean; onToggle: () => vo
     </button>
 );
 
+const FontPicker: React.FC<{ value: string; onChange: (font: string) => void }> = ({ value, onChange }) => {
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState('');
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    GOOGLE_FONTS.forEach(loadGoogleFont);
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setOpen(false);
+        setSearch('');
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [open]);
+
+  const filtered = GOOGLE_FONTS.filter(f => f.toLowerCase().includes(search.toLowerCase()));
+
+  return (
+    <div ref={containerRef} className="relative">
+      <button
+        onClick={() => setOpen(v => !v)}
+        className="w-full flex items-center justify-between border border-gray-300 rounded-lg px-2 py-1.5 bg-white hover:border-primary transition text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+        style={{ fontFamily: value }}
+      >
+        <span className="truncate min-w-0">{value}</span>
+        <ChevronDown className={`w-3 h-3 text-gray-400 ml-2 flex-shrink-0 transition-transform ${open ? 'rotate-180' : ''}`} />
+      </button>
+
+      {open && (
+        <div className="absolute z-50 left-0 right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl overflow-hidden">
+          <div className="p-2 border-b border-gray-100">
+            <input
+              autoFocus
+              type="text"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Cari font..."
+              className="w-full text-xs border border-gray-200 rounded px-2 py-1.5 focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+            />
+          </div>
+          <div className="max-h-48 overflow-y-auto">
+            {filtered.map(font => (
+              <button
+                key={font}
+                onClick={() => { onChange(font); setOpen(false); setSearch(''); }}
+                className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 flex items-center justify-between transition border-l-2
+                  ${value === font ? 'border-primary bg-emerald-50/50' : 'border-transparent'}`}
+                style={{ fontFamily: font }}
+              >
+                <span className="truncate min-w-0">{font}</span>
+                {font === 'Plus Jakarta Sans' && (
+                  <span className="text-[9px] font-bold bg-primary text-white px-1.5 py-0.5 rounded-full ml-2 flex-shrink-0" style={{ fontFamily: 'Inter, sans-serif' }}>
+                    DEFAULT
+                  </span>
+                )}
+              </button>
+            ))}
+            {filtered.length === 0 && (
+              <div className="px-3 py-4 text-xs text-gray-400 text-center">Tidak ditemukan</div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ canvas, selectedObject, refreshKey }) => {
     // Basic
     const [fillColor, setFillColor] = useState('#1a1a1a');
@@ -54,7 +136,7 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ canvas, selectedObjec
     const aspectRatio = useRef(1);
 
     // Text
-    const [fontFamily, setFontFamily] = useState('Inter');
+    const [fontFamily, setFontFamily] = useState('Plus Jakarta Sans');
     const [fontSize, setFontSize] = useState(48);
     const [fontSizeInput, setFontSizeInput] = useState('48');
     const [isBold, setIsBold] = useState(false);
@@ -280,16 +362,7 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ canvas, selectedObjec
                 <>
                     <div>
                         <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Font</label>
-                        <select
-                            value={fontFamily}
-                            onChange={(e) => handleFontChange(e.target.value)}
-                            className="w-full text-sm border border-gray-300 rounded-lg px-2 py-1.5 focus:border-primary focus:ring-1 focus:ring-primary outline-none"
-                            style={{ fontFamily }}
-                        >
-                            {GOOGLE_FONTS.map(f => (
-                                <option key={f} value={f} style={{ fontFamily: f }}>{f}</option>
-                            ))}
-                        </select>
+                        <FontPicker value={fontFamily} onChange={handleFontChange} />
                     </div>
 
                     <div>
