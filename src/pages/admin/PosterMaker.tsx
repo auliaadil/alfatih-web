@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Loader2, Sparkles, LayoutTemplate, Save, X, Image as ImageIcon } from 'lucide-react';
+import { Loader2, Sparkles, LayoutTemplate, Save, X, Plus } from 'lucide-react';
 import { applyTemplateContent, TemplateInputs, TemplateType } from '../../../services/posterAutofillService';
 import { fetchTemplate, fetchTemplates, saveTemplate, updateTemplate, SavedTemplate } from '../../services/posterTemplates';
-import { STARTER_TEMPLATES as ALL_STARTERS } from '../../components/admin/PosterMaker/TemplatePanel';
 import { supabase } from '../../lib/supabase';
 import { TourPackage } from '../../../types';
 import FabricCanvas, { FabricCanvasRef, CanvasSize } from '../../components/admin/PosterMaker/FabricCanvas';
@@ -16,8 +15,6 @@ import CanvasContextMenu from '../../components/admin/PosterMaker/CanvasContextM
 import AssetPanel from '../../components/admin/PosterMaker/AssetPanel';
 import { STARTER_TEMPLATES, PosterTemplate, TemplateThumbnail } from '../../components/admin/PosterMaker/TemplatePanel';
 import { FabricObject, FabricImage } from 'fabric';
-
-type ViewState = 'pick-template' | 'fill-content' | 'editing';
 
 const getTemplateType = (template: PosterTemplate): TemplateType => {
     if (template.id.includes('conversion')) return 'conversion';
@@ -140,19 +137,145 @@ const SaveModal: React.FC<SaveModalProps> = ({
     );
 };
 
+// ── New Design Modal ──────────────────────────────────────────────────────────
+interface NewDesignModalProps {
+    canDismiss: boolean;
+    starterOverrides: Map<string, SavedTemplate>;
+    customTemplates: SavedTemplate[];
+    onPickBlank: (size: CanvasSize) => void;
+    onPickStarter: (t: PosterTemplate) => void;
+    onPickCustom: (t: SavedTemplate) => void;
+    onClose: () => void;
+}
+
+const NewDesignModal: React.FC<NewDesignModalProps> = ({
+    canDismiss, starterOverrides, customTemplates,
+    onPickBlank, onPickStarter, onPickCustom, onClose,
+}) => {
+    const [size, setSize] = useState<CanvasSize>('post');
+    const visibleStarters = STARTER_TEMPLATES.filter(t => t.aspectRatio === size);
+    const visibleCustom = customTemplates.filter(t => t.aspect_ratio === size);
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl p-6 max-h-[90vh] flex flex-col">
+                <div className="flex items-center justify-between mb-5 flex-shrink-0">
+                    <h2 className="text-lg font-bold text-gray-900">Buat Desain Baru</h2>
+                    {canDismiss && (
+                        <button onClick={onClose} className="p-1 text-gray-400 hover:text-gray-600 transition">
+                            <X className="w-5 h-5" />
+                        </button>
+                    )}
+                </div>
+
+                {/* Size picker */}
+                <div className="flex-shrink-0 mb-5">
+                    <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-2">Ukuran Kanvas</p>
+                    <div className="flex gap-3">
+                        {(['post', 'story'] as const).map(s => (
+                            <button
+                                key={s}
+                                onClick={() => setSize(s)}
+                                className={`flex-1 border-2 rounded-xl p-3 text-center transition-all ${
+                                    size === s ? 'border-primary bg-emerald-50' : 'border-gray-200 hover:border-gray-300'
+                                }`}
+                            >
+                                <div className={`text-2xl font-black leading-none ${size === s ? 'text-primary' : 'text-gray-400'}`}>
+                                    {s === 'post' ? '4:5' : '9:16'}
+                                </div>
+                                <div className={`text-[10px] font-semibold mt-1 ${size === s ? 'text-primary' : 'text-gray-400'}`}>
+                                    {s === 'post' ? 'Post · 1080×1350' : 'Story · 1080×1920'}
+                                </div>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Template grid */}
+                <div className="flex-1 overflow-y-auto min-h-0">
+                    <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-3">Pilih Template</p>
+                    <div className="grid grid-cols-4 gap-3">
+                        {/* Blank canvas */}
+                        <button
+                            onClick={() => onPickBlank(size)}
+                            className="border-2 border-dashed border-primary rounded-xl bg-emerald-50 hover:bg-emerald-100 transition-all group flex flex-col items-center justify-center"
+                            style={{ aspectRatio: size === 'post' ? '4/5' : '9/16' }}
+                        >
+                            <Plus className="w-6 h-6 text-primary group-hover:scale-110 transition-transform" />
+                            <span className="text-[10px] font-bold text-primary mt-1 text-center leading-tight">
+                                Kanvas<br/>Kosong
+                            </span>
+                        </button>
+
+                        {/* Custom templates */}
+                        {visibleCustom.map(t => (
+                            <button
+                                key={t.id}
+                                onClick={() => onPickCustom(t)}
+                                className="rounded-xl border border-blue-200 hover:border-primary hover:shadow-md transition-all overflow-hidden bg-white"
+                                style={{ aspectRatio: size === 'post' ? '4/5' : '9/16' }}
+                                title={t.name}
+                            >
+                                {t.thumbnail_data_url
+                                    ? <img src={t.thumbnail_data_url} alt={t.name} className="w-full h-full object-cover" />
+                                    : <div className="w-full h-full bg-gray-100 flex items-center justify-center"><LayoutTemplate className="w-5 h-5 text-gray-300" /></div>
+                                }
+                            </button>
+                        ))}
+
+                        {/* Starter templates */}
+                        {visibleStarters.map(t => {
+                            const override = starterOverrides.get(t.id);
+                            return (
+                                <button
+                                    key={t.id}
+                                    onClick={() => onPickStarter(t)}
+                                    className="rounded-xl border border-gray-200 hover:border-primary hover:shadow-md transition-all overflow-hidden bg-white relative"
+                                    style={{ aspectRatio: size === 'post' ? '4/5' : '9/16' }}
+                                    title={t.name}
+                                >
+                                    {override?.thumbnail_data_url
+                                        ? <img src={override.thumbnail_data_url} alt={t.name} className="w-full h-full object-cover" />
+                                        : <TemplateThumbnail t={t} />
+                                    }
+                                    {override && (
+                                        <span className="absolute top-1 right-1 text-[8px] font-bold bg-primary text-white px-1.5 py-0.5 rounded-full leading-none">
+                                            Modified
+                                        </span>
+                                    )}
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+
+                <button
+                    onClick={() => onPickBlank(size)}
+                    className="mt-5 w-full py-3 bg-primary text-white rounded-xl text-sm font-bold hover:bg-emerald-700 transition flex-shrink-0"
+                >
+                    Mulai Mendesain →
+                </button>
+            </div>
+        </div>
+    );
+};
+
 // ── Main Component ────────────────────────────────────────────────────────────
 const PosterMaker: React.FC = () => {
     const canvasRef = useRef<FabricCanvasRef>(null);
     const location = useLocation();
 
-    const [viewState, setViewState] = useState<ViewState>('pick-template');
     const [loadedTemplate, setLoadedTemplate] = useState<PosterTemplate | null>(null);
     const [canvasSize, setCanvasSize] = useState<CanvasSize>('post');
+    const [isNewDesignModalOpen, setIsNewDesignModalOpen] = useState(true);
+    const [isFreehandActive, setIsFreehandActive] = useState(false);
+    const [brushColor, setBrushColor] = useState('#1a1a1a');
+    const [brushWidth, setBrushWidth] = useState(4);
     const [isExporting, setIsExporting] = useState(false);
     const [isGenerating, setIsGenerating] = useState(false);
     const [layerRefreshKey, setLayerRefreshKey] = useState(0);
     const [selectedObject, setSelectedObject] = useState<FabricObject | null>(null);
-    const [rightTab, setRightTab] = useState<'layers' | 'properties' | 'drafts' | 'assets'>('layers');
+    const [rightTab, setRightTab] = useState<'layers' | 'properties' | 'drafts' | 'assets' | 'ai'>('layers');
     const [canUndo, setCanUndo] = useState(false);
     const [canRedo, setCanRedo] = useState(false);
     const [propRefreshKey, setPropRefreshKey] = useState(0);
@@ -221,7 +344,7 @@ const PosterMaker: React.FC = () => {
                 setLoadedTemplate(posterTemplate);
                 setCanvasSize(t.aspect_ratio);
                 setTimeout(() => canvasRef.current?.loadTemplate(t.canvas_json), 200);
-                setViewState('editing');
+                setIsNewDesignModalOpen(false);
             });
             return;
         }
@@ -278,6 +401,11 @@ const PosterMaker: React.FC = () => {
                 canvasRef.current?.duplicateSelected();
             } else if (e.key === 'Delete' || e.key === 'Backspace') {
                 canvasRef.current?.deleteSelected();
+            } else if (e.key === 'Escape') {
+                if (canvasRef.current?.isFreehandMode()) {
+                    canvasRef.current.setFreehandMode(false);
+                    setIsFreehandActive(false);
+                }
             }
         };
         window.addEventListener('keydown', handleKeyDown);
@@ -330,18 +458,52 @@ const PosterMaker: React.FC = () => {
 
     const handleSizeChange = (size: CanvasSize) => setCanvasSize(size);
 
+    const handlePickBlank = (size: CanvasSize) => {
+        setLoadedTemplate(null);
+        setEditingTemplateId(null);
+        setEditingTemplateName('');
+        setLoadedStarterId(null);
+        setCanvasSize(size);
+        setTimeout(() => {
+            const canvas = canvasRef.current?.getCanvas();
+            if (canvas) {
+                canvas.clear();
+                canvas.backgroundColor = '#ffffff';
+                canvas.requestRenderAll();
+            }
+        }, 200);
+        setIsNewDesignModalOpen(false);
+    };
+
+    const handleToggleFreehand = () => {
+        const next = !isFreehandActive;
+        setIsFreehandActive(next);
+        canvasRef.current?.setFreehandMode(next);
+    };
+
+    const handleBrushColorChange = (color: string) => {
+        setBrushColor(color);
+        const canvas = canvasRef.current?.getCanvas();
+        if (canvas?.freeDrawingBrush) (canvas.freeDrawingBrush as any).color = color;
+    };
+
+    const handleBrushWidthChange = (width: number) => {
+        setBrushWidth(width);
+        const canvas = canvasRef.current?.getCanvas();
+        if (canvas?.freeDrawingBrush) (canvas.freeDrawingBrush as any).width = width;
+    };
+
     const handlePickTemplate = (template: PosterTemplate) => {
         setLoadedStarterId(template.id);
 
         const override = starterOverrides.get(template.id);
         if (override) {
-            // Load the saved override instead of the hardcoded template
             setLoadedTemplate(template);
             setCanvasSize(override.aspect_ratio);
             setEditingTemplateId(override.id);
             setEditingTemplateName(override.name);
             setTimeout(() => canvasRef.current?.loadTemplate(override.canvas_json), 200);
-            setViewState('editing');
+            setIsNewDesignModalOpen(false);
             return;
         }
 
@@ -351,7 +513,8 @@ const PosterMaker: React.FC = () => {
         setEditingTemplateName(template.name);
         setTimeout(() => canvasRef.current?.loadTemplate(template.json), 200);
         const type = getTemplateType(template);
-        setViewState(type === 'blank' ? 'editing' : 'fill-content');
+        if (type !== 'blank') setRightTab('ai');
+        setIsNewDesignModalOpen(false);
     };
 
     const handlePickCustomTemplate = (t: SavedTemplate) => {
@@ -361,15 +524,11 @@ const PosterMaker: React.FC = () => {
         setEditingTemplateId(t.id);
         setEditingTemplateName(t.name);
         setTimeout(() => canvasRef.current?.loadTemplate(t.canvas_json), 200);
-        setViewState('editing');
+        setIsNewDesignModalOpen(false);
     };
 
     const handleChangeTemplate = () => {
-        setLoadedTemplate(null);
-        setEditingTemplateId(null);
-        setEditingTemplateName('');
-        setLoadedStarterId(null);
-        setViewState('pick-template');
+        setIsNewDesignModalOpen(true);
     };
 
     const handleLoadDraft = (json: any) => {
@@ -380,7 +539,7 @@ const PosterMaker: React.FC = () => {
         setEditingTemplateId(null);
         setEditingTemplateName('');
         setLoadedStarterId(null);
-        setViewState('editing');
+        setIsNewDesignModalOpen(false);
     };
 
     const handleSelectionChange = (obj: FabricObject | null) => {
@@ -525,7 +684,6 @@ const PosterMaker: React.FC = () => {
 
             cr.requestRenderAll();
             refreshLayers();
-            setViewState('editing');
         } catch (e) {
             console.error(e);
             alert('Gagal menerapkan konten AI.');
@@ -535,87 +693,6 @@ const PosterMaker: React.FC = () => {
     };
 
     const templateType = useMemo(() => loadedTemplate ? getTemplateType(loadedTemplate) : null, [loadedTemplate]);
-    const postTemplates = useMemo(() => STARTER_TEMPLATES.filter(t => t.aspectRatio === 'post'), []);
-    const storyTemplates = useMemo(() => STARTER_TEMPLATES.filter(t => t.aspectRatio === 'story'), []);
-    const customPost = useMemo(() => customTemplates.filter(t => t.aspect_ratio === 'post'), [customTemplates]);
-    const customStory = useMemo(() => customTemplates.filter(t => t.aspect_ratio === 'story'), [customTemplates]);
-
-    const renderStarterGroup = (title: string, subtitle: string, templates: PosterTemplate[]) => (
-        <div className="mb-5">
-            <div className="mb-2">
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{title}</p>
-                <p className="text-[9px] text-gray-300 mt-0.5">{subtitle}</p>
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-                {templates.map(t => {
-                    const override = starterOverrides.get(t.id);
-                    return (
-                        <button
-                            key={t.id}
-                            onClick={() => handlePickTemplate(t)}
-                            className="text-left rounded-lg border hover:border-primary hover:shadow-md transition-all group overflow-hidden bg-white relative border-gray-200"
-                        >
-                            {override && (
-                                <span className="absolute top-1.5 right-1.5 z-10 text-[9px] font-bold bg-primary text-white px-1.5 py-0.5 rounded-full leading-none">
-                                    Modified
-                                </span>
-                            )}
-                            <div className="p-1.5">
-                                {override?.thumbnail_data_url ? (
-                                    <div className={`w-full overflow-hidden rounded ${t.aspectRatio === 'story' ? 'aspect-[9/16]' : 'aspect-[4/5]'}`}>
-                                        <img src={override.thumbnail_data_url} alt={t.name} className="w-full h-full object-cover" />
-                                    </div>
-                                ) : (
-                                    <TemplateThumbnail t={t} />
-                                )}
-                            </div>
-                            <div className="px-2 pb-2">
-                                <div className="text-[10px] font-bold text-gray-700 group-hover:text-primary leading-tight">{t.name}</div>
-                                <div className="text-[9px] text-gray-400 mt-0.5 leading-tight line-clamp-1">{t.description}</div>
-                            </div>
-                        </button>
-                    );
-                })}
-            </div>
-        </div>
-    );
-
-    const renderCustomGroup = (title: string, subtitle: string, templates: SavedTemplate[]) => {
-        if (templates.length === 0) return null;
-        return (
-            <div className="mb-5">
-                <div className="mb-2">
-                    <p className="text-[10px] font-bold text-primary uppercase tracking-wider">{title}</p>
-                    <p className="text-[9px] text-gray-300 mt-0.5">{subtitle}</p>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                    {templates.map(t => (
-                        <button
-                            key={t.id}
-                            onClick={() => handlePickCustomTemplate(t)}
-                            className="text-left rounded-lg border border-blue-200 hover:border-primary hover:shadow-md transition-all group overflow-hidden bg-white"
-                        >
-                            <div className={`w-full bg-gray-100 overflow-hidden ${t.aspect_ratio === 'story' ? 'aspect-[9/16]' : 'aspect-[4/5]'}`}>
-                                {t.thumbnail_data_url ? (
-                                    <img src={t.thumbnail_data_url} alt={t.name} className="w-full h-full object-cover" />
-                                ) : (
-                                    <div className="w-full h-full flex items-center justify-center">
-                                        <LayoutTemplate className="w-5 h-5 text-gray-300" />
-                                    </div>
-                                )}
-                            </div>
-                            <div className="px-2 py-1.5">
-                                <div className="text-[10px] font-bold text-gray-700 group-hover:text-primary leading-tight line-clamp-1">{t.name}</div>
-                                {t.description && (
-                                    <div className="text-[9px] text-gray-400 mt-0.5 leading-tight line-clamp-1">{t.description}</div>
-                                )}
-                            </div>
-                        </button>
-                    ))}
-                </div>
-            </div>
-        );
-    };
 
     const renderAiInputs = () => {
         switch (templateType) {
@@ -692,15 +769,22 @@ const PosterMaker: React.FC = () => {
                         Design marketing posters with a full canvas editor, AI-powered copy, and your package assets.
                     </p>
                 </div>
-                {viewState === 'editing' && (
+                <div className="flex items-center gap-3 flex-shrink-0">
+                    <button
+                        onClick={handleChangeTemplate}
+                        className="flex items-center gap-2 px-4 py-2 border-2 border-gray-300 text-gray-600 rounded-lg text-sm font-semibold hover:border-gray-400 transition"
+                    >
+                        <LayoutTemplate className="w-4 h-4" />
+                        Buat / Ganti Desain
+                    </button>
                     <button
                         onClick={() => setIsSaveModalOpen(true)}
-                        className="flex-shrink-0 flex items-center gap-2 px-4 py-2 border-2 border-primary text-primary rounded-lg text-sm font-semibold hover:bg-blue-50 transition"
+                        className="flex items-center gap-2 px-4 py-2 border-2 border-primary text-primary rounded-lg text-sm font-semibold hover:bg-blue-50 transition"
                     >
                         <Save className="w-4 h-4" />
                         {editingTemplateId ? 'Update / Simpan Template' : 'Simpan Template'}
                     </button>
-                )}
+                </div>
             </div>
 
             {/* Toolbar */}
@@ -711,7 +795,11 @@ const PosterMaker: React.FC = () => {
                 onAddRect={() => canvasRef.current?.addRect()}
                 onAddCircle={() => canvasRef.current?.addCircle()}
                 onAddLine={() => canvasRef.current?.addLine()}
+                onAddArrow={() => canvasRef.current?.addArrow()}
+                onToggleFreehand={handleToggleFreehand}
+                onAddDivider={() => canvasRef.current?.addDivider()}
                 onAddImage={handleAddImage}
+                isFreehandActive={isFreehandActive}
                 onDelete={() => canvasRef.current?.deleteSelected()}
                 onAlignLeft={() => canvasRef.current?.alignLeft()}
                 onAlignCenter={() => canvasRef.current?.alignCenter()}
@@ -731,108 +819,39 @@ const PosterMaker: React.FC = () => {
                 canRedo={canRedo}
             />
 
-            {/* Main Layout */}
+            {/* Main Layout — 9/3 */}
             <div className="grid grid-cols-1 lg:grid-cols-12 lg:grid-rows-1 gap-4 flex-1 min-h-0">
 
-                {/* Left Sidebar */}
-                <div className="lg:col-span-3 lg:h-full overflow-y-auto">
-                    {viewState === 'pick-template' ? (
-                        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-                            <div className="flex items-center gap-2 mb-4">
-                                <LayoutTemplate className="w-4 h-4 text-gray-500" />
-                                <div>
-                                    <h3 className="text-sm font-semibold text-gray-800">Pilih Template</h3>
-                                    <p className="text-[10px] text-gray-400">Klik untuk mulai dengan template</p>
-                                </div>
+                {/* Center: Canvas (col-span-9) */}
+                <div className="lg:col-span-9 lg:h-full flex flex-col relative">
+
+                    {/* Freehand brush strip */}
+                    {isFreehandActive && (
+                        <div className="flex items-center gap-4 px-4 py-2 bg-violet-50 border border-violet-200 rounded-lg mb-2 flex-shrink-0">
+                            <span className="text-xs font-semibold text-violet-700 flex items-center gap-1.5">
+                                ✏️ Mode Gambar Bebas
+                            </span>
+                            <div className="flex items-center gap-2">
+                                <label className="text-xs text-violet-600">Warna</label>
+                                <input
+                                    type="color"
+                                    value={brushColor}
+                                    onChange={e => handleBrushColorChange(e.target.value)}
+                                    className="w-7 h-7 rounded border border-violet-200 cursor-pointer p-0"
+                                />
                             </div>
-
-                            {/* Custom templates first (if any) */}
-                            {renderCustomGroup('Template Tersimpan · Post', '1080 × 1350 px', customPost)}
-                            {renderCustomGroup('Template Tersimpan · Story', '1080 × 1920 px', customStory)}
-
-                            {/* Starter templates */}
-                            {renderStarterGroup('Starter · Post (4:5)', '1080 × 1350 px', postTemplates)}
-                            {renderStarterGroup('Starter · Story (9:16)', '1080 × 1920 px', storyTemplates)}
-                        </div>
-                    ) : (
-                        <div className="space-y-3">
-                            {/* Active template badge */}
-                            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-3">
-                                {loadedTemplate ? (
-                                    <>
-                                        <div className="flex items-center justify-between mb-2">
-                                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
-                                                {editingTemplateId ? 'Mengedit Template' : 'Template Aktif'}
-                                            </span>
-                                            <button onClick={handleChangeTemplate} className="text-[10px] font-semibold text-primary hover:underline">Ganti</button>
-                                        </div>
-                                        <div className="flex items-center gap-2.5">
-                                            <div className="w-10 flex-shrink-0">
-                                                {editingTemplateId ? (
-                                                    <div className="aspect-[4/5] bg-gray-100 rounded overflow-hidden flex items-center justify-center">
-                                                        <LayoutTemplate className="w-4 h-4 text-gray-300" />
-                                                    </div>
-                                                ) : (
-                                                    <TemplateThumbnail t={loadedTemplate} />
-                                                )}
-                                            </div>
-                                            <div>
-                                                <div className="text-sm font-semibold text-gray-800 leading-tight">{loadedTemplate.name}</div>
-                                                <div className="text-[10px] text-gray-400">
-                                                    {loadedTemplate.aspectRatio === 'post' ? 'Post 4:5' : 'Story 9:16'}
-                                                    {editingTemplateId && <span className="ml-1 text-primary font-semibold">· Custom</span>}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </>
-                                ) : (
-                                    <button
-                                        onClick={handleChangeTemplate}
-                                        className="w-full text-sm text-primary font-semibold flex items-center justify-center gap-1.5 py-1 hover:underline"
-                                    >
-                                        <LayoutTemplate className="w-3.5 h-3.5" />
-                                        Ganti Template
-                                    </button>
-                                )}
+                            <div className="flex items-center gap-2">
+                                <label className="text-xs text-violet-600">Ukuran: {brushWidth}px</label>
+                                <input
+                                    type="range" min={2} max={40} value={brushWidth}
+                                    onChange={e => handleBrushWidthChange(parseInt(e.target.value))}
+                                    className="w-24 accent-violet-600"
+                                />
                             </div>
-
-                            {/* AI Content panel */}
-                            {loadedTemplate && templateType !== 'blank' && !editingTemplateId && (
-                                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-                                    <h3 className="text-sm font-semibold text-gray-800 mb-3 flex items-center gap-1.5">
-                                        <Sparkles className="w-3.5 h-3.5 text-primary" />
-                                        {viewState === 'fill-content' ? 'Isi Konten' : 'AI Content'}
-                                    </h3>
-                                    <div className="space-y-3">
-                                        {renderAiInputs()}
-                                        <button
-                                            onClick={handleGenerateAndApply}
-                                            disabled={isGenerating}
-                                            className="w-full flex items-center justify-center gap-2 py-2.5 bg-primary text-white rounded-lg text-sm font-semibold hover:bg-blue-600 transition disabled:opacity-50"
-                                        >
-                                            {isGenerating
-                                                ? <Loader2 className="w-4 h-4 animate-spin" />
-                                                : <Sparkles className="w-4 h-4" />
-                                            }
-                                            {viewState === 'fill-content' ? 'Generate & Terapkan' : 'Update Konten'}
-                                        </button>
-                                        {viewState === 'fill-content' && (
-                                            <button
-                                                onClick={() => setViewState('editing')}
-                                                className="w-full text-center text-sm text-gray-400 hover:text-gray-600 transition"
-                                            >
-                                                Lewati →
-                                            </button>
-                                        )}
-                                    </div>
-                                </div>
-                            )}
+                            <span className="text-xs text-violet-400 ml-auto">Tekan Esc untuk keluar</span>
                         </div>
                     )}
-                </div>
 
-                {/* Center: Canvas */}
-                <div className="lg:col-span-6 lg:h-full flex flex-col relative">
                     <div
                         className="flex-1 min-h-0 flex flex-col"
                         onContextMenu={e => { e.preventDefault(); setContextMenu({ x: e.clientX, y: e.clientY }); }}
@@ -863,17 +882,9 @@ const PosterMaker: React.FC = () => {
                             canvasRef.current?.setZoom(fit);
                         }}
                     />
-                    {viewState === 'pick-template' && (
-                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                            <div className="bg-white/80 backdrop-blur-sm rounded-xl px-6 py-4 text-center shadow-lg border border-gray-100">
-                                <LayoutTemplate className="w-8 h-8 text-gray-300 mx-auto mb-2" />
-                                <p className="text-sm font-semibold text-gray-500">Pilih template untuk memulai</p>
-                            </div>
-                        </div>
-                    )}
                 </div>
 
-                {/* Right Sidebar */}
+                {/* Right Sidebar (col-span-3) */}
                 <div className="lg:col-span-3 lg:h-full">
                     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col h-full">
                         <div className="flex border-b border-gray-200 overflow-x-auto flex-shrink-0">
@@ -881,14 +892,27 @@ const PosterMaker: React.FC = () => {
                                 <button
                                     key={tab}
                                     onClick={() => setRightTab(tab)}
-                                    className={`flex-1 py-2.5 text-xs font-semibold capitalize transition whitespace-nowrap ${rightTab === tab
-                                        ? 'text-primary border-b-2 border-primary bg-blue-50/50'
-                                        : 'text-gray-500 hover:text-gray-700'
+                                    className={`flex-1 py-2.5 text-xs font-semibold capitalize transition whitespace-nowrap ${
+                                        rightTab === tab
+                                            ? 'text-primary border-b-2 border-primary bg-blue-50/50'
+                                            : 'text-gray-500 hover:text-gray-700'
                                     }`}
                                 >
                                     {tab}
                                 </button>
                             ))}
+                            {loadedTemplate && templateType !== 'blank' && !editingTemplateId && (
+                                <button
+                                    onClick={() => setRightTab('ai')}
+                                    className={`flex-1 py-2.5 text-xs font-semibold transition whitespace-nowrap ${
+                                        rightTab === 'ai'
+                                            ? 'text-primary border-b-2 border-primary bg-blue-50/50'
+                                            : 'text-gray-500 hover:text-gray-700'
+                                    }`}
+                                >
+                                    ✦ AI
+                                </button>
+                            )}
                         </div>
                         <div className="p-4 overflow-y-auto flex-1 min-h-0">
                             {rightTab === 'layers' && (
@@ -905,15 +929,33 @@ const PosterMaker: React.FC = () => {
                                 />
                             )}
                             {rightTab === 'assets' && (
-                                <AssetPanel
-                                    onAddImage={url => canvasRef.current?.addImageFromUrl(url)}
-                                />
+                                <AssetPanel onAddImage={url => canvasRef.current?.addImageFromUrl(url)} />
                             )}
                             {rightTab === 'drafts' && (
                                 <DraftPanel
                                     canvas={canvasRef.current?.getCanvas() || null}
                                     onLoadDraft={handleLoadDraft}
                                 />
+                            )}
+                            {rightTab === 'ai' && loadedTemplate && templateType !== 'blank' && (
+                                <div className="space-y-3">
+                                    <h3 className="text-sm font-semibold text-gray-800 flex items-center gap-1.5">
+                                        <Sparkles className="w-3.5 h-3.5 text-primary" />
+                                        AI Content
+                                    </h3>
+                                    {renderAiInputs()}
+                                    <button
+                                        onClick={handleGenerateAndApply}
+                                        disabled={isGenerating}
+                                        className="w-full flex items-center justify-center gap-2 py-2.5 bg-primary text-white rounded-lg text-sm font-semibold hover:bg-blue-600 transition disabled:opacity-50"
+                                    >
+                                        {isGenerating
+                                            ? <Loader2 className="w-4 h-4 animate-spin" />
+                                            : <Sparkles className="w-4 h-4" />
+                                        }
+                                        Generate & Terapkan
+                                    </button>
+                                </div>
                             )}
                         </div>
                     </div>
@@ -930,6 +972,19 @@ const PosterMaker: React.FC = () => {
                     onSaveNew={handleSaveNew}
                     onUpdate={handleUpdate}
                     onClose={() => setIsSaveModalOpen(false)}
+                />
+            )}
+
+            {/* New Design Modal */}
+            {isNewDesignModalOpen && (
+                <NewDesignModal
+                    canDismiss={loadedTemplate !== null || editingTemplateId !== null}
+                    starterOverrides={starterOverrides}
+                    customTemplates={customTemplates}
+                    onPickBlank={handlePickBlank}
+                    onPickStarter={handlePickTemplate}
+                    onPickCustom={handlePickCustomTemplate}
+                    onClose={() => setIsNewDesignModalOpen(false)}
                 />
             )}
 
