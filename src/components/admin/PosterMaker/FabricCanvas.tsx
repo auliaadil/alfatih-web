@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useImperativeHandle, forwardRef, useState } from 'react';
-import { Canvas, Rect, Textbox, Circle, Line, FabricImage, FabricObject } from 'fabric';
+import { Canvas, Rect, Textbox, Circle, Line, Path, PencilBrush, FabricImage, FabricObject } from 'fabric';
 import { installSceneSnap } from './fabricSnap';
 
 export type CanvasSize = 'post' | 'story';
@@ -8,6 +8,21 @@ const CANVAS_DIMENSIONS: Record<CanvasSize, { width: number; height: number }> =
     post: { width: 1080, height: 1350 },
     story: { width: 1080, height: 1920 },
 };
+
+function buildWavyPath(w: number): string {
+  const seg = 8;
+  const segW = w / seg;
+  const amp = 20;
+  let d = `M 0 0`;
+  for (let i = 0; i < seg; i++) {
+    const x1 = i * segW + segW / 4;
+    const x2 = i * segW + (3 * segW) / 4;
+    const x3 = (i + 1) * segW;
+    const y = i % 2 === 0 ? -amp : amp;
+    d += ` C ${x1} ${y} ${x2} ${y} ${x3} 0`;
+  }
+  return d;
+}
 
 export interface FabricCanvasRef {
     getCanvas: () => Canvas | null;
@@ -35,6 +50,10 @@ export interface FabricCanvasRef {
     getFitScale: () => number;
     undo: () => void;
     redo: () => void;
+    addArrow: () => void;
+    addDivider: () => void;
+    setFreehandMode: (enabled: boolean) => void;
+    isFreehandMode: () => boolean;
 }
 
 interface FabricCanvasProps {
@@ -60,6 +79,7 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
         const history = useRef<object[]>([]);
         const historyIndex = useRef<number>(-1);
         const isHistoryProcessing = useRef(false);
+        const freehandRef = useRef(false);
 
         const updateHistoryState = () => {
             if (onHistoryChange) {
@@ -155,7 +175,7 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
                 if (!c) return;
                 const tb = new Textbox(text || 'Edit this text', {
                     left: 100, top: 100, originX: 'left', originY: 'top',
-                    width: 500, fontSize: 48, fontFamily: 'Inter, sans-serif',
+                    width: 500, fontSize: 48, fontFamily: 'Plus Jakarta Sans, sans-serif',
                     fill: '#1a1a1a', fontWeight: '700', editable: true,
                 });
                 c.add(tb);
@@ -197,6 +217,61 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
                 c.setActiveObject(line);
                 c.requestRenderAll();
             },
+
+            addArrow: () => {
+                const c = fabricRef.current;
+                if (!c) return;
+                const arrowPath = 'M 0 15 L 250 15 L 250 0 L 300 20 L 250 40 L 250 25 L 0 25 Z';
+                const arrow = new Path(arrowPath, {
+                    left: (c.width ?? 1080) / 2 - 150,
+                    top: (c.height ?? 1350) / 2 - 20,
+                    fill: '#1a1a1a',
+                    stroke: '',
+                    strokeWidth: 0,
+                    originX: 'left',
+                    originY: 'top',
+                });
+                c.add(arrow);
+                c.setActiveObject(arrow);
+                c.requestRenderAll();
+            },
+
+            addDivider: () => {
+                const c = fabricRef.current;
+                if (!c) return;
+                const w = (c.width ?? 1080) * 0.8;
+                const divider = new Path(buildWavyPath(w), {
+                    left: (c.width ?? 1080) * 0.1,
+                    top: (c.height ?? 1350) / 2,
+                    stroke: '#1a1a1a',
+                    strokeWidth: 4,
+                    fill: '',
+                    strokeLineCap: 'round',
+                    strokeLineJoin: 'round',
+                    originX: 'left',
+                    originY: 'center',
+                });
+                c.add(divider);
+                c.setActiveObject(divider);
+                c.requestRenderAll();
+            },
+
+            setFreehandMode: (enabled: boolean) => {
+                const c = fabricRef.current;
+                if (!c) return;
+                freehandRef.current = enabled;
+                c.isDrawingMode = enabled;
+                if (enabled) {
+                    const brush = new PencilBrush(c);
+                    brush.color = '#1a1a1a';
+                    brush.width = 4;
+                    c.freeDrawingBrush = brush;
+                } else {
+                    c.selection = true;
+                }
+            },
+
+            isFreehandMode: () => freehandRef.current,
 
             addImageFromUrl: (url: string) => {
                 const c = fabricRef.current;
