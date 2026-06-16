@@ -38,6 +38,7 @@ interface EditorToolbarProps {
     onToggleFreehand: () => void;
     onAddDivider: () => void;
     isFreehandActive: boolean;
+    activeDrawTool: string | null;
 }
 
 const ToolBtn: React.FC<{
@@ -74,7 +75,8 @@ const EditorToolbar: React.FC<EditorToolbarProps> = ({
     onCopy, onPaste, onDuplicate,
     onExport, onSetCanvasSize,
     onUndo, onRedo, canUndo, canRedo,
-    onAddArrow, onToggleFreehand, onAddDivider, isFreehandActive
+    onAddArrow, onToggleFreehand, onAddDivider, isFreehandActive,
+    activeDrawTool,
 }) => {
     return (
         <div className="bg-white border border-gray-200 rounded-xl shadow-sm px-3 py-2 flex items-center gap-1 flex-wrap flex-shrink-0">
@@ -97,10 +99,10 @@ const EditorToolbar: React.FC<EditorToolbarProps> = ({
 
             {/* Insert Tools */}
             <ToolBtn onClick={onAddText} title="Add Text"><Type className="w-4 h-4" /></ToolBtn>
-            <ToolBtn onClick={onAddRect} title="Add Rectangle"><Square className="w-4 h-4" /></ToolBtn>
-            <ToolBtn onClick={onAddCircle} title="Add Circle"><Circle className="w-4 h-4" /></ToolBtn>
-            <ToolBtn onClick={onAddLine} title="Add Line"><Minus className="w-4 h-4" /></ToolBtn>
-            <ToolBtn onClick={onAddArrow} title="Tambah Panah"><MoveRight className="w-4 h-4" /></ToolBtn>
+            <ToolBtn onClick={onAddRect}    title="Add Rectangle"            active={activeDrawTool === 'rect'    || undefined}><Square className="w-4 h-4" /></ToolBtn>
+            <ToolBtn onClick={onAddCircle}  title="Add Circle"               active={activeDrawTool === 'circle'  || undefined}><Circle className="w-4 h-4" /></ToolBtn>
+            <ToolBtn onClick={onAddLine}    title="Add Line"                 active={activeDrawTool === 'line'    || undefined}><Minus className="w-4 h-4" /></ToolBtn>
+            <ToolBtn onClick={onAddArrow}   title="Tambah Panah"             active={activeDrawTool === 'arrow'   || undefined}><MoveRight className="w-4 h-4" /></ToolBtn>
             <ToolBtn
                 onClick={onToggleFreehand}
                 title="Gambar Bebas (Freehand)"
@@ -108,7 +110,7 @@ const EditorToolbar: React.FC<EditorToolbarProps> = ({
             >
                 <Pencil className="w-4 h-4" />
             </ToolBtn>
-            <ToolBtn onClick={onAddDivider} title="Tambah Divider Dekoratif"><Waves className="w-4 h-4" /></ToolBtn>
+            <ToolBtn onClick={onAddDivider} title="Tambah Divider Dekoratif" active={activeDrawTool === 'divider' || undefined}><Waves className="w-4 h-4" /></ToolBtn>
             <ToolBtn onClick={onAddImage} title="Add Image"><ImagePlus className="w-4 h-4" /></ToolBtn>
 
             <Divider />
