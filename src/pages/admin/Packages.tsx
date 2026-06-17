@@ -8,6 +8,7 @@ import {
     SearchInput, Pagination,
 } from '../../components/admin/ui';
 import PackageDetailModal from './PackageDetailModal';
+import PackageDetailPanel from './PackageDetailPanel';
 
 const PAGE_SIZE = 12;
 
@@ -19,6 +20,9 @@ const Packages: React.FC = () => {
 
     const [isDetailOpen, setIsDetailOpen] = useState(false);
     const [selectedPackage, setSelectedPackage] = useState<any | null>(null);
+
+    const [isPanelOpen, setIsPanelOpen] = useState(false);
+    const [panelPackage, setPanelPackage] = useState<any | null>(null);
 
     const [deleteId, setDeleteId] = useState<string | null>(null);
     const [deleting, setDeleting] = useState(false);
@@ -173,11 +177,11 @@ const Packages: React.FC = () => {
                                     {/* Actions */}
                                     <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
                                         <button
-                                            onClick={() => { setSelectedPackage(pkg); setIsDetailOpen(true); }}
+                                            onClick={() => { setPanelPackage(pkg); setIsPanelOpen(true); }}
                                             className="flex items-center gap-1.5 text-xs font-semibold text-primary hover:text-blue-700 transition-colors"
                                         >
                                             <Users className="w-3.5 h-3.5" />
-                                            Participants
+                                            Detail
                                         </button>
                                         <div className="flex items-center gap-1">
                                             <button
@@ -211,6 +215,13 @@ const Packages: React.FC = () => {
                 <PackageDetailModal
                     pkg={selectedPackage}
                     onClose={() => { setIsDetailOpen(false); setSelectedPackage(null); }}
+                />
+            )}
+
+            {isPanelOpen && panelPackage && (
+                <PackageDetailPanel
+                    pkg={panelPackage}
+                    onClose={() => { setIsPanelOpen(false); setPanelPackage(null); }}
                 />
             )}
 
