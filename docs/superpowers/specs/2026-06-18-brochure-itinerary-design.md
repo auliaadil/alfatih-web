@@ -77,6 +77,12 @@ If both are present:
    > *"Mode Brosur aktif — pilih template lalu klik AI Autofill untuk mengisi otomatis dari paket ini."*
 3. Auto-open the template picker panel (`setShowTemplatePanel(true)` or equivalent) so the user lands directly on template selection.
 
+**No-template empty state:** `STARTER_TEMPLATES` is currently empty and user-saved templates may not exist yet. When brochure mode opens and no templates are available (neither starter nor saved), the template picker must show a clear empty state instead of a blank panel:
+
+> *"Belum ada template tersedia. Buat dan simpan template brosur di Poster Maker terlebih dahulu, lalu coba lagi."*
+
+The user can still dismiss the banner and work on a blank canvas if they choose. Template creation is **out of scope** for this feature — templates will be built separately.
+
 No changes to autofill logic, template rendering, or export. The existing `exportPng()` → download flow is the brochure output.
 
 ## 3. Itinerary PDF — Edge Function
