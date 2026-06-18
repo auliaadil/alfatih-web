@@ -7,7 +7,6 @@ import {
     btnPrimary, btnGhost, useToast, StatusBadge,
     SearchInput, Pagination,
 } from '../../components/admin/ui';
-import PackageDetailModal from './PackageDetailModal';
 import PackageDetailPanel from './PackageDetailPanel';
 
 const PAGE_SIZE = 12;
@@ -17,9 +16,6 @@ const Packages: React.FC = () => {
     const navigate = useNavigate();
     const [packages, setPackages] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-
-    const [isDetailOpen, setIsDetailOpen] = useState(false);
-    const [selectedPackage, setSelectedPackage] = useState<any | null>(null);
 
     const [isPanelOpen, setIsPanelOpen] = useState(false);
     const [panelPackage, setPanelPackage] = useState<any | null>(null);
@@ -209,13 +205,6 @@ const Packages: React.FC = () => {
 
             {!loading && (
                 <Pagination page={page} totalItems={filtered.length} pageSize={PAGE_SIZE} onPageChange={setPage} />
-            )}
-
-            {isDetailOpen && selectedPackage && (
-                <PackageDetailModal
-                    pkg={selectedPackage}
-                    onClose={() => { setIsDetailOpen(false); setSelectedPackage(null); }}
-                />
             )}
 
             {isPanelOpen && panelPackage && (
