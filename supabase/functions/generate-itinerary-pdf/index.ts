@@ -22,7 +22,6 @@ const COLOR_PRIMARY = rgb(0 / 255, 132 / 255, 255 / 255);   // #0084FF
 const COLOR_SECONDARY = rgb(245 / 255, 158 / 255, 11 / 255); // #F59E0B
 const COLOR_DARK = rgb(15 / 255, 23 / 255, 42 / 255);        // #0F172A
 const COLOR_GRAY = rgb(107 / 255, 114 / 255, 128 / 255);     // gray-500
-const COLOR_LIGHT_BG = rgb(248 / 255, 250 / 255, 252 / 255); // slate-50
 const COLOR_WHITE = rgb(1, 1, 1);
 
 interface DrawContext {
@@ -165,7 +164,7 @@ async function buildItineraryPdf(
 
         for (const day of itinerary) {
             // Day header
-            const dayLabel = `Hari ${day.day}${day.title ? ` — ${day.title}` : ''}`;
+            const dayLabel = `Hari ${day.day}${day.title ? ` - ${day.title}` : ''}`;
             // Add extra spacing and a new page check before each day
             if (ctx.y < MARGIN + 60) {
                 ctx.page = ctx.doc.addPage([PAGE_W, PAGE_H]);
@@ -199,7 +198,7 @@ async function buildItineraryPdf(
             if ((list as any[]).length === 0) continue;
             drawText(ctx, label, { fontSize: 9, bold: true, color: COLOR_GRAY });
             for (const h of list as any[]) {
-                const stars = '★'.repeat(h.stars || 0);
+                const stars = '*'.repeat(h.stars || 0);
                 drawText(ctx, `${h.name}${stars ? `  ${stars}` : ''}`, { fontSize: 10, bold: false, color: COLOR_DARK, indent: 8 });
             }
             ctx.y -= 4;
@@ -213,6 +212,11 @@ async function buildItineraryPdf(
         drawSectionHeader(ctx, 'Harga Paket');
         ctx.y -= 4;
 
+        // Ensure at least 50pt of space before drawing pricing columns
+        if (ctx.y < MARGIN + 50) {
+            ctx.page = ctx.doc.addPage([PAGE_W, PAGE_H]);
+            ctx.y = PAGE_H - MARGIN;
+        }
         const colW = CONTENT_W / Math.max(roomOptions.length, 1);
         for (let i = 0; i < roomOptions.length; i++) {
             const opt = roomOptions[i];
@@ -258,7 +262,7 @@ async function buildItineraryPdf(
     if (siteSettings.phone) {
         ctx.page.drawText(`Telp: ${siteSettings.phone}`, { x: MARGIN, y: 36, size: 9, font, color: rgb(0.8, 0.9, 1) });
     }
-    ctx.page.drawText('Alfatih Dunia Wisata — adwisata.com', { x: MARGIN, y: 18, size: 8, font, color: rgb(0.7, 0.8, 0.9) });
+    ctx.page.drawText('Alfatih Dunia Wisata - adwisata.com', { x: MARGIN, y: 18, size: 8, font, color: rgb(0.7, 0.8, 0.9) });
 
     return doc.save();
 }
