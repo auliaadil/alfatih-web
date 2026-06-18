@@ -3,9 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { X, Image, FileDown, Loader2, Users } from 'lucide-react';
 import { supabase } from '@/src/lib/supabase';
 import { useSiteSettings } from '../../contexts/SiteSettingsContext';
-
-// TODO: replace with real import after Task 4
-const downloadItineraryPdf = async (..._args: any[]) => { alert('PDF coming soon'); };
+import { downloadItineraryPdf } from '../../../services/itineraryPdfService';
 
 interface PackageDetailPanelProps {
     pkg: any;
