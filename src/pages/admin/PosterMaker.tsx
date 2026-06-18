@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import { Loader2, Sparkles, LayoutTemplate, Save, X, Plus } from 'lucide-react';
 import { applyTemplateContent, TemplateInputs, TemplateType } from '../../../services/posterAutofillService';
 import { fetchTemplate, fetchTemplates, saveTemplate, updateTemplate, SavedTemplate } from '../../services/posterTemplates';
@@ -282,10 +282,12 @@ const PosterMaker: React.FC = () => {
     const [isGenerating, setIsGenerating] = useState(false);
     const [layerRefreshKey, setLayerRefreshKey] = useState(0);
     const [selectedObject, setSelectedObject] = useState<FabricObject | null>(null);
-    const [rightTab, setRightTab] = useState<'layers' | 'properties' | 'drafts' | 'assets' | 'ai'>('layers');
+    const [rightTab, setRightTab] = useState<'layers' | 'properties' | 'drafts' | 'assets' | 'ai'>('drafts');
     const [canUndo, setCanUndo] = useState(false);
     const [canRedo, setCanRedo] = useState(false);
     const [propRefreshKey, setPropRefreshKey] = useState(0);
+    const [draftName, setDraftName] = useState('');
+    const [draftRefreshKey, setDraftRefreshKey] = useState(0);
 
     // Zoom
     const [zoom, setZoom] = useState(0.35);
@@ -325,10 +327,29 @@ const PosterMaker: React.FC = () => {
     const [packages, setPackages] = useState<TourPackage[]>([]);
     const [selectedPackageId, setSelectedPackageId] = useState<string>('');
 
+    const [searchParams] = useSearchParams();
+    const [isBrochureBannerVisible, setIsBrochureBannerVisible] = useState(false);
+
+    const brochurePackageId = searchParams.get('packageId');
+    const isBrochureMode = searchParams.get('mode') === 'brochure';
+
     useEffect(() => {
         fetchPackages();
         loadCustomTemplates();
     }, []);
+
+    useEffect(() => {
+        if (!isBrochureMode || !brochurePackageId) return;
+
+        // Wait for packages to be loaded by the existing fetchPackages effect
+        if (packages.length === 0) return;
+
+        const found = packages.find(p => p.id === brochurePackageId);
+        if (found) {
+            setSelectedPackageId(found.id);
+            setIsBrochureBannerVisible(true);
+        }
+    }, [isBrochureMode, brochurePackageId, packages]);
 
     useEffect(() => {
         document.body.style.overflow = 'hidden';
@@ -493,6 +514,7 @@ const PosterMaker: React.FC = () => {
         if (next) {
             canvasRef.current?.cancelDraw();
             setActiveDrawTool(null);
+            setRightTab('properties');
         }
         setIsFreehandActive(next);
         canvasRef.current?.setFreehandMode(next);
@@ -503,6 +525,20 @@ const PosterMaker: React.FC = () => {
                 (canvas.freeDrawingBrush as any).width = brushWidth;
             }
         }
+    };
+
+    const handleSaveDraft = () => {
+        const canvas = canvasRef.current?.getCanvas();
+        if (!canvas) return;
+        const name = draftName.trim() || `Draft ${new Date().toLocaleString('id-ID')}`;
+        const json = canvas.toJSON();
+        const thumbnail = canvas.toDataURL({ format: 'jpeg', quality: 0.5, multiplier: 0.2 });
+        const newDraft = { id: Date.now().toString(), name, thumbnail, json, created_at: Date.now() };
+        const saved = localStorage.getItem('alfatih_poster_drafts');
+        const existing: any[] = saved ? JSON.parse(saved) : [];
+        localStorage.setItem('alfatih_poster_drafts', JSON.stringify([newDraft, ...existing]));
+        setDraftName('');
+        setDraftRefreshKey(k => k + 1);
     };
 
     const handleBrushColorChange = (color: string) => {
@@ -574,7 +610,8 @@ const PosterMaker: React.FC = () => {
         setSelectedObject(obj);
         refreshLayers();
         setPropRefreshKey(k => k + 1);
-        if (obj) setRightTab('properties');
+        const isMultiSelect = (canvasRef.current?.getCanvas()?.getActiveObjects()?.length ?? 0) > 1;
+        if (obj && !isMultiSelect) setRightTab('properties');
     };
 
     const handleObjectTransforming = (obj: FabricObject) => {
@@ -798,6 +835,23 @@ const PosterMaker: React.FC = () => {
                     </p>
                 </div>
                 <div className="flex items-center gap-3 flex-shrink-0">
+                    <div className="flex items-center gap-1.5">
+                        <input
+                            type="text"
+                            value={draftName}
+                            onChange={e => setDraftName(e.target.value)}
+                            onKeyDown={e => e.key === 'Enter' && handleSaveDraft()}
+                            placeholder="Nama draft..."
+                            className="text-xs border border-gray-300 rounded-lg px-3 py-2 w-36 focus:ring-primary focus:border-primary"
+                        />
+                        <button
+                            onClick={handleSaveDraft}
+                            className="flex items-center gap-1.5 px-3 py-2 border-2 border-gray-300 text-gray-600 rounded-lg text-sm font-semibold hover:border-gray-400 transition"
+                        >
+                            <Save className="w-4 h-4" />
+                            Simpan Draft
+                        </button>
+                    </div>
                     <button
                         onClick={handleChangeTemplate}
                         className="flex items-center gap-2 px-4 py-2 border-2 border-gray-300 text-gray-600 rounded-lg text-sm font-semibold hover:border-gray-400 transition"
@@ -847,6 +901,22 @@ const PosterMaker: React.FC = () => {
                 canUndo={canUndo}
                 canRedo={canRedo}
             />
+
+            {isBrochureMode && isBrochureBannerVisible && (
+                <div className="flex items-center justify-between gap-3 px-4 py-2 bg-blue-50 border-b border-blue-200 text-sm flex-shrink-0">
+                    <p className="text-blue-800">
+                        <span className="font-semibold">Mode Brosur aktif</span> — pilih template lalu klik{' '}
+                        <span className="font-semibold">AI Autofill</span> untuk mengisi otomatis dari paket ini.
+                    </p>
+                    <button
+                        onClick={() => setIsBrochureBannerVisible(false)}
+                        className="flex-shrink-0 text-blue-400 hover:text-blue-600 transition"
+                        title="Tutup banner"
+                    >
+                        <X className="w-4 h-4" />
+                    </button>
+                </div>
+            )}
 
             {/* Main Layout — 9/3 */}
             <div className="grid grid-cols-1 lg:grid-cols-12 lg:grid-rows-1 gap-4 flex-1 min-h-0">
@@ -971,8 +1041,8 @@ const PosterMaker: React.FC = () => {
                             )}
                             {rightTab === 'drafts' && (
                                 <DraftPanel
-                                    canvas={canvasRef.current?.getCanvas() || null}
                                     onLoadDraft={handleLoadDraft}
+                                    refreshKey={draftRefreshKey}
                                 />
                             )}
                             {rightTab === 'ai' && loadedTemplate && templateType !== 'blank' && (
