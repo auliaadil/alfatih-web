@@ -33,7 +33,8 @@ export const applyTemplateContent = async (
     })
 
     if (!res.ok) return textNodes
-    return await res.json()
+    const result = await res.json()
+    return Array.isArray(result) ? result : textNodes
   } catch (err) {
     console.error('posterAutofillService error:', err)
     return textNodes

@@ -57,6 +57,7 @@ export interface FabricCanvasRef {
     setFreehandMode: (enabled: boolean) => void;
     isFreehandMode: () => boolean;
     cancelDraw: () => void;
+    setPanMode?: (enabled: boolean) => void;
 }
 
 interface FabricCanvasProps {
@@ -89,6 +90,12 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
         const drawModeRef    = useRef<'rect' | 'circle' | 'line' | 'arrow' | 'divider' | null>(null);
         const drawStartRef   = useRef<{ x: number; y: number } | null>(null);
         const previewObjectRef = useRef<FabricObject | null>(null);
+        
+        const panModeRef = useRef(false);
+        const spacePressedRef = useRef(false);
+        const isDraggingRef = useRef(false);
+        const lastClientPosRef = useRef({ x: 0, y: 0 });
+        const bgDragActiveRef = useRef(false);
 
         const updateHistoryState = () => {
             if (onHistoryChange) {
@@ -152,6 +159,16 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
             canvas.on('object:moving', (e) => { if (e.target) onObjectTransforming?.(e.target as FabricObject); });
 
             canvas.on('mouse:down', (e) => {
+                const isPan = panModeRef.current || spacePressedRef.current;
+                if (isPan) {
+                    isDraggingRef.current = true;
+                    lastClientPosRef.current = { x: e.e.clientX, y: e.e.clientY };
+                    canvas.defaultCursor = 'grabbing';
+                    canvas.hoverCursor = 'grabbing';
+                    canvas.selection = false;
+                    return;
+                }
+
                 const { x, y } = e.scenePoint;
 
                 // --- Text placement mode ---
@@ -213,6 +230,20 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
             });
 
             canvas.on('mouse:move', (e) => {
+                const isPan = panModeRef.current || spacePressedRef.current;
+                if (isPan && isDraggingRef.current) {
+                    const dx = e.e.clientX - lastClientPosRef.current.x;
+                    const dy = e.e.clientY - lastClientPosRef.current.y;
+                    lastClientPosRef.current = { x: e.e.clientX, y: e.e.clientY };
+                    
+                    const container = wrapperRef.current;
+                    if (container) {
+                        container.scrollLeft -= dx;
+                        container.scrollTop -= dy;
+                    }
+                    return;
+                }
+
                 if (!drawModeRef.current || !drawStartRef.current || !previewObjectRef.current) return;
                 const { x: cx, y: cy } = e.scenePoint;
                 const { x: sx, y: sy } = drawStartRef.current;
@@ -241,6 +272,14 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
             });
 
             canvas.on('mouse:up', (e) => {
+                const isPan = panModeRef.current || spacePressedRef.current;
+                if (isPan) {
+                    isDraggingRef.current = false;
+                    canvas.defaultCursor = 'grab';
+                    canvas.hoverCursor = 'grab';
+                    return;
+                }
+
                 if (!drawModeRef.current || !drawStartRef.current || !previewObjectRef.current) return;
                 const { x: ex, y: ey } = e.scenePoint;
                 const { x: sx, y: sy } = drawStartRef.current;
@@ -402,35 +441,116 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
             };
             canvas.on('text:editing:entered', onEditEntered);
 
-            const handleEscape = (ev: KeyboardEvent) => {
-                if (ev.key !== 'Escape') return;
+            let keyboardMoved = false;
+            const handleKeyDown = (ev: KeyboardEvent) => {
                 const c = fabricRef.current;
                 if (!c) return;
-                // Cancel text placement
-                if (textPlacementRef.current) {
-                    textPlacementRef.current = false;
-                    c.defaultCursor = 'default';
-                    c.hoverCursor = 'move';
-                }
-                // Cancel draw mode
-                if (drawModeRef.current) {
-                    if (previewObjectRef.current) {
-                        c.remove(previewObjectRef.current);
-                        previewObjectRef.current = null;
+
+                if (ev.key === ' ' && !['INPUT', 'TEXTAREA'].includes((ev.target as HTMLElement)?.tagName)) {
+                    ev.preventDefault();
+                    if (!spacePressedRef.current) {
+                        spacePressedRef.current = true;
+                        if (!panModeRef.current) {
+                            c.defaultCursor = 'grab';
+                            c.hoverCursor = 'grab';
+                            c.selection = false;
+                            c.requestRenderAll();
+                        }
                     }
-                    drawStartRef.current = null;
-                    drawModeRef.current = null;
-                    c.selection = true;
-                    c.defaultCursor = 'default';
-                    c.hoverCursor = 'move';
-                    onDrawModeChange?.(null);
-                    c.requestRenderAll();
+                    return;
+                }
+
+                if (ev.key === 'Escape') {
+                    // Cancel text placement
+                    if (textPlacementRef.current) {
+                        textPlacementRef.current = false;
+                        c.defaultCursor = 'default';
+                        c.hoverCursor = 'move';
+                    }
+                    // Cancel draw mode
+                    if (drawModeRef.current) {
+                        if (previewObjectRef.current) {
+                            c.remove(previewObjectRef.current);
+                            previewObjectRef.current = null;
+                        }
+                        drawStartRef.current = null;
+                        drawModeRef.current = null;
+                        c.selection = true;
+                        c.defaultCursor = 'default';
+                        c.hoverCursor = 'move';
+                        onDrawModeChange?.(null);
+                        c.requestRenderAll();
+                    }
+                    return;
+                }
+
+                // If user is typing in an input field, textarea, or editing text on canvas, ignore
+                if (['INPUT', 'TEXTAREA', 'SELECT'].includes((ev.target as HTMLElement)?.tagName)) {
+                    return;
+                }
+                const activeObject = c.getActiveObject();
+                if (activeObject && (activeObject as any).isEditing) {
+                    return;
+                }
+
+                // Handle arrow keys for moving selected objects
+                const activeObjects = c.getActiveObjects();
+                if (activeObjects.length > 0) {
+                    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(ev.key)) {
+                        ev.preventDefault();
+                        const step = ev.shiftKey ? 10 : 1;
+                        
+                        const currentTop = activeObject!.top || 0;
+                        const currentLeft = activeObject!.left || 0;
+                        
+                        if (ev.key === 'ArrowUp') activeObject!.set('top', currentTop - step);
+                        else if (ev.key === 'ArrowDown') activeObject!.set('top', currentTop + step);
+                        else if (ev.key === 'ArrowLeft') activeObject!.set('left', currentLeft - step);
+                        else if (ev.key === 'ArrowRight') activeObject!.set('left', currentLeft + step);
+                        
+                        activeObject!.setCoords();
+                        c.requestRenderAll();
+                        keyboardMoved = true;
+                    }
                 }
             };
-            document.addEventListener('keydown', handleEscape);
+
+            const handleKeyUp = (ev: KeyboardEvent) => {
+                if (ev.key === ' ') {
+                    spacePressedRef.current = false;
+                    const c = fabricRef.current;
+                    if (c && !panModeRef.current) {
+                        if (drawModeRef.current) {
+                            c.selection = false;
+                            c.defaultCursor = 'crosshair';
+                        } else {
+                            c.selection = true;
+                            c.defaultCursor = 'default';
+                        }
+                        c.hoverCursor = 'move';
+                        c.requestRenderAll();
+                    }
+                    return;
+                }
+
+                if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(ev.key)) {
+                    if (keyboardMoved) {
+                        const c = fabricRef.current;
+                        if (c) {
+                            const activeObject = c.getActiveObject();
+                            c.fire('object:modified', { target: activeObject });
+                        }
+                        keyboardMoved = false;
+                    }
+                }
+            };
+
+            document.addEventListener('keydown', handleKeyDown);
+            document.addEventListener('keyup', handleKeyUp);
 
             return () => {
-                document.removeEventListener('keydown', handleEscape);
+                document.removeEventListener('keydown', handleKeyDown);
+                document.removeEventListener('keyup', handleKeyUp);
                 canvas.off('text:editing:entered', onEditEntered);
                 if (caretProto.__caretClampPatched) {
                     delete caretProto._calcTextareaPosition; // restore inherited IText method
@@ -453,6 +573,24 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
             window.addEventListener('resize', updateScale);
             return () => window.removeEventListener('resize', updateScale);
         }, [canvasSize]);
+
+        // Scroll the canvas viewport on wheel (non-Ctrl). Ctrl+wheel is handled by PosterMaker for zoom.
+        useEffect(() => {
+            const el = wrapperRef.current;
+            if (!el) return;
+            const onWheel = (e: WheelEvent) => {
+                if (e.ctrlKey || e.metaKey) return;
+                e.preventDefault();
+                if (e.shiftKey) {
+                    el.scrollLeft += e.deltaY;
+                } else {
+                    el.scrollLeft += e.deltaX;
+                    el.scrollTop += e.deltaY;
+                }
+            };
+            el.addEventListener('wheel', onWheel, { passive: false });
+            return () => el.removeEventListener('wheel', onWheel);
+        }, []);
 
         useImperativeHandle(ref, () => ({
             getCanvas: () => fabricRef.current,
@@ -640,6 +778,22 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
                 onDrawModeChange?.(null);
             },
 
+            setPanMode: (enabled: boolean) => {
+                panModeRef.current = enabled;
+                const c = fabricRef.current;
+                if (!c) return;
+                if (enabled) {
+                    c.defaultCursor = 'grab';
+                    c.hoverCursor = 'grab';
+                    c.selection = false;
+                } else {
+                    c.defaultCursor = 'default';
+                    c.hoverCursor = 'move';
+                    c.selection = true;
+                }
+                c.requestRenderAll();
+            },
+
             addImageFromUrl: (url: string) => {
                 const c = fabricRef.current;
                 if (!c) return;
@@ -771,7 +925,13 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
             loadTemplate: (json: object) => {
                 const c = fabricRef.current;
                 if (!c) return;
-                c.loadFromJSON(json).then(() => {
+                const safeJson = JSON.parse(JSON.stringify(json)) as Record<string, unknown>;
+                if (Array.isArray(safeJson.objects)) {
+                    (safeJson.objects as Record<string, unknown>[]).forEach(obj => {
+                        if (obj.type === 'image') obj.crossOrigin = 'anonymous';
+                    });
+                }
+                c.loadFromJSON(safeJson).then(() => {
                     c.requestRenderAll();
                     onCanvasModified?.();
                 });
@@ -834,22 +994,74 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
         return (
             <div
                 ref={wrapperRef}
-                className="flex-1 flex items-start justify-center py-6 bg-gray-100 rounded-lg border border-gray-200"
-                style={{ overflow: 'clip' }}
+                className="flex-1 min-h-0 bg-gray-100 rounded-lg border border-gray-200"
+                style={{ overflow: 'auto' }}
             >
+                {/* Centering wrapper — fills the scroll viewport and centers the canvas when it fits */}
                 <div
-                    style={{ width: dims.width * scale, height: dims.height * scale, flexShrink: 0, overflow: 'clip' }}
-                    className="shadow-2xl rounded-sm"
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        minWidth: '100%',
+                        minHeight: '100%',
+                        padding: '24px',
+                        boxSizing: 'border-box',
+                    }}
+                    onPointerDown={(e) => {
+                        // Fabric only listens on its own <canvas> element. Clicks starting on
+                        // the gray background are forwarded to Fabric's upper canvas so that
+                        // rubber-band selection (and pan-drag) can start from outside the poster.
+                        if ((e.target as HTMLElement).tagName === 'CANVAS') return;
+                        const upper =
+                            canvasEl.current?.parentElement?.querySelector<HTMLCanvasElement>('canvas + canvas')
+                            ?? canvasEl.current;
+                        if (!upper) return;
+                        bgDragActiveRef.current = true;
+                        upper.dispatchEvent(new PointerEvent('pointerdown', {
+                            bubbles: false, cancelable: true, pointerId: 1, pointerType: 'mouse',
+                            clientX: e.clientX, clientY: e.clientY,
+                            buttons: e.buttons, button: e.button,
+                            ctrlKey: e.ctrlKey, shiftKey: e.shiftKey, metaKey: e.metaKey,
+                        }));
+                        // While dragging, keep forwarding pointermove when the pointer is over
+                        // the gray area so Fabric can update the selection rectangle.
+                        const onDocMove = (ev: PointerEvent) => {
+                            if (!bgDragActiveRef.current) return;
+                            const r = upper.getBoundingClientRect();
+                            const overCanvas = ev.clientX >= r.left && ev.clientX <= r.right
+                                            && ev.clientY >= r.top  && ev.clientY <= r.bottom;
+                            if (!overCanvas) {
+                                upper.dispatchEvent(new PointerEvent('pointermove', {
+                                    bubbles: false, cancelable: false, pointerId: 1, pointerType: 'mouse',
+                                    clientX: ev.clientX, clientY: ev.clientY,
+                                    buttons: ev.buttons, ctrlKey: ev.ctrlKey, shiftKey: ev.shiftKey, metaKey: ev.metaKey,
+                                }));
+                            }
+                        };
+                        const onDocUp = () => {
+                            bgDragActiveRef.current = false;
+                            document.removeEventListener('pointermove', onDocMove, true);
+                            document.removeEventListener('pointerup', onDocUp, true);
+                        };
+                        document.addEventListener('pointermove', onDocMove, true);
+                        document.addEventListener('pointerup', onDocUp, true);
+                    }}
                 >
                     <div
-                        style={{
-                            transform: `scale(${scale})`,
-                            transformOrigin: 'top left',
-                            width: dims.width,
-                            height: dims.height,
-                        }}
+                        style={{ width: dims.width * scale, height: dims.height * scale, flexShrink: 0, overflow: 'clip' }}
+                        className="shadow-2xl rounded-sm"
                     >
-                        <canvas ref={canvasEl} />
+                        <div
+                            style={{
+                                transform: `scale(${scale})`,
+                                transformOrigin: 'top left',
+                                width: dims.width,
+                                height: dims.height,
+                            }}
+                        >
+                            <canvas ref={canvasEl} />
+                        </div>
                     </div>
                 </div>
             </div>

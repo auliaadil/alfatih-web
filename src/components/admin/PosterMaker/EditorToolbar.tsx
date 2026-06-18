@@ -5,7 +5,7 @@ import {
     ChevronUp, ChevronDown, ChevronsUp, ChevronsDown,
     Download, Loader2, RectangleHorizontal, RectangleVertical,
     Undo, Redo, Copy, Clipboard, CopyPlus,
-    MoveRight, Pencil, Waves
+    MoveRight, Pencil, Waves, MousePointer2, Hand
 } from 'lucide-react';
 import { CanvasSize } from './FabricCanvas';
 
@@ -39,22 +39,25 @@ interface EditorToolbarProps {
     onAddDivider: () => void;
     isFreehandActive: boolean;
     activeDrawTool: 'rect' | 'circle' | 'line' | 'arrow' | 'divider' | null;
+    cursorMode: 'select' | 'pan';
+    onSetCursorMode: (mode: 'select' | 'pan') => void;
 }
 
 const ToolBtn: React.FC<{
     onClick: () => void;
     title: string;
     active?: boolean;
+    disabled?: boolean;
     danger?: boolean;
     children: React.ReactNode;
-}> = ({ onClick, title, active, danger, children }) => (
+}> = ({ onClick, title, active, disabled, danger, children }) => (
     <button
         onClick={onClick}
         title={title}
-        disabled={active === false}
+        disabled={disabled}
         className={`p-2 rounded-lg transition-all text-sm ${danger
             ? 'text-red-500 hover:bg-red-50 hover:text-red-600'
-            : active === false // Used for disabled state of Undo/Redo explicitly via active prop abuse or rather standard disabled
+            : disabled
                 ? 'text-gray-300 cursor-not-allowed'
                 : active
                     ? 'bg-primary text-white shadow-sm'
@@ -76,10 +79,16 @@ const EditorToolbar: React.FC<EditorToolbarProps> = ({
     onExport, onSetCanvasSize,
     onUndo, onRedo, canUndo, canRedo,
     onAddArrow, onToggleFreehand, onAddDivider, isFreehandActive,
-    activeDrawTool,
+    activeDrawTool, cursorMode, onSetCursorMode
 }) => {
     return (
         <div className="bg-white border border-gray-200 rounded-xl shadow-sm px-3 py-2 flex items-center gap-1 flex-wrap flex-shrink-0">
+
+            {/* Cursor Modes */}
+            <ToolBtn onClick={() => onSetCursorMode('select')} title="Select (V)" active={cursorMode === 'select' && !activeDrawTool && !isFreehandActive}><MousePointer2 className="w-4 h-4" /></ToolBtn>
+            <ToolBtn onClick={() => onSetCursorMode('pan')} title="Hand Tool (H or Spacebar)" active={cursorMode === 'pan'}><Hand className="w-4 h-4" /></ToolBtn>
+
+            <Divider />
 
             {/* Canvas Size */}
             <ToolBtn onClick={() => onSetCanvasSize('post')} title="Post (3:4)" active={canvasSize === 'post'}>
@@ -92,25 +101,25 @@ const EditorToolbar: React.FC<EditorToolbarProps> = ({
             <Divider />
 
             {/* History */}
-            <ToolBtn onClick={onUndo} title="Undo (Ctrl+Z)" active={canUndo ? undefined : false}><Undo className="w-4 h-4" /></ToolBtn>
-            <ToolBtn onClick={onRedo} title="Redo (Ctrl+Shift+Z)" active={canRedo ? undefined : false}><Redo className="w-4 h-4" /></ToolBtn>
+            <ToolBtn onClick={onUndo} title="Undo (Ctrl+Z)" disabled={!canUndo}><Undo className="w-4 h-4" /></ToolBtn>
+            <ToolBtn onClick={onRedo} title="Redo (Ctrl+Y)" disabled={!canRedo}><Redo className="w-4 h-4" /></ToolBtn>
 
             <Divider />
 
             {/* Insert Tools */}
             <ToolBtn onClick={onAddText} title="Add Text"><Type className="w-4 h-4" /></ToolBtn>
-            <ToolBtn onClick={onAddRect}    title="Add Rectangle"            active={activeDrawTool === 'rect'    || undefined}><Square className="w-4 h-4" /></ToolBtn>
-            <ToolBtn onClick={onAddCircle}  title="Add Circle"               active={activeDrawTool === 'circle'  || undefined}><Circle className="w-4 h-4" /></ToolBtn>
-            <ToolBtn onClick={onAddLine}    title="Add Line"                 active={activeDrawTool === 'line'    || undefined}><Minus className="w-4 h-4" /></ToolBtn>
-            <ToolBtn onClick={onAddArrow}   title="Tambah Panah"             active={activeDrawTool === 'arrow'   || undefined}><MoveRight className="w-4 h-4" /></ToolBtn>
+            <ToolBtn onClick={onAddRect}    title="Add Rectangle"            active={activeDrawTool === 'rect'}><Square className="w-4 h-4" /></ToolBtn>
+            <ToolBtn onClick={onAddCircle}  title="Add Circle"               active={activeDrawTool === 'circle'}><Circle className="w-4 h-4" /></ToolBtn>
+            <ToolBtn onClick={onAddLine}    title="Add Line"                 active={activeDrawTool === 'line'}><Minus className="w-4 h-4" /></ToolBtn>
+            <ToolBtn onClick={onAddArrow}   title="Tambah Panah"             active={activeDrawTool === 'arrow'}><MoveRight className="w-4 h-4" /></ToolBtn>
             <ToolBtn
                 onClick={onToggleFreehand}
-                title="Gambar Bebas (Freehand)"
-                active={isFreehandActive || undefined}
+                title="Freehand Draw"
+                active={isFreehandActive}
             >
                 <Pencil className="w-4 h-4" />
             </ToolBtn>
-            <ToolBtn onClick={onAddDivider} title="Tambah Divider Dekoratif" active={activeDrawTool === 'divider' || undefined}><Waves className="w-4 h-4" /></ToolBtn>
+            <ToolBtn onClick={onAddDivider} title="Add Divider"              active={activeDrawTool === 'divider'}><Waves className="w-4 h-4" /></ToolBtn>
             <ToolBtn onClick={onAddImage} title="Add Image"><ImagePlus className="w-4 h-4" /></ToolBtn>
 
             <Divider />

@@ -32,10 +32,28 @@ export const generateTemplateThumbnail = (id: string, json: object): Promise<str
         try {
             // Wait for fonts so 'Outfit'/'Inter' render correctly
             await document.fonts.ready;
-            await fabricCanvas.loadFromJSON(json);
+
+            // Inject crossOrigin on image objects so the canvas stays untainted
+            const jsonCopy = JSON.parse(JSON.stringify(json)) as Record<string, unknown>;
+            if (Array.isArray(jsonCopy.objects)) {
+                (jsonCopy.objects as Record<string, unknown>[]).forEach(obj => {
+                    if (obj.type === 'image') obj.crossOrigin = 'anonymous';
+                });
+            }
+
+            try {
+                await fabricCanvas.loadFromJSON(jsonCopy);
+            } catch (err) {
+                console.warn('loadFromJSON warning during thumbnail generation:', err);
+            }
             fabricCanvas.requestRenderAll();
 
-            const dataUrl = fabricCanvas.toDataURL({ format: 'jpeg', multiplier: 0.15, quality: 0.85 });
+            let dataUrl: string;
+            try {
+                dataUrl = fabricCanvas.toDataURL({ format: 'jpeg', multiplier: 0.15, quality: 0.85 });
+            } catch {
+                return '';
+            }
             cache.set(id, dataUrl);
             return dataUrl;
         } finally {

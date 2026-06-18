@@ -176,7 +176,6 @@ const Packages: React.FC = () => {
                                             onClick={() => { setPanelPackage(pkg); setIsPanelOpen(true); }}
                                             className="flex items-center gap-1.5 text-xs font-semibold text-primary hover:text-blue-700 transition-colors"
                                         >
-                                            <Users className="w-3.5 h-3.5" />
                                             Detail
                                         </button>
                                         <div className="flex items-center gap-1">

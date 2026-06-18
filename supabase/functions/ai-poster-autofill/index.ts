@@ -167,6 +167,13 @@ Format respons:
       throw new Error('Gemini returned invalid JSON')
     }
 
+    if (!Array.isArray(parsed)) {
+      console.error('Gemini did not return an array, falling back to original nodes:', typeof parsed)
+      return new Response(JSON.stringify(textNodes), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
     return new Response(JSON.stringify(parsed), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })

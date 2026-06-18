@@ -14,7 +14,7 @@ import CanvasZoom from '../../components/admin/PosterMaker/CanvasZoom';
 import CanvasContextMenu from '../../components/admin/PosterMaker/CanvasContextMenu';
 import AssetPanel from '../../components/admin/PosterMaker/AssetPanel';
 import { STARTER_TEMPLATES, PosterTemplate, TemplateThumbnail } from '../../components/admin/PosterMaker/TemplatePanel';
-import { FabricObject, FabricImage } from 'fabric';
+import { FabricObject, FabricImage, Rect } from 'fabric';
 
 const getTemplateType = (template: PosterTemplate): TemplateType => {
     if (template.id.includes('conversion')) return 'conversion';
@@ -276,6 +276,7 @@ const PosterMaker: React.FC = () => {
     const [isNewDesignModalOpen, setIsNewDesignModalOpen] = useState(true);
     const [isFreehandActive, setIsFreehandActive] = useState(false);
     const [activeDrawTool, setActiveDrawTool] = useState<'rect' | 'circle' | 'line' | 'arrow' | 'divider' | null>(null);
+    const [cursorMode, setCursorMode] = useState<'select' | 'pan'>('select');
     const [brushColor, setBrushColor] = useState('#1a1a1a');
     const [brushWidth, setBrushWidth] = useState(4);
     const [isExporting, setIsExporting] = useState(false);
@@ -425,6 +426,10 @@ const PosterMaker: React.FC = () => {
             } else if (cmdOrCtrl && (e.key === 'd' || e.key === 'D')) {
                 e.preventDefault();
                 canvasRef.current?.duplicateSelected();
+            } else if (!cmdOrCtrl && e.key.toLowerCase() === 'v' && !e.shiftKey) {
+                if (!canvasRef.current?.isTextPlacementMode()) handleSetCursorMode('select');
+            } else if (!cmdOrCtrl && e.key.toLowerCase() === 'h' && !e.shiftKey) {
+                if (!canvasRef.current?.isTextPlacementMode()) handleSetCursorMode('pan');
             } else if (e.key === 'Delete' || e.key === 'Backspace') {
                 canvasRef.current?.deleteSelected();
             } else if (e.key === 'Escape') {
@@ -491,6 +496,7 @@ const PosterMaker: React.FC = () => {
         setIsFreehandActive(false);
         canvasRef.current?.cancelDraw();
         setActiveDrawTool(null);
+        handleSetCursorMode('select');
         setLoadedTemplate(null);
         setEditingTemplateId(null);
         setEditingTemplateName('');
@@ -512,6 +518,8 @@ const PosterMaker: React.FC = () => {
         if (next) {
             canvasRef.current?.cancelDraw();
             setActiveDrawTool(null);
+            setCursorMode('select');
+            canvasRef.current?.setPanMode?.(false);
         }
         setIsFreehandActive(next);
         canvasRef.current?.setFreehandMode(next);
@@ -579,6 +587,7 @@ const PosterMaker: React.FC = () => {
         setIsFreehandActive(false);
         canvasRef.current?.cancelDraw();
         setActiveDrawTool(null);
+        handleSetCursorMode('select');
         if (json.width === 1080 && json.height === 1350) setCanvasSize('post');
         else if (json.width === 1080 && json.height === 1920) setCanvasSize('story');
         setTimeout(() => canvasRef.current?.loadTemplate(json), 200);
@@ -593,7 +602,6 @@ const PosterMaker: React.FC = () => {
         setSelectedObject(obj);
         refreshLayers();
         setPropRefreshKey(k => k + 1);
-        if (obj) setRightTab('properties');
     };
 
     const handleObjectTransforming = (obj: FabricObject) => {
@@ -606,7 +614,11 @@ const PosterMaker: React.FC = () => {
         if (!canvas) return undefined;
         canvas.discardActiveObject();
         canvas.requestRenderAll();
-        return canvas.toDataURL({ format: 'jpeg', multiplier: 0.15, quality: 0.8 });
+        try {
+            return canvas.toDataURL({ format: 'jpeg', multiplier: 0.15, quality: 0.8 });
+        } catch {
+            return undefined;
+        }
     };
 
     const handleSaveNew = async (name: string, description: string) => {
@@ -710,15 +722,42 @@ const PosterMaker: React.FC = () => {
                         const originalWidth = imgObj.width * imgObj.scaleX;
                         const originalHeight = imgObj.height * imgObj.scaleY;
                         const originalIndex = cr.getObjects().indexOf(imgObj);
-                        const newImg = new FabricImage(imgElement, {
-                            left: imgObj.left,
-                            top: imgObj.top,
-                            originX: imgObj.originX,
-                            originY: imgObj.originY,
+
+                        const newImg = new FabricImage(imgElement);
+                        const coverScale = Math.max(
+                            originalWidth / newImg.width!,
+                            originalHeight / newImg.height!,
+                        );
+
+                        // Resolve placeholder top-left corner regardless of originX/Y
+                        const ox = imgObj.originX || 'left';
+                        const oy = imgObj.originY || 'top';
+                        const anchorLeft = ox === 'center' ? imgObj.left - originalWidth / 2
+                                         : ox === 'right'  ? imgObj.left - originalWidth
+                                         : imgObj.left;
+                        const anchorTop  = oy === 'center' ? imgObj.top - originalHeight / 2
+                                         : oy === 'bottom' ? imgObj.top - originalHeight
+                                         : imgObj.top;
+
+                        // Center the scaled image within the placeholder bounds
+                        const scaledW = newImg.width! * coverScale;
+                        const scaledH = newImg.height! * coverScale;
+                        newImg.set({
+                            left: anchorLeft + (originalWidth - scaledW) / 2,
+                            top: anchorTop + (originalHeight - scaledH) / 2,
+                            originX: 'left',
+                            originY: 'top',
+                            scaleX: coverScale,
+                            scaleY: coverScale,
+                            clipPath: new Rect({
+                                left: anchorLeft,
+                                top: anchorTop,
+                                width: originalWidth,
+                                height: originalHeight,
+                                absolutePositioned: true,
+                            }),
                         });
-                        const scaleX = originalWidth / newImg.width!;
-                        const scaleY = originalHeight / newImg.height!;
-                        newImg.scale(Math.max(scaleX, scaleY));
+
                         cr.remove(imgObj);
                         cr.add(newImg);
                         cr.moveObjectTo(newImg, originalIndex);
@@ -736,6 +775,19 @@ const PosterMaker: React.FC = () => {
             alert('Gagal menerapkan konten AI.');
         } finally {
             setIsGenerating(false);
+        }
+    };
+
+    const handleSetCursorMode = (mode: 'select' | 'pan') => {
+        setCursorMode(mode);
+        if (mode === 'pan') {
+            canvasRef.current?.setPanMode?.(true);
+            canvasRef.current?.cancelDraw();
+            setActiveDrawTool(null);
+            canvasRef.current?.setFreehandMode(false);
+            setIsFreehandActive(false);
+        } else {
+            canvasRef.current?.setPanMode?.(false);
         }
     };
 
@@ -838,14 +890,16 @@ const PosterMaker: React.FC = () => {
             <EditorToolbar
                 canvasSize={canvasSize}
                 isExporting={isExporting}
-                onAddText={() => canvasRef.current?.addText()}
-                onAddRect={() => canvasRef.current?.addRect()}
-                onAddCircle={() => canvasRef.current?.addCircle()}
-                onAddLine={() => canvasRef.current?.addLine()}
-                onAddArrow={() => canvasRef.current?.addArrow()}
+                cursorMode={cursorMode}
+                onSetCursorMode={handleSetCursorMode}
+                onAddText={() => { handleSetCursorMode('select'); canvasRef.current?.addText(); }}
+                onAddRect={() => { handleSetCursorMode('select'); canvasRef.current?.addRect(); setActiveDrawTool('rect'); setIsFreehandActive(false); }}
+                onAddCircle={() => { handleSetCursorMode('select'); canvasRef.current?.addCircle(); setActiveDrawTool('circle'); setIsFreehandActive(false); }}
+                onAddLine={() => { handleSetCursorMode('select'); canvasRef.current?.addLine(); setActiveDrawTool('line'); setIsFreehandActive(false); }}
+                onAddArrow={() => { handleSetCursorMode('select'); canvasRef.current?.addArrow(); setActiveDrawTool('arrow'); setIsFreehandActive(false); }}
+                onAddDivider={() => { handleSetCursorMode('select'); canvasRef.current?.addDivider(); setActiveDrawTool('divider'); setIsFreehandActive(false); }}
                 onToggleFreehand={handleToggleFreehand}
-                onAddDivider={() => canvasRef.current?.addDivider()}
-                onAddImage={handleAddImage}
+                onAddImage={() => { handleSetCursorMode('select'); handleAddImage(); }}
                 isFreehandActive={isFreehandActive}
                 activeDrawTool={activeDrawTool}
                 onDelete={() => canvasRef.current?.deleteSelected()}

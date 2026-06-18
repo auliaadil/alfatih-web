@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Canvas, FabricObject } from 'fabric';
+import { Canvas, FabricObject, ActiveSelection } from 'fabric';
 import { Eye, EyeOff, Lock, Unlock, Trash2, Type, Square, Image, Circle as CircleIcon, Minus } from 'lucide-react';
 
 interface LayerPanelProps {
@@ -50,8 +50,27 @@ const LayerPanel: React.FC<LayerPanelProps> = ({ canvas, refreshKey }) => {
         );
     }
 
-    const handleSelect = (obj: FabricObject) => {
-        canvas.setActiveObject(obj);
+    const handleSelect = (obj: FabricObject, e: React.MouseEvent) => {
+        if (e.shiftKey) {
+            const current = canvas.getActiveObjects();
+            const alreadySelected = current.includes(obj);
+            let next: FabricObject[];
+            if (alreadySelected) {
+                next = current.filter(o => o !== obj);
+            } else {
+                next = [...current, obj];
+            }
+            if (next.length === 0) {
+                canvas.discardActiveObject();
+            } else if (next.length === 1) {
+                canvas.setActiveObject(next[0]);
+            } else {
+                const sel = new ActiveSelection(next, { canvas });
+                canvas.setActiveObject(sel);
+            }
+        } else {
+            canvas.setActiveObject(obj);
+        }
         canvas.requestRenderAll();
     };
 
@@ -128,12 +147,12 @@ const LayerPanel: React.FC<LayerPanelProps> = ({ canvas, refreshKey }) => {
         setDragOverIdx(null);
     };
 
-    const activeObj = canvas.getActiveObject();
+    const activeObjs = canvas.getActiveObjects();
 
     return (
         <div className="space-y-1">
             {objects.map((obj, idx) => {
-                const isActive = activeObj === obj;
+                const isActive = activeObjs.includes(obj);
                 const isLocked = obj.lockMovementX;
                 const isVisible = obj.visible !== false;
 
@@ -146,7 +165,7 @@ const LayerPanel: React.FC<LayerPanelProps> = ({ canvas, refreshKey }) => {
                     onDragLeave={() => setDragOverIdx(null)}
                     onDrop={(e) => handleDrop(e, idx)}
                     onDragEnd={handleDragEnd}
-                    onClick={() => handleSelect(obj)}
+                    onClick={(e) => handleSelect(obj, e)}
                     className={`flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer transition-all text-sm border-2
                       ${dragOverIdx === idx ? 'border-t-primary border-transparent' : 'border-transparent'}
                       ${draggedIdx === idx ? 'opacity-50 scale-95' : 'opacity-100'}
