@@ -1,20 +1,37 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
-import { Loader2, Sparkles, LayoutTemplate, Save, X, Plus } from 'lucide-react';
+import { Loader2, Sparkles, LayoutTemplate, Save, X, Plus, Clock } from 'lucide-react';
 import { applyTemplateContent, TemplateInputs, TemplateType } from '../../../services/posterAutofillService';
 import { fetchTemplate, fetchTemplates, saveTemplate, updateTemplate, SavedTemplate } from '../../services/posterTemplates';
 import { supabase } from '../../lib/supabase';
 import { TourPackage } from '../../../types';
+import { useToast } from '../../components/admin/ui';
 import FabricCanvas, { FabricCanvasRef, CanvasSize } from '../../components/admin/PosterMaker/FabricCanvas';
 import EditorToolbar from '../../components/admin/PosterMaker/EditorToolbar';
 import LayerPanel from '../../components/admin/PosterMaker/LayerPanel';
 import PropertiesPanel from '../../components/admin/PosterMaker/PropertiesPanel';
-import DraftPanel from '../../components/admin/PosterMaker/DraftPanel';
 import CanvasZoom from '../../components/admin/PosterMaker/CanvasZoom';
 import CanvasContextMenu from '../../components/admin/PosterMaker/CanvasContextMenu';
 import AssetPanel from '../../components/admin/PosterMaker/AssetPanel';
 import { STARTER_TEMPLATES, PosterTemplate, TemplateThumbnail } from '../../components/admin/PosterMaker/TemplatePanel';
 import { FabricObject, FabricImage, Rect } from 'fabric';
+
+// ── Draft helpers ────────────────────────────────────────────────────────────
+interface PosterDraft {
+    id: string;
+    name: string;
+    json: any;
+    thumbnail: string;
+    created_at: string;
+}
+
+const DRAFTS_KEY = 'alfatih_poster_drafts';
+const MAX_DRAFTS = 10;
+
+function loadDraftsFromStorage(): PosterDraft[] {
+    try { return JSON.parse(localStorage.getItem(DRAFTS_KEY) ?? '[]'); }
+    catch { return []; }
+}
 
 const getTemplateType = (template: PosterTemplate): TemplateType => {
     if (template.id.includes('conversion')) return 'conversion';
@@ -142,15 +159,18 @@ interface NewDesignModalProps {
     canDismiss: boolean;
     starterOverrides: Map<string, SavedTemplate>;
     customTemplates: SavedTemplate[];
+    drafts: PosterDraft[];
     onPickBlank: (size: CanvasSize) => void;
     onPickStarter: (t: PosterTemplate) => void;
     onPickCustom: (t: SavedTemplate) => void;
+    onPickDraft: (d: PosterDraft) => void;
+    onDeleteDraft: (id: string) => void;
     onClose: () => void;
 }
 
 const NewDesignModal: React.FC<NewDesignModalProps> = ({
-    canDismiss, starterOverrides, customTemplates,
-    onPickBlank, onPickStarter, onPickCustom, onClose,
+    canDismiss, starterOverrides, customTemplates, drafts,
+    onPickBlank, onPickStarter, onPickCustom, onPickDraft, onDeleteDraft, onClose,
 }) => {
     const [size, setSize] = useState<CanvasSize>('post');
     const visibleStarters = STARTER_TEMPLATES.filter(t => t.aspectRatio === size);
@@ -196,6 +216,35 @@ const NewDesignModal: React.FC<NewDesignModalProps> = ({
                         ))}
                     </div>
                 </div>
+
+                {/* Drafts */}
+                {drafts.length > 0 && (
+                    <div className="flex-shrink-0 mb-5">
+                        <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-2">Lanjutkan Draft</p>
+                        <div className="flex gap-3 overflow-x-auto pb-1">
+                            {drafts.map(d => (
+                                <div key={d.id} className="relative flex-shrink-0 group cursor-pointer" style={{ width: 72 }}>
+                                    <button
+                                        onClick={() => onPickDraft(d)}
+                                        className="w-full rounded-lg overflow-hidden border border-gray-200 hover:border-primary hover:shadow-md transition-all"
+                                        style={{ aspectRatio: '4/5' }}
+                                        title={d.name}
+                                    >
+                                        {d.thumbnail
+                                            ? <img src={d.thumbnail} alt={d.name} className="w-full h-full object-cover" />
+                                            : <div className="w-full h-full bg-gray-100 flex items-center justify-center"><Clock className="w-4 h-4 text-gray-300" /></div>
+                                        }
+                                    </button>
+                                    <p className="text-[9px] text-gray-500 truncate mt-1 text-center">{new Date(d.created_at).toLocaleDateString('id-ID')}</p>
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); onDeleteDraft(d.id); }}
+                                        className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white rounded-full text-[9px] items-center justify-center hidden group-hover:flex"
+                                    >×</button>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
 
                 {/* Template grid */}
                 <div className="flex-1 overflow-y-auto min-h-0">
@@ -270,6 +319,7 @@ const NewDesignModal: React.FC<NewDesignModalProps> = ({
 const PosterMaker: React.FC = () => {
     const canvasRef = useRef<FabricCanvasRef>(null);
     const location = useLocation();
+    const toast = useToast();
 
     const [loadedTemplate, setLoadedTemplate] = useState<PosterTemplate | null>(null);
     const [canvasSize, setCanvasSize] = useState<CanvasSize>('post');
@@ -283,7 +333,8 @@ const PosterMaker: React.FC = () => {
     const [isGenerating, setIsGenerating] = useState(false);
     const [layerRefreshKey, setLayerRefreshKey] = useState(0);
     const [selectedObject, setSelectedObject] = useState<FabricObject | null>(null);
-    const [rightTab, setRightTab] = useState<'layers' | 'properties' | 'drafts' | 'assets' | 'ai'>('layers');
+    const [rightTab, setRightTab] = useState<'layers' | 'properties' | 'assets' | 'ai'>('layers');
+    const [drafts, setDrafts] = useState<PosterDraft[]>(() => loadDraftsFromStorage());
     const [canUndo, setCanUndo] = useState(false);
     const [canRedo, setCanRedo] = useState(false);
     const [propRefreshKey, setPropRefreshKey] = useState(0);
@@ -582,7 +633,8 @@ const PosterMaker: React.FC = () => {
         setIsNewDesignModalOpen(true);
     };
 
-    const handleLoadDraft = (json: any) => {
+    const handlePickDraft = (draft: PosterDraft) => {
+        const json = draft.json;
         canvasRef.current?.setFreehandMode(false);
         setIsFreehandActive(false);
         canvasRef.current?.cancelDraw();
@@ -596,6 +648,28 @@ const PosterMaker: React.FC = () => {
         setEditingTemplateName('');
         setLoadedStarterId(null);
         setIsNewDesignModalOpen(false);
+    };
+
+    const handleSaveDraft = () => {
+        const canvas = canvasRef.current?.getCanvas();
+        if (!canvas) return;
+        const newDraft: PosterDraft = {
+            id: `${Date.now()}`,
+            name: `Draft ${new Date().toLocaleString('id-ID')}`,
+            json: canvas.toJSON(),
+            thumbnail: generateThumbnail() ?? '',
+            created_at: new Date().toISOString(),
+        };
+        const updated = [newDraft, ...drafts].slice(0, MAX_DRAFTS);
+        setDrafts(updated);
+        localStorage.setItem(DRAFTS_KEY, JSON.stringify(updated));
+        toast('success', 'Draft disimpan.');
+    };
+
+    const handleDeleteDraft = (id: string) => {
+        const updated = drafts.filter(d => d.id !== id);
+        setDrafts(updated);
+        localStorage.setItem(DRAFTS_KEY, JSON.stringify(updated));
     };
 
     const handleSelectionChange = (obj: FabricObject | null) => {
@@ -643,9 +717,9 @@ const PosterMaker: React.FC = () => {
             setEditingTemplateId(result.id);
             setEditingTemplateName(result.name);
             setIsSaveModalOpen(false);
-            alert(`Template "${name}" berhasil disimpan.`);
+            toast('success', `Template "${name}" berhasil disimpan.`);
         } else {
-            alert('Gagal menyimpan template. Coba lagi.');
+            toast('error', 'Gagal menyimpan template. Coba lagi.');
         }
     };
 
@@ -672,9 +746,9 @@ const PosterMaker: React.FC = () => {
                 )
             );
             setIsSaveModalOpen(false);
-            alert(`Template "${name}" berhasil diperbarui.`);
+            toast('success', `Template "${name}" berhasil diperbarui.`);
         } else {
-            alert('Gagal memperbarui template. Coba lagi.');
+            toast('error', 'Gagal memperbarui template. Coba lagi.');
         }
     };
 
@@ -772,7 +846,7 @@ const PosterMaker: React.FC = () => {
             refreshLayers();
         } catch (e) {
             console.error(e);
-            alert('Gagal menerapkan konten AI.');
+            toast('error', 'Gagal menerapkan konten AI.');
         } finally {
             setIsGenerating(false);
         }
@@ -875,6 +949,13 @@ const PosterMaker: React.FC = () => {
                     >
                         <LayoutTemplate className="w-4 h-4" />
                         Buat / Ganti Desain
+                    </button>
+                    <button
+                        onClick={handleSaveDraft}
+                        className="flex items-center gap-2 px-4 py-2 border-2 border-amber-400 text-amber-600 rounded-lg text-sm font-semibold hover:bg-amber-50 transition"
+                    >
+                        <Clock className="w-4 h-4" />
+                        Simpan Draft
                     </button>
                     <button
                         onClick={() => setIsSaveModalOpen(true)}
@@ -1015,7 +1096,7 @@ const PosterMaker: React.FC = () => {
                 <div className="lg:col-span-3 lg:h-full">
                     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col h-full">
                         <div className="flex border-b border-gray-200 overflow-x-auto flex-shrink-0">
-                            {(['layers', 'properties', 'assets', 'drafts'] as const).map(tab => (
+                            {(['layers', 'properties', 'assets'] as const).map(tab => (
                                 <button
                                     key={tab}
                                     onClick={() => setRightTab(tab)}
@@ -1057,11 +1138,6 @@ const PosterMaker: React.FC = () => {
                             )}
                             {rightTab === 'assets' && (
                                 <AssetPanel onAddImage={url => canvasRef.current?.addImageFromUrl(url)} />
-                            )}
-                            {rightTab === 'drafts' && (
-                                <DraftPanel
-                                    onLoadDraft={handleLoadDraft}
-                                />
                             )}
                             {rightTab === 'ai' && loadedTemplate && templateType !== 'blank' && (
                                 <div className="space-y-3">
@@ -1107,9 +1183,12 @@ const PosterMaker: React.FC = () => {
                     canDismiss={loadedTemplate !== null || editingTemplateId !== null}
                     starterOverrides={starterOverrides}
                     customTemplates={customTemplates}
+                    drafts={drafts}
                     onPickBlank={handlePickBlank}
                     onPickStarter={handlePickTemplate}
                     onPickCustom={handlePickCustomTemplate}
+                    onPickDraft={handlePickDraft}
+                    onDeleteDraft={handleDeleteDraft}
                     onClose={() => setIsNewDesignModalOpen(false)}
                 />
             )}
