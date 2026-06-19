@@ -67,8 +67,8 @@ const injectFooterData = (templates: PosterTemplate[], footer: FooterData): Post
                 if (text.includes('|') && (text.includes('@') || text.includes('.com'))) {
                     return { ...obj, text: contactLine };
                 }
-                // License line: references PPIU / Penyelenggara
-                if (text.includes('PPIU') || text.includes('Penyelenggara')) {
+                // License line: references Penyelenggara or No. Izin
+                if (text.includes('Penyelenggara') || text.includes('No. Izin')) {
                     return { ...obj, text: licenseLine };
                 }
                 return obj;
