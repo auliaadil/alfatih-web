@@ -588,6 +588,134 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                 { type: 'textbox', left: 80, top: 1825, width: 920, text: 'Penyelenggara Perjalanan Ibadah Umrah (PPIU) No. Izin: 1234/2024', fontSize: 14, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500', fill: '#FFFFFF', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
             ]
         }
+    },
+    {
+        id: 'hotel-airline-post-conversion',
+        name: 'Hotel & Penerbangan (Post)',
+        description: 'Dua foto berdampingan: hotel bintang 5 dan penerbangan langsung. Mendukung AI Auto-Fill.',
+        previewColors: ['#0084FF', '#F59E0B', '#F1F5F9'],
+        aspectRatio: 'post',
+        json: {
+            version: '7.2.0',
+            width: 1080,
+            height: 1350,
+            objects: [
+                // Background
+                { type: 'rect', left: 0, top: 0, width: 1080, height: 1350, fill: '#F8FAFC', originX: 'left', originY: 'top', selectable: false, evented: false },
+                // Top accent bar
+                { type: 'rect', left: 0, top: 0, width: 1080, height: 15, fill: '#F59E0B', originX: 'left', originY: 'top', selectable: false, evented: false },
+                // Gold divider
+                { type: 'rect', left: 60, top: 245, width: 200, height: 4, fill: '#D4A373', originX: 'left', originY: 'top', selectable: true },
+                // Hotel image (left)
+                { type: 'image', left: 60, top: 340, width: 455, height: 320, scaleX: 1, scaleY: 1, src: 'https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&w=455&h=320&q=80', rx: 12, ry: 12, crossOrigin: 'anonymous', originX: 'left', originY: 'top', selectable: true },
+                // Airline image (right)
+                { type: 'image', left: 565, top: 340, width: 455, height: 320, scaleX: 1, scaleY: 1, src: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=455&h=320&q=80', rx: 12, ry: 12, crossOrigin: 'anonymous', originX: 'left', originY: 'top', selectable: true },
+                // Info card 1 background (date)
+                { type: 'rect', left: 60, top: 745, width: 300, height: 100, rx: 12, ry: 12, fill: '#F1F5F9', originX: 'left', originY: 'top', selectable: false, evented: false },
+                // Info card 2 background (duration)
+                { type: 'rect', left: 390, top: 745, width: 300, height: 100, rx: 12, ry: 12, fill: '#F1F5F9', originX: 'left', originY: 'top', selectable: false, evented: false },
+                // Info card 3 background (price)
+                { type: 'rect', left: 720, top: 745, width: 300, height: 100, rx: 12, ry: 12, fill: '#F1F5F9', originX: 'left', originY: 'top', selectable: false, evented: false },
+                // CTA button background
+                { type: 'rect', left: 340, top: 1140, width: 400, height: 60, rx: 30, ry: 30, fill: '#0084FF', originX: 'left', originY: 'top', selectable: true },
+                // Footer background
+                { type: 'rect', left: 0, top: 1210, width: 1080, height: 140, fill: '#0084FF', originX: 'left', originY: 'top', selectable: false, evented: false },
+                // Category
+                { type: 'textbox', left: 60, top: 100, width: 960, text: 'PAKET PREMIUM UMRAH', fontSize: 18, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#F59E0B', charSpacing: 150, originX: 'left', originY: 'top', editable: true },
+                // Title
+                { type: 'textbox', left: 60, top: 140, width: 960, text: 'Umrah Premium Syawal 1447H', fontSize: 50, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#0F172A', lineHeight: 1.2, originX: 'left', originY: 'top', editable: true },
+                // Description
+                { type: 'textbox', left: 60, top: 270, width: 960, text: 'Nikmati pengalaman ibadah dengan fasilitas premium — hotel bintang 5 dan penerbangan langsung.', fontSize: 18, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 'normal', fill: '#64748B', lineHeight: 1.4, originX: 'left', originY: 'top', editable: true },
+                // Hotel image label
+                { type: 'textbox', left: 60, top: 674, width: 455, text: '🏨 Hotel Bintang 5 Makkah', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#0F172A', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
+                // Airline image label
+                { type: 'textbox', left: 565, top: 674, width: 455, text: '✈ Penerbangan Langsung Jeddah', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#0F172A', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
+                // Card 1 text (date)
+                { type: 'textbox', left: 60, top: 766, width: 300, text: 'Keberangkatan\n12 Okt 2026', fontSize: 22, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#0F172A', textAlign: 'center', lineHeight: 1.3, originX: 'left', originY: 'top', editable: true },
+                // Card 2 text (duration)
+                { type: 'textbox', left: 390, top: 766, width: 300, text: 'Durasi\n12 Hari', fontSize: 22, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#0F172A', textAlign: 'center', lineHeight: 1.3, originX: 'left', originY: 'top', editable: true },
+                // Card 3 text (price)
+                { type: 'textbox', left: 720, top: 766, width: 300, text: 'Harga Mulai\nRp 32.5 Jt', fontSize: 22, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#F59E0B', textAlign: 'center', lineHeight: 1.3, originX: 'left', originY: 'top', editable: true },
+                // Room pricing
+                { type: 'textbox', left: 60, top: 875, width: 960, text: 'Quad: Rp 32.500.000 | Triple: Rp 34.500.000 | Double: Rp 36.500.000', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '600', fill: '#64748B', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
+                // Feature bullet diamonds
+                { type: 'textbox', left: 100, top: 918, width: 30, text: '◆\n◆\n◆', fontSize: 12, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#F59E0B', textAlign: 'center', lineHeight: 2.3, originX: 'left', originY: 'top', editable: true },
+                // Feature list
+                { type: 'textbox', left: 142, top: 918, width: 838, text: 'Hotel Makkah: Anjum / Setaraf (*5) & Madinah: Front Taiba / Setaraf (*5)\nTiket Pesawat Saudia Airlines Penerbangan Langsung Jeddah\nMuthawwif Pembimbing Ibadah & Air Zamzam 5L', fontSize: 18, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500', fill: '#0F172A', lineHeight: 1.5, originX: 'left', originY: 'top', editable: true },
+                // CTA text
+                { type: 'textbox', left: 340, top: 1159, width: 400, text: 'DAFTAR SEKARANG', fontSize: 18, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#FFFFFF', textAlign: 'center', charSpacing: 100, originX: 'left', originY: 'top', editable: true },
+                // Footer brand
+                { type: 'textbox', left: 60, top: 1235, width: 300, text: 'ALFATIH DUNIA WISATA', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#FFFFFF', originX: 'left', originY: 'top', editable: true },
+                // Footer contact
+                { type: 'textbox', left: 380, top: 1235, width: 640, text: 'adwisata.com  |  @alfatih.umroh  |  +62 815-164-222-5', fontSize: 15, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#FFFFFF', textAlign: 'right', originX: 'left', originY: 'top', editable: true },
+                // Footer license
+                { type: 'textbox', left: 60, top: 1280, width: 960, text: 'Penyelenggara Perjalanan Ibadah Umrah (PPIU) No. Izin: 1234/2024', fontSize: 12, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500', fill: '#FFFFFF', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
+            ]
+        }
+    },
+    {
+        id: 'hotel-airline-story-conversion',
+        name: 'Hotel & Penerbangan (Story)',
+        description: 'Dua foto berdampingan: hotel bintang 5 dan penerbangan langsung, format Story. Mendukung AI Auto-Fill.',
+        previewColors: ['#0084FF', '#F59E0B', '#F1F5F9'],
+        aspectRatio: 'story',
+        json: {
+            version: '7.2.0',
+            width: 1080,
+            height: 1920,
+            objects: [
+                // Background
+                { type: 'rect', left: 0, top: 0, width: 1080, height: 1920, fill: '#F8FAFC', originX: 'left', originY: 'top', selectable: false, evented: false },
+                // Top accent bar
+                { type: 'rect', left: 0, top: 0, width: 1080, height: 20, fill: '#F59E0B', originX: 'left', originY: 'top', selectable: false, evented: false },
+                // Gold divider
+                { type: 'rect', left: 80, top: 315, width: 250, height: 5, fill: '#D4A373', originX: 'left', originY: 'top', selectable: true },
+                // Hotel image (left)
+                { type: 'image', left: 80, top: 500, width: 440, height: 430, scaleX: 1, scaleY: 1, src: 'https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&w=440&h=430&q=80', rx: 14, ry: 14, crossOrigin: 'anonymous', originX: 'left', originY: 'top', selectable: true },
+                // Airline image (right)
+                { type: 'image', left: 560, top: 500, width: 440, height: 430, scaleX: 1, scaleY: 1, src: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=440&h=430&q=80', rx: 14, ry: 14, crossOrigin: 'anonymous', originX: 'left', originY: 'top', selectable: true },
+                // Info card 1 (date)
+                { type: 'rect', left: 80, top: 1060, width: 280, height: 120, rx: 14, ry: 14, fill: '#F1F5F9', originX: 'left', originY: 'top', selectable: false, evented: false },
+                // Info card 2 (duration)
+                { type: 'rect', left: 400, top: 1060, width: 280, height: 120, rx: 14, ry: 14, fill: '#F1F5F9', originX: 'left', originY: 'top', selectable: false, evented: false },
+                // Info card 3 (price)
+                { type: 'rect', left: 720, top: 1060, width: 280, height: 120, rx: 14, ry: 14, fill: '#F1F5F9', originX: 'left', originY: 'top', selectable: false, evented: false },
+                // CTA button background
+                { type: 'rect', left: 320, top: 1590, width: 440, height: 70, rx: 35, ry: 35, fill: '#0084FF', originX: 'left', originY: 'top', selectable: true },
+                // Footer background
+                { type: 'rect', left: 0, top: 1740, width: 1080, height: 180, fill: '#0084FF', originX: 'left', originY: 'top', selectable: false, evented: false },
+                // Category
+                { type: 'textbox', left: 80, top: 140, width: 920, text: 'PAKET PREMIUM UMRAH', fontSize: 20, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#F59E0B', charSpacing: 150, originX: 'left', originY: 'top', editable: true },
+                // Title
+                { type: 'textbox', left: 80, top: 190, width: 920, text: 'Umrah Premium Syawal 1447H', fontSize: 55, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#0F172A', lineHeight: 1.2, originX: 'left', originY: 'top', editable: true },
+                // Description
+                { type: 'textbox', left: 80, top: 358, width: 920, text: 'Nikmati pengalaman ibadah dengan fasilitas premium — hotel bintang 5 dan penerbangan langsung.', fontSize: 22, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 'normal', fill: '#64748B', lineHeight: 1.4, originX: 'left', originY: 'top', editable: true },
+                // Hotel label
+                { type: 'textbox', left: 80, top: 946, width: 440, text: '🏨 Hotel Bintang 5 Makkah', fontSize: 18, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#0F172A', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
+                // Airline label
+                { type: 'textbox', left: 560, top: 946, width: 440, text: '✈ Penerbangan Langsung', fontSize: 18, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#0F172A', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
+                // Card 1 text
+                { type: 'textbox', left: 80, top: 1082, width: 280, text: 'Keberangkatan\n12 Okt 2026', fontSize: 22, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#0F172A', textAlign: 'center', lineHeight: 1.3, originX: 'left', originY: 'top', editable: true },
+                // Card 2 text
+                { type: 'textbox', left: 400, top: 1082, width: 280, text: 'Durasi\n12 Hari', fontSize: 22, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#0F172A', textAlign: 'center', lineHeight: 1.3, originX: 'left', originY: 'top', editable: true },
+                // Card 3 text
+                { type: 'textbox', left: 720, top: 1082, width: 280, text: 'Harga Mulai\nRp 32.5 Jt', fontSize: 22, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#F59E0B', textAlign: 'center', lineHeight: 1.3, originX: 'left', originY: 'top', editable: true },
+                // Room pricing
+                { type: 'textbox', left: 80, top: 1215, width: 920, text: 'Quad: Rp 32.500.000 | Triple: Rp 34.500.000 | Double: Rp 36.500.000', fontSize: 20, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '600', fill: '#64748B', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
+                // Feature bullet diamonds
+                { type: 'textbox', left: 120, top: 1270, width: 34, text: '◆\n◆\n◆', fontSize: 13, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#F59E0B', textAlign: 'center', lineHeight: 2.46, originX: 'left', originY: 'top', editable: true },
+                // Feature list
+                { type: 'textbox', left: 166, top: 1270, width: 754, text: 'Hotel Makkah: Anjum / Setaraf (*5) & Madinah: Front Taiba (*5)\nTiket Pesawat Saudia Airlines Penerbangan Langsung Jeddah\nMuthawwif Pembimbing Ibadah & Air Zamzam 5L', fontSize: 22, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500', fill: '#0F172A', lineHeight: 1.6, originX: 'left', originY: 'top', editable: true },
+                // CTA text
+                { type: 'textbox', left: 320, top: 1611, width: 440, text: 'DAFTAR SEKARANG', fontSize: 20, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#FFFFFF', textAlign: 'center', charSpacing: 100, originX: 'left', originY: 'top', editable: true },
+                // Footer brand
+                { type: 'textbox', left: 80, top: 1765, width: 320, text: 'ALFATIH DUNIA WISATA', fontSize: 18, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#FFFFFF', originX: 'left', originY: 'top', editable: true },
+                // Footer contact
+                { type: 'textbox', left: 420, top: 1765, width: 580, text: 'adwisata.com  |  @alfatih.umroh  |  +62 815-164-222-5', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#FFFFFF', textAlign: 'right', originX: 'left', originY: 'top', editable: true },
+                // Footer license
+                { type: 'textbox', left: 80, top: 1825, width: 920, text: 'Penyelenggara Perjalanan Ibadah Umrah (PPIU) No. Izin: 1234/2024', fontSize: 14, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500', fill: '#FFFFFF', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
+            ]
+        }
     }
 ];
 
