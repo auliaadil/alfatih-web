@@ -253,8 +253,8 @@ const NewDesignModal: React.FC<NewDesignModalProps> = ({
                                         style={{ aspectRatio: '4/5' }}
                                         title={d.name}
                                     >
-                                        {d.thumbnail
-                                            ? <img src={d.thumbnail} alt={d.name} className="w-full h-full object-cover" />
+                                        {d.slides[0]?.thumbnail
+                                            ? <img src={d.slides[0].thumbnail} alt={d.name} className="w-full h-full object-cover" />
                                             : <div className="w-full h-full bg-gray-100 flex items-center justify-center"><Clock className="w-4 h-4 text-gray-300" /></div>
                                         }
                                     </button>
@@ -378,6 +378,10 @@ const PosterMaker: React.FC = () => {
     const [canUndo, setCanUndo] = useState(false);
     const [canRedo, setCanRedo] = useState(false);
     const [propRefreshKey, setPropRefreshKey] = useState(0);
+
+    // Slides
+    const [slides, setSlides] = useState<PosterSlide[]>([]);
+    const [activeSlideIndex, setActiveSlideIndex] = useState(0);
 
     // Zoom
     const [zoom, setZoom] = useState(0.35);
@@ -593,6 +597,15 @@ const PosterMaker: React.FC = () => {
         setEditingTemplateName('');
         setLoadedStarterId(null);
         setCanvasSize(size);
+        const blankJson = {
+            version: '7.2.0',
+            width: 1080,
+            height: size === 'post' ? 1350 : 1920,
+            objects: [],
+            background: '#ffffff',
+        };
+        setSlides([{ id: `${Date.now()}`, json: blankJson, thumbnail: '' }]);
+        setActiveSlideIndex(0);
         setTimeout(() => {
             const canvas = canvasRef.current?.getCanvas();
             if (canvas) {
@@ -644,6 +657,8 @@ const PosterMaker: React.FC = () => {
             setCanvasSize(override.aspect_ratio);
             setEditingTemplateId(override.id);
             setEditingTemplateName(override.name);
+            setSlides([{ id: `${Date.now()}`, json: override.canvas_json, thumbnail: '' }]);
+            setActiveSlideIndex(0);
             setTimeout(() => canvasRef.current?.loadTemplate(override.canvas_json), 200);
             setIsNewDesignModalOpen(false);
             return;
@@ -653,6 +668,8 @@ const PosterMaker: React.FC = () => {
         setCanvasSize(template.aspectRatio);
         setEditingTemplateId(null);
         setEditingTemplateName(template.name);
+        setSlides([{ id: `${Date.now()}`, json: template.json, thumbnail: '' }]);
+        setActiveSlideIndex(0);
         setTimeout(() => canvasRef.current?.loadTemplate(template.json), 200);
         const type = getTemplateType(template);
         if (type !== 'blank') setRightTab('ai');
@@ -665,6 +682,8 @@ const PosterMaker: React.FC = () => {
         setCanvasSize(t.aspect_ratio);
         setEditingTemplateId(t.id);
         setEditingTemplateName(t.name);
+        setSlides([{ id: `${Date.now()}`, json: t.canvas_json, thumbnail: '' }]);
+        setActiveSlideIndex(0);
         setTimeout(() => canvasRef.current?.loadTemplate(t.canvas_json), 200);
         setIsNewDesignModalOpen(false);
     };
@@ -673,16 +692,17 @@ const PosterMaker: React.FC = () => {
         setIsNewDesignModalOpen(true);
     };
 
-    const handlePickDraft = (draft: PosterDraft) => {
-        const json = draft.json;
+    const handlePickDraft = (d: PosterDraft) => {
         canvasRef.current?.setFreehandMode(false);
         setIsFreehandActive(false);
         canvasRef.current?.cancelDraw();
         setActiveDrawTool(null);
         handleSetCursorMode('select');
-        if (json.width === 1080 && json.height === 1350) setCanvasSize('post');
-        else if (json.width === 1080 && json.height === 1920) setCanvasSize('story');
-        setTimeout(() => canvasRef.current?.loadTemplate(json), 200);
+        const draft = normalizeDraft(d);
+        setSlides(draft.slides);
+        setActiveSlideIndex(0);
+        setCanvasSize(draft.canvasSize);
+        setTimeout(() => canvasRef.current?.loadTemplate(draft.slides[0].json), 200);
         setLoadedTemplate(null);
         setEditingTemplateId(null);
         setEditingTemplateName('');
@@ -693,11 +713,12 @@ const PosterMaker: React.FC = () => {
     const handleSaveDraft = () => {
         const canvas = canvasRef.current?.getCanvas();
         if (!canvas) return;
+        const currentSlides = snapshotActiveSlide();
         const newDraft: PosterDraft = {
             id: `${Date.now()}`,
             name: `Draft ${new Date().toLocaleString('id-ID')}`,
-            json: canvas.toJSON(),
-            thumbnail: generateThumbnail() ?? '',
+            slides: currentSlides,
+            canvasSize,
             created_at: new Date().toISOString(),
         };
         const updated = [newDraft, ...drafts].slice(0, MAX_DRAFTS);
@@ -733,6 +754,62 @@ const PosterMaker: React.FC = () => {
         } catch {
             return undefined;
         }
+    };
+
+    const snapshotActiveSlide = (): PosterSlide[] => {
+        const canvas = canvasRef.current?.getCanvas();
+        if (!canvas || slides.length === 0) return slides;
+        const json = canvas.toJSON();
+        const thumbnail = generateThumbnail() ?? '';
+        const updated = slides.map((s, i) =>
+            i === activeSlideIndex ? { ...s, json, thumbnail } : s
+        );
+        setSlides(updated);
+        return updated;
+    };
+
+    const switchToSlide = (newIndex: number) => {
+        if (newIndex === activeSlideIndex) return;
+        const updated = snapshotActiveSlide();
+        setActiveSlideIndex(newIndex);
+        setTimeout(() => canvasRef.current?.loadTemplate(updated[newIndex].json), 100);
+    };
+
+    const handleAddSlide = () => {
+        const blankJson = {
+            version: '7.2.0',
+            width: 1080,
+            height: canvasSize === 'post' ? 1350 : 1920,
+            objects: [],
+            background: '#ffffff',
+        };
+        const newSlide: PosterSlide = { id: `${Date.now()}`, json: blankJson, thumbnail: '' };
+        const updated = snapshotActiveSlide();
+        const newSlides = [...updated, newSlide];
+        setSlides(newSlides);
+        const newIndex = newSlides.length - 1;
+        setActiveSlideIndex(newIndex);
+        setTimeout(() => canvasRef.current?.loadTemplate(blankJson), 100);
+    };
+
+    const handleDuplicateSlide = (index: number) => {
+        const updated = snapshotActiveSlide();
+        const clone: PosterSlide = { ...updated[index], id: `${Date.now()}` };
+        const newSlides = [...updated.slice(0, index + 1), clone, ...updated.slice(index + 1)];
+        setSlides(newSlides);
+        const newIndex = index + 1;
+        setActiveSlideIndex(newIndex);
+        setTimeout(() => canvasRef.current?.loadTemplate(clone.json), 100);
+    };
+
+    const handleDeleteSlide = (index: number) => {
+        if (slides.length <= 1) return;
+        const updated = snapshotActiveSlide();
+        const newSlides = updated.filter((_, i) => i !== index);
+        setSlides(newSlides);
+        const newIndex = Math.min(index, newSlides.length - 1);
+        setActiveSlideIndex(newIndex);
+        setTimeout(() => canvasRef.current?.loadTemplate(newSlides[newIndex].json), 100);
     };
 
     const handleSaveNew = async (name: string, description: string) => {
