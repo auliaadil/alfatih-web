@@ -35,3 +35,4 @@ supabase/.temp
 
 # Claude Code local state (worktrees, settings)
 .claude/
+.worktrees/
