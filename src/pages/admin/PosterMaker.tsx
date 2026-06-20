@@ -1337,7 +1337,7 @@ const PosterMaker: React.FC = () => {
             {/* New Design Modal */}
             {isNewDesignModalOpen && (
                 <NewDesignModal
-                    canDismiss={loadedTemplate !== null || editingTemplateId !== null}
+                    canDismiss={true}
                     starterOverrides={starterOverrides}
                     customTemplates={customTemplates}
                     drafts={drafts}

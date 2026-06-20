@@ -59,6 +59,7 @@ export function changeBulletStyle(
   obj.bulletList = { ...obj.bulletList, style: newStyle };
   normalizeBulletList(obj);
   canvas.requestRenderAll();
+  canvas.fire('object:modified', { target: obj } as any);
 }
 
 export function changeBulletColor(
@@ -69,6 +70,7 @@ export function changeBulletColor(
   obj.bulletList = { ...obj.bulletList, bulletColor: newColor };
   applyBulletStyles(obj);
   canvas.requestRenderAll();
+  canvas.fire('object:modified', { target: obj } as any);
 }
 
 export function createBulletListTextbox(

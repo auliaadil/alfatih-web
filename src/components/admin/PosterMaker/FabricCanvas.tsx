@@ -160,10 +160,13 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
             canvas.on('text:editing:exited', (e: any) => {
                 const target = e.target;
                 if (target && (target as any).bulletList) {
+                    const textBefore = target.text;
                     normalizeBulletList(target as any);
                     canvas.requestRenderAll();
-                    onCanvasModified?.();
-                    saveHistory(canvas);
+                    if (target.text !== textBefore) {
+                        onCanvasModified?.();
+                        saveHistory(canvas);
+                    }
                 }
             });
             canvas.on('object:scaling', (e) => { if (e.target) onObjectTransforming?.(e.target as FabricObject); });
