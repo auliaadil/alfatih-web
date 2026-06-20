@@ -3,10 +3,13 @@ import { LayoutTemplate } from 'lucide-react';
 import { generateTemplateThumbnail } from './templateThumbnail';
 import { useSiteSettings } from '../../../contexts/SiteSettingsContext';
 
+export type TemplateType = 'Conversion' | 'Tour Promotion' | 'Documentation' | 'Content';
+
 export interface PosterTemplate {
     id: string;
     name: string;
     description: string;
+    type: TemplateType;
     previewColors: [string, string, string];
     aspectRatio: 'post' | 'story';
     json: object;
@@ -85,6 +88,7 @@ const BASE_TEMPLATES: PosterTemplate[] = [
         id: 'brochure-post-conversion',
         name: 'Brosur Paket Umrah (Post)',
         description: 'Brosur promosi paket Umrah dengan tata letak minimalis dan premium. Mendukung AI Auto-Fill.',
+        type: 'Conversion',
         previewColors: ['#0084FF', '#D4A373', '#F8FAFC'],
         aspectRatio: 'post',
         json: {
@@ -121,6 +125,7 @@ const BASE_TEMPLATES: PosterTemplate[] = [
         id: 'brochure-story-conversion',
         name: 'Brosur Paket Umrah (Story)',
         description: 'Brosur promosi paket Umrah dalam format portrait Story. Mendukung AI Auto-Fill.',
+        type: 'Conversion',
         previewColors: ['#0084FF', '#D4A373', '#F8FAFC'],
         aspectRatio: 'story',
         json: {
@@ -473,6 +478,7 @@ const BASE_TEMPLATES: PosterTemplate[] = [
         id: 'promo-post-conversion',
         name: 'Promo Diskon Umrah (Post)',
         description: 'Harga coret dengan badge HEMAT dan urgency kursi tersisa. Mendukung AI Auto-Fill.',
+        type: 'Conversion',
         previewColors: ['#0084FF', '#EF4444', '#F8FAFC'],
         aspectRatio: 'post',
         json: {
@@ -535,6 +541,7 @@ const BASE_TEMPLATES: PosterTemplate[] = [
         id: 'promo-story-conversion',
         name: 'Promo Diskon Umrah (Story)',
         description: 'Harga coret dengan badge HEMAT dan urgency kursi tersisa, format Story. Mendukung AI Auto-Fill.',
+        type: 'Conversion',
         previewColors: ['#0084FF', '#EF4444', '#F8FAFC'],
         aspectRatio: 'story',
         json: {
@@ -597,6 +604,7 @@ const BASE_TEMPLATES: PosterTemplate[] = [
         id: 'hotel-airline-post-conversion',
         name: 'Hotel & Penerbangan (Post)',
         description: 'Dua foto berdampingan: hotel bintang 5 dan penerbangan langsung. Mendukung AI Auto-Fill.',
+        type: 'Conversion',
         previewColors: ['#F59E0B', '#0084FF', '#F8FAFC'],
         aspectRatio: 'post',
         json: {
@@ -667,6 +675,7 @@ const BASE_TEMPLATES: PosterTemplate[] = [
         id: 'hotel-airline-story-conversion',
         name: 'Hotel & Penerbangan (Story)',
         description: 'Dua foto berdampingan: hotel bintang 5 dan penerbangan langsung, format Story. Mendukung AI Auto-Fill.',
+        type: 'Conversion',
         previewColors: ['#F59E0B', '#0084FF', '#F8FAFC'],
         aspectRatio: 'story',
         json: {
@@ -737,6 +746,7 @@ const BASE_TEMPLATES: PosterTemplate[] = [
         id: 'feature-grid-post-conversion',
         name: 'Grid Fasilitas Umrah (Post)',
         description: 'Split vertikal: foto tall di kiri, kartu fasilitas bertumpuk di kanan. Mendukung AI Auto-Fill.',
+        type: 'Conversion',
         previewColors: ['#0084FF', '#F59E0B', '#F8FAFC'],
         aspectRatio: 'post',
         json: {
@@ -813,6 +823,7 @@ const BASE_TEMPLATES: PosterTemplate[] = [
         id: 'feature-grid-story-conversion',
         name: 'Grid Fasilitas Umrah (Story)',
         description: 'Split vertikal: foto tall di kiri, kartu fasilitas bertumpuk di kanan, format Story. Mendukung AI Auto-Fill.',
+        type: 'Conversion',
         previewColors: ['#0084FF', '#F59E0B', '#F8FAFC'],
         aspectRatio: 'story',
         json: {
@@ -889,6 +900,7 @@ const BASE_TEMPLATES: PosterTemplate[] = [
         id: 'departure-focus-post-conversion',
         name: 'Fokus Keberangkatan (Post)',
         description: 'Tanggal besar dioverlay di atas gambar dengan panel putih semi-transparan. Mendukung AI Auto-Fill.',
+        type: 'Conversion',
         previewColors: ['#F59E0B', '#0084FF', '#F8FAFC'],
         aspectRatio: 'post',
         json: {
@@ -959,6 +971,7 @@ const BASE_TEMPLATES: PosterTemplate[] = [
         id: 'departure-focus-story-conversion',
         name: 'Fokus Keberangkatan (Story)',
         description: 'Tanggal besar dioverlay di atas gambar dengan panel putih semi-transparan, format Story. Mendukung AI Auto-Fill.',
+        type: 'Conversion',
         previewColors: ['#F59E0B', '#0084FF', '#F8FAFC'],
         aspectRatio: 'story',
         json: {
