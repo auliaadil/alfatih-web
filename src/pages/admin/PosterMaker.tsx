@@ -579,7 +579,7 @@ const PosterMaker: React.FC = () => {
 
             for (let i = 0; i < updated.length; i++) {
                 canvasRef.current?.loadTemplate(updated[i].json);
-                // Wait for Fabric.js to finish rendering
+                // TODO: replace fixed delay with fabric after:render hook for reliable export on slow machines
                 await new Promise<void>(resolve => setTimeout(resolve, 300));
 
                 const dataUrl = await canvasRef.current?.exportPng();
@@ -627,6 +627,7 @@ const PosterMaker: React.FC = () => {
         setTimeout(() => {
             const canvas = canvasRef.current?.getCanvas();
             if (canvas) {
+                // canvas.clear() instead of loadTemplate: blank state is always white + empty objects
                 canvas.clear();
                 canvas.backgroundColor = '#ffffff';
                 canvas.requestRenderAll();
@@ -716,11 +717,10 @@ const PosterMaker: React.FC = () => {
         canvasRef.current?.cancelDraw();
         setActiveDrawTool(null);
         handleSetCursorMode('select');
-        const draft = normalizeDraft(d);
-        setSlides(draft.slides);
+        setSlides(d.slides);
         setActiveSlideIndex(0);
-        setCanvasSize(draft.canvasSize);
-        setTimeout(() => canvasRef.current?.loadTemplate(draft.slides[0].json), 200);
+        setCanvasSize(d.canvasSize);
+        setTimeout(() => canvasRef.current?.loadTemplate(d.slides[0].json), 200);
         setLoadedTemplate(null);
         setEditingTemplateId(null);
         setEditingTemplateName('');
