@@ -2,35 +2,26 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Pencil, Trash2, LayoutTemplate, Loader2, Lock } from 'lucide-react';
 import { SavedTemplate, fetchTemplates, deleteTemplate } from '../../services/posterTemplates';
-import { STARTER_TEMPLATES, PosterTemplate, TemplateThumbnail } from '../../components/admin/PosterMaker/TemplatePanel';
+import { STARTER_TEMPLATES, PosterTemplate, TemplateThumbnail, TemplateType } from '../../components/admin/PosterMaker/TemplatePanel';
 
-const TYPE_LABELS: Record<string, string> = {
-    conversion: 'Conversion',
-    aspiration: 'Aspiration',
-    'edu-reminder': 'Edu Reminder',
-    'social-proof': 'Social Proof',
-    blank: 'Blank',
-    custom: 'Custom',
+const TYPE_LABELS: Record<TemplateType, string> = {
+    'Conversion': 'Conversion',
+    'Tour Promotion': 'Tour Promotion',
+    'Documentation': 'Documentation',
+    'Content': 'Content',
 };
 
-const TYPE_COLORS: Record<string, string> = {
-    conversion: 'bg-blue-100 text-blue-700',
-    aspiration: 'bg-yellow-100 text-yellow-700',
-    'edu-reminder': 'bg-green-100 text-green-700',
-    'social-proof': 'bg-purple-100 text-purple-700',
-    blank: 'bg-gray-100 text-gray-600',
-    custom: 'bg-orange-100 text-orange-700',
-};
-
-const getStarterType = (id: string): string => {
-    if (id.includes('conversion')) return 'conversion';
-    if (id.includes('aspiration')) return 'aspiration';
-    if (id.includes('edu-reminder')) return 'edu-reminder';
-    if (id.includes('social-proof')) return 'social-proof';
-    return 'blank';
+const TYPE_COLORS: Record<TemplateType, string> = {
+    'Conversion': 'bg-blue-100 text-blue-700',
+    'Tour Promotion': 'bg-amber-100 text-amber-700',
+    'Documentation': 'bg-purple-100 text-purple-700',
+    'Content': 'bg-teal-100 text-teal-700',
 };
 
 type FilterTab = 'all' | 'post' | 'story';
+type TypeFilter = 'All' | TemplateType;
+
+const POSTER_TYPE_PILLS: TypeFilter[] = ['All', 'Conversion', 'Tour Promotion', 'Documentation', 'Content'];
 
 const PosterTemplates: React.FC = () => {
     const navigate = useNavigate();
@@ -38,6 +29,7 @@ const PosterTemplates: React.FC = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [deletingId, setDeletingId] = useState<string | null>(null);
     const [filter, setFilter] = useState<FilterTab>('all');
+    const [typeFilter, setTypeFilter] = useState<TypeFilter>('All');
 
     // Map starter_id → override for quick lookup
     const starterOverrides = React.useMemo(() => {
@@ -76,13 +68,14 @@ const PosterTemplates: React.FC = () => {
         });
     };
 
-    const filteredStarters = filter === 'all'
-        ? STARTER_TEMPLATES
-        : STARTER_TEMPLATES.filter(t => t.aspectRatio === filter);
+    const filteredStarters = STARTER_TEMPLATES.filter(t =>
+        (filter === 'all' || t.aspectRatio === filter) &&
+        (typeFilter === 'All' || t.type === typeFilter)
+    );
 
-    const filteredCustom = filter === 'all'
-        ? customTemplates
-        : customTemplates.filter(t => t.aspect_ratio === filter);
+    const filteredCustom = customTemplates.filter(t =>
+        (filter === 'all' || t.aspect_ratio === filter)
+    );
 
     const totalCount = filteredStarters.length + filteredCustom.length;
 
@@ -106,23 +99,40 @@ const PosterTemplates: React.FC = () => {
             </div>
 
             {/* Filter tabs */}
-            <div className="flex items-center gap-2">
-                {(['all', 'post', 'story'] as FilterTab[]).map(tab => (
-                    <button
-                        key={tab}
-                        onClick={() => setFilter(tab)}
-                        className={`px-3 py-1.5 rounded-lg text-sm font-medium transition border ${
-                            filter === tab
-                                ? 'bg-primary text-white border-primary'
-                                : 'bg-white border-gray-200 text-gray-600 hover:border-primary hover:text-primary'
-                        }`}
-                    >
-                        {tab === 'all' ? 'Semua' : tab === 'post' ? 'Post (4:5)' : 'Story (9:16)'}
-                    </button>
-                ))}
-                {!isLoading && (
-                    <span className="ml-auto text-sm text-gray-400">{totalCount} template</span>
-                )}
+            <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                    {(['all', 'post', 'story'] as FilterTab[]).map(tab => (
+                        <button
+                            key={tab}
+                            onClick={() => setFilter(tab)}
+                            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition border ${
+                                filter === tab
+                                    ? 'bg-primary text-white border-primary'
+                                    : 'bg-white border-gray-200 text-gray-600 hover:border-primary hover:text-primary'
+                            }`}
+                        >
+                            {tab === 'all' ? 'Semua' : tab === 'post' ? 'Post (4:5)' : 'Story (9:16)'}
+                        </button>
+                    ))}
+                    {!isLoading && (
+                        <span className="ml-auto text-sm text-gray-400">{totalCount} template</span>
+                    )}
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                    {POSTER_TYPE_PILLS.map(pill => (
+                        <button
+                            key={pill}
+                            onClick={() => setTypeFilter(pill)}
+                            className={`rounded-full px-3 py-1 text-[10px] font-semibold transition-colors ${
+                                typeFilter === pill
+                                    ? 'bg-primary text-white'
+                                    : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                            }`}
+                        >
+                            {pill}
+                        </button>
+                    ))}
+                </div>
             </div>
 
             {isLoading ? (
@@ -200,7 +210,6 @@ interface StarterCardProps {
 }
 
 const StarterCard: React.FC<StarterCardProps> = ({ template: t, override, onUse }) => {
-    const type = getStarterType(t.id);
     return (
         <div className={`bg-white rounded-xl border shadow-sm overflow-hidden hover:shadow-md transition-shadow relative ${override ? 'border-primary/40' : 'border-gray-200'}`}>
             {override && (
@@ -223,8 +232,8 @@ const StarterCard: React.FC<StarterCardProps> = ({ template: t, override, onUse 
                     {override ? override.name : t.description}
                 </p>
                 <div className="flex flex-wrap items-center gap-1.5 mt-2">
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${TYPE_COLORS[type] ?? TYPE_COLORS.custom}`}>
-                        {TYPE_LABELS[type] ?? type}
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${TYPE_COLORS[t.type] ?? 'bg-gray-100 text-gray-600'}`}>
+                        {TYPE_LABELS[t.type] ?? t.type}
                     </span>
                     <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">
                         {t.aspectRatio === 'post' ? '4:5' : '9:16'}
