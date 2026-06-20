@@ -1320,11 +1320,19 @@ interface TemplatePanelProps {
     onLoadTemplate: (template: PosterTemplate) => void;
 }
 
+const FILTER_PILLS: Array<TemplateType | 'All'> = ['All', 'Conversion', 'Tour Promotion', 'Documentation', 'Content'];
+
 const TemplatePanel: React.FC<TemplatePanelProps> = ({ onLoadTemplate }) => {
     const siteSettings = useSiteSettings();
     const liveTemplates = useMemo(() => buildStarterTemplates(siteSettings), [siteSettings]);
-    const postTemplates  = liveTemplates.filter(t => t.aspectRatio === 'post');
-    const storyTemplates = liveTemplates.filter(t => t.aspectRatio === 'story');
+    const [typeFilter, setTypeFilter] = useState<TemplateType | 'All'>('All');
+
+    const filteredTemplates = typeFilter === 'All'
+        ? liveTemplates
+        : liveTemplates.filter(t => t.type === typeFilter);
+
+    const postTemplates  = filteredTemplates.filter(t => t.aspectRatio === 'post');
+    const storyTemplates = filteredTemplates.filter(t => t.aspectRatio === 'story');
 
     const renderGroup = (title: string, subtitle: string, templates: PosterTemplate[]) => (
         <div className="mb-6">
@@ -1362,12 +1370,27 @@ const TemplatePanel: React.FC<TemplatePanelProps> = ({ onLoadTemplate }) => {
 
     return (
         <div>
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex items-center gap-2 mb-3">
                 <LayoutTemplate className="w-4 h-4 text-gray-500" />
                 <div>
                     <h3 className="text-sm font-semibold text-gray-800">Templates</h3>
                     <p className="text-[10px] text-gray-400">Design system Alfatih Dunia Wisata</p>
                 </div>
+            </div>
+            <div className="flex flex-wrap gap-1.5 mb-4">
+                {FILTER_PILLS.map(pill => (
+                    <button
+                        key={pill}
+                        onClick={() => setTypeFilter(pill)}
+                        className={`rounded-full px-3 py-1 text-[10px] font-semibold transition-colors ${
+                            typeFilter === pill
+                                ? 'bg-primary text-white'
+                                : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                        }`}
+                    >
+                        {pill}
+                    </button>
+                ))}
             </div>
             {renderGroup('Instagram Post (4:5)', '1080 × 1350 px', postTemplates)}
             {renderGroup('Instagram Story (9:16)', '1080 × 1920 px', storyTemplates)}
