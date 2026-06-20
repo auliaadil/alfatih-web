@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useImperativeHandle, forwardRef, useState } from 'react';
 import { Canvas, Rect, Textbox, Circle, Line, Path, PencilBrush, FabricImage, FabricObject } from 'fabric';
 import { installSceneSnap } from './fabricSnap';
+import { createBulletListTextbox, normalizeBulletList } from './fabricBulletList';
 
 export type CanvasSize = 'post' | 'story';
 
@@ -54,6 +55,7 @@ export interface FabricCanvasRef {
     redo: () => void;
     addArrow: () => void;
     addDivider: () => void;
+    addBulletList: () => void;
     setFreehandMode: (enabled: boolean) => void;
     isFreehandMode: () => boolean;
     cancelDraw: () => void;
@@ -110,7 +112,7 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
             if (historyIndex.current < history.current.length - 1) {
                 history.current = history.current.slice(0, historyIndex.current + 1);
             }
-            history.current.push(c.toJSON());
+            history.current.push(c.toJSON(['bulletList']));
             historyIndex.current = history.current.length - 1;
             updateHistoryState();
         };
@@ -154,6 +156,15 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
                 if ((e.target as any).isPreview) return;
                 onCanvasModified?.();
                 saveHistory(canvas);
+            });
+            canvas.on('text:editing:exited', (e: any) => {
+                const target = e.target;
+                if (target && (target as any).bulletList) {
+                    normalizeBulletList(target as any);
+                    canvas.requestRenderAll();
+                    onCanvasModified?.();
+                    saveHistory(canvas);
+                }
             });
             canvas.on('object:scaling', (e) => { if (e.target) onObjectTransforming?.(e.target as FabricObject); });
             canvas.on('object:moving', (e) => { if (e.target) onObjectTransforming?.(e.target as FabricObject); });
@@ -617,6 +628,15 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
                     c.defaultCursor = 'text';
                     c.hoverCursor = 'text';
                 }
+            },
+
+            addBulletList: () => {
+                const c = fabricRef.current;
+                if (!c) return;
+                const tb = createBulletListTextbox(c);
+                c.add(tb);
+                c.setActiveObject(tb);
+                c.requestRenderAll();
             },
 
             isTextPlacementMode: () => textPlacementRef.current,

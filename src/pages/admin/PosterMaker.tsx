@@ -778,7 +778,7 @@ const PosterMaker: React.FC = () => {
     const snapshotActiveSlide = (): PosterSlide[] => {
         const canvas = canvasRef.current?.getCanvas();
         if (!canvas || slides.length === 0) return slides;
-        const json = canvas.toJSON();
+        const json = canvas.toJSON(['bulletList']);
         const thumbnail = generateThumbnail() ?? '';
         const updated = slides.map((s, i) =>
             i === activeSlideIndex ? { ...s, json, thumbnail } : s
@@ -842,7 +842,7 @@ const PosterMaker: React.FC = () => {
             description: description.trim(),
             aspect_ratio: canvasSize,
             template_type: templateType,
-            canvas_json: canvas.toJSON(),
+            canvas_json: canvas.toJSON(['bulletList']),
             thumbnail_data_url: generateThumbnail(),
             starter_id: loadedStarterId,
         });
@@ -868,7 +868,7 @@ const PosterMaker: React.FC = () => {
         const ok = await updateTemplate(editingTemplateId, {
             name: name.trim(),
             description: description.trim(),
-            canvas_json: canvas.toJSON(),
+            canvas_json: canvas.toJSON(['bulletList']),
             thumbnail_data_url: generateThumbnail(),
         });
 
