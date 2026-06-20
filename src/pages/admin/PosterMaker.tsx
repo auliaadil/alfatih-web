@@ -56,6 +56,7 @@ const getTemplateType = (template: PosterTemplate): TemplateType => {
     if (template.id.includes('aspiration')) return 'aspiration';
     if (template.id.includes('edu-reminder')) return 'edu-reminder';
     if (template.id.includes('social-proof')) return 'social-proof';
+    if (template.id.includes('content')) return 'content';
     return 'blank';
 };
 
@@ -196,7 +197,9 @@ const NewDesignModal: React.FC<NewDesignModalProps> = ({
     const [size, setSize] = useState<CanvasSize>('post');
     const [typeFilter, setTypeFilter] = useState<PosterTemplateType | 'All'>('All');
     const visibleStarters = starterTemplates.filter(t =>
-        t.aspectRatio === size && (typeFilter === 'All' || t.type === typeFilter)
+        t.aspectRatio === size &&
+        (typeFilter === 'All' || t.type === typeFilter) &&
+        !t.id.startsWith('content-cover-')
     );
     const visibleCustom = customTemplates.filter(t => t.aspect_ratio === size);
 

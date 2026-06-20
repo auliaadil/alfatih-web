@@ -3,7 +3,7 @@ import { TourPackage } from '../types'
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL
 
-export type TemplateType = 'conversion' | 'aspiration' | 'edu-reminder' | 'social-proof' | 'blank'
+export type TemplateType = 'conversion' | 'aspiration' | 'edu-reminder' | 'social-proof' | 'content' | 'blank'
 
 export interface TemplateInputs {
   templateType: TemplateType
