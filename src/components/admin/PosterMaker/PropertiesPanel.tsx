@@ -14,7 +14,7 @@ const GOOGLE_FONTS = [
     // Display / Bold
     'Bebas Neue', 'Anton', 'Oswald',
     // Decorative / Script
-    'Pacifico', 'Dancing Script', 'Caveat',
+    'Great Vibes', 'Pacifico', 'Dancing Script', 'Caveat',
     // Arabic
     'Amiri', 'Noto Sans Arabic', 'Cairo', 'Tajawal',
 ];
