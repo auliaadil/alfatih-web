@@ -12,6 +12,7 @@ import EditorToolbar from '../../components/admin/PosterMaker/EditorToolbar';
 import LayerPanel from '../../components/admin/PosterMaker/LayerPanel';
 import PropertiesPanel from '../../components/admin/PosterMaker/PropertiesPanel';
 import CanvasZoom from '../../components/admin/PosterMaker/CanvasZoom';
+import SlideStrip from '../../components/admin/PosterMaker/SlideStrip';
 import CanvasContextMenu from '../../components/admin/PosterMaker/CanvasContextMenu';
 import AssetPanel from '../../components/admin/PosterMaker/AssetPanel';
 import { STARTER_TEMPLATES, buildStarterTemplates, PosterTemplate, TemplateThumbnail, TemplateType as PosterTemplateType } from '../../components/admin/PosterMaker/TemplatePanel';
@@ -1205,6 +1206,20 @@ const PosterMaker: React.FC = () => {
                             }}
                         />
                     </div>
+
+                    {/* Slide strip — only show once a design is open */}
+                    {slides.length > 0 && (
+                        <SlideStrip
+                            slides={slides}
+                            activeIndex={activeSlideIndex}
+                            canvasSize={canvasSize}
+                            onSwitch={switchToSlide}
+                            onAdd={handleAddSlide}
+                            onDuplicate={handleDuplicateSlide}
+                            onDelete={handleDeleteSlide}
+                        />
+                    )}
+
                     <CanvasZoom
                         zoom={zoom}
                         fitScale={canvasRef.current?.getFitScale() ?? zoom}
