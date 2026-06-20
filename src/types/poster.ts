@@ -30,3 +30,9 @@ export interface TemplateConfig {
     layoutType: LayoutType;
     options: LayoutOptions;
 }
+
+export interface PosterSlide {
+    id: string;
+    json: any;
+    thumbnail: string;
+}

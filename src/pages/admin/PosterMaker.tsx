@@ -5,6 +5,7 @@ import { applyTemplateContent, TemplateInputs, TemplateType } from '../../../ser
 import { fetchTemplate, fetchTemplates, saveTemplate, updateTemplate, SavedTemplate } from '../../services/posterTemplates';
 import { supabase } from '../../lib/supabase';
 import { TourPackage } from '../../../types';
+import { PosterSlide } from '../../../types/poster';
 import { useToast } from '../../components/admin/ui';
 import FabricCanvas, { FabricCanvasRef, CanvasSize } from '../../components/admin/PosterMaker/FabricCanvas';
 import EditorToolbar from '../../components/admin/PosterMaker/EditorToolbar';
@@ -21,17 +22,32 @@ import { FabricObject, FabricImage } from 'fabric';
 interface PosterDraft {
     id: string;
     name: string;
-    json: any;
-    thumbnail: string;
+    slides: PosterSlide[];
+    canvasSize: CanvasSize;
     created_at: string;
 }
 
 const DRAFTS_KEY = 'alfatih_poster_drafts';
 const MAX_DRAFTS = 10;
 
+function normalizeDraft(raw: any): PosterDraft {
+    if (Array.isArray(raw.slides)) return raw as PosterDraft;
+    const canvasSize: CanvasSize =
+        raw.json?.width === 1080 && raw.json?.height === 1920 ? 'story' : 'post';
+    return {
+        id: raw.id,
+        name: raw.name,
+        slides: [{ id: '1', json: raw.json, thumbnail: raw.thumbnail ?? '' }],
+        canvasSize,
+        created_at: raw.created_at,
+    };
+}
+
 function loadDraftsFromStorage(): PosterDraft[] {
-    try { return JSON.parse(localStorage.getItem(DRAFTS_KEY) ?? '[]'); }
-    catch { return []; }
+    try {
+        const raw: any[] = JSON.parse(localStorage.getItem(DRAFTS_KEY) ?? '[]');
+        return raw.map(normalizeDraft);
+    } catch { return []; }
 }
 
 const getTemplateType = (template: PosterTemplate): TemplateType => {
