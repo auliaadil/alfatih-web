@@ -65,6 +65,7 @@ export interface TourPackage {
 
   // Dates
   departure_date: string;
+  departure_date_hijri?: string;
   arrival_date?: string;
 
   // Flight routes (structured)

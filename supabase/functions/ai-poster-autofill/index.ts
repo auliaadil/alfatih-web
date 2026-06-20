@@ -57,7 +57,8 @@ Deno.serve(async (req) => {
         const features = (pkg.features || []).slice(0, 6).join(', ')
         contextBlock = `
 Nama Paket: ${pkg.title}
-Tanggal Keberangkatan: ${pkg.departure_date}
+Tanggal Keberangkatan (Masehi): ${pkg.departure_date}
+Tanggal Keberangkatan (Hijriah): ${pkg.departure_date_hijri || ''}
 Durasi: ${pkg.duration}
 Kategori: ${pkg.category}
 Harga Mulai: ${startingPrice} per pax
@@ -67,6 +68,7 @@ Deskripsi: ${(pkg.description || '').substring(0, 200)}`
         instructionBlock = `
 - Ganti headline utama dengan nama paket dan kata kunci unggulan.
 - Ganti tanggal, durasi, harga dengan data aktual dari paket.
+- Jika ada teks bulan Hijriah (contoh: "Syawal 1447H"), ganti dengan nilai Tanggal Keberangkatan (Hijriah) dari data paket.
 - Ganti baris benefit/keunggulan dengan fitur aktual dari paket (maks 10 kata per baris).
 - Ganti teks kategori/label dengan nama kategori paket.
 - Pertahankan teks singkat seperti label tombol (Daftar Sekarang, Hubungi Kami), social handle, nama brand, dan nomor lisensi PPIU.`

@@ -4,6 +4,7 @@ import { FormField, inputClass, selectClass, SectionCard, btnPrimary, btnSeconda
 import ImagePickerModal from './ImagePickerModal';
 import { WizardDraft } from '../../../pages/admin/PackageWizard';
 import { supabase } from '../../../lib/supabase';
+import { toHijriMonthYear } from '../../../lib/hijriUtils';
 
 interface Props {
   draft: WizardDraft;
@@ -123,7 +124,10 @@ const Step1BasicInfo: React.FC<Props> = ({ draft, updateDraft, onNext, categorie
                 required
                 className={inputClass}
                 value={draft.departure_date}
-                onChange={(e) => updateDraft({ departure_date: e.target.value })}
+                onChange={(e) => updateDraft({
+                  departure_date: e.target.value,
+                  departure_date_hijri: toHijriMonthYear(e.target.value),
+                })}
               />
             </FormField>
             <FormField label="Arrival Date" required>
@@ -137,6 +141,16 @@ const Step1BasicInfo: React.FC<Props> = ({ draft, updateDraft, onNext, categorie
               />
             </FormField>
           </div>
+
+          <FormField label="Tanggal Hijriah (Keberangkatan)" hint="Dihitung otomatis, dapat diedit manual">
+            <input
+              type="text"
+              className={`${inputClass} bg-amber-50`}
+              placeholder="e.g. Syawal 1447 H"
+              value={draft.departure_date_hijri}
+              onChange={(e) => updateDraft({ departure_date_hijri: e.target.value })}
+            />
+          </FormField>
 
           {duration && (
             <div className="flex items-center gap-2">

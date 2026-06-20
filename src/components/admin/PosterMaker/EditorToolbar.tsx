@@ -111,9 +111,7 @@ const EditorToolbar: React.FC<EditorToolbarProps> = ({
             <ToolBtn onClick={onAddText} title="Add Text"><Type className="w-4 h-4" /></ToolBtn>
             <ToolBtn onClick={onAddBulletList} title="Add Bullet List"><List className="w-4 h-4" /></ToolBtn>
             <ToolBtn onClick={onAddRect}    title="Add Rectangle"            active={activeDrawTool === 'rect'}><Square className="w-4 h-4" /></ToolBtn>
-            <ToolBtn onClick={onAddCircle}  title="Add Circle"               active={activeDrawTool === 'circle'}><Circle className="w-4 h-4" /></ToolBtn>
             <ToolBtn onClick={onAddLine}    title="Add Line"                 active={activeDrawTool === 'line'}><Minus className="w-4 h-4" /></ToolBtn>
-            <ToolBtn onClick={onAddArrow}   title="Tambah Panah"             active={activeDrawTool === 'arrow'}><MoveRight className="w-4 h-4" /></ToolBtn>
             <ToolBtn
                 onClick={onToggleFreehand}
                 title="Freehand Draw"
@@ -121,7 +119,6 @@ const EditorToolbar: React.FC<EditorToolbarProps> = ({
             >
                 <Pencil className="w-4 h-4" />
             </ToolBtn>
-            <ToolBtn onClick={onAddDivider} title="Add Divider"              active={activeDrawTool === 'divider'}><Waves className="w-4 h-4" /></ToolBtn>
             <ToolBtn onClick={onAddImage} title="Add Image"><ImagePlus className="w-4 h-4" /></ToolBtn>
 
             <Divider />

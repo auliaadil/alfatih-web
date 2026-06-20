@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { X, Upload, Plus, Trash2, Loader2 } from 'lucide-react';
+import { toHijriMonthYear } from '../../lib/hijriUtils';
 
 interface RoomOption {
     name: string;
@@ -43,6 +44,7 @@ const PackageForm: React.FC<PackageFormProps> = ({ airlinesData, hotelsData, ini
     const [category, setCategory] = useState(initialData?.category || 'Umrah');
     const [duration, setDuration] = useState(initialData?.duration || '9 Days');
     const [departureDate, setDepartureDate] = useState(initialData?.departure_date || '');
+    const [departureHijri, setDepartureHijri] = useState(initialData?.departure_date_hijri || '');
     const [flightDetails, setFlightDetails] = useState(initialData?.flight_details || '');
     const [isPopular, setIsPopular] = useState(initialData?.is_popular || false);
     const [description, setDescription] = useState(initialData?.description || '');
@@ -187,6 +189,7 @@ const PackageForm: React.FC<PackageFormProps> = ({ airlinesData, hotelsData, ini
             category,
             duration,
             departure_date: departureDate,
+            departure_date_hijri: departureHijri || null,
             flight_details: flightDetails,
             is_popular: isPopular,
             description,
@@ -271,9 +274,26 @@ const PackageForm: React.FC<PackageFormProps> = ({ airlinesData, hotelsData, ini
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Duration (e.g. 9 Days)</label>
                                     <input type="text" required className="w-full px-4 py-2 border rounded-md" value={duration} onChange={e => setDuration(e.target.value)} />
                                 </div>
-                                <div>
+                                <div className="space-y-2">
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Departure Date</label>
-                                    <input type="text" required placeholder="e.g. 15 Mei 2024" className="w-full px-4 py-2 border rounded-md" value={departureDate} onChange={e => setDepartureDate(e.target.value)} />
+                                    <input
+                                        type="date"
+                                        required
+                                        className="w-full px-4 py-2 border rounded-md"
+                                        value={departureDate}
+                                        onChange={e => {
+                                            setDepartureDate(e.target.value);
+                                            setDepartureHijri(toHijriMonthYear(e.target.value));
+                                        }}
+                                    />
+                                    <input
+                                        type="text"
+                                        className="w-full px-4 py-2 border rounded-md text-sm bg-amber-50"
+                                        placeholder="Hijriah (auto) — e.g. Syawal 1447 H"
+                                        value={departureHijri}
+                                        onChange={e => setDepartureHijri(e.target.value)}
+                                    />
+                                    <p className="text-xs text-gray-400">Tanggal Hijriah dihitung otomatis, dapat diedit manual.</p>
                                 </div>
                                 <div className="flex items-end mb-2">
                                     <label className="flex items-center gap-2 cursor-pointer">

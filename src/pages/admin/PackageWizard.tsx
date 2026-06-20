@@ -14,6 +14,7 @@ export interface WizardDraft {
   title: string;
   category: string;
   departure_date: string;
+  departure_date_hijri: string;
   arrival_date: string;
   image_url: string;
   image_credit: string;
@@ -38,7 +39,7 @@ export interface WizardDraft {
 }
 
 const EMPTY_DRAFT: WizardDraft = {
-  title: '', category: '', departure_date: '', arrival_date: '',
+  title: '', category: '', departure_date: '', departure_date_hijri: '', arrival_date: '',
   image_url: '', image_credit: '', gallery: [], is_popular: false,
   airline_ids: [], hotel_ids: [], flight_routes: [],
   description: '', features: [],
@@ -89,6 +90,7 @@ const PackageWizard: React.FC = () => {
           title: data.title ?? '',
           category: data.category ?? '',
           departure_date: data.departure_date ?? '',
+          departure_date_hijri: data.departure_date_hijri ?? '',
           arrival_date: data.arrival_date ?? '',
           image_url: data.image_url ?? '',
           image_credit: data.image_credit ?? '',
@@ -126,6 +128,7 @@ const PackageWizard: React.FC = () => {
       title: draft.title,
       category: draft.category,
       departure_date: draft.departure_date,
+      departure_date_hijri: draft.departure_date_hijri || null,
       arrival_date: draft.arrival_date,
       duration: computedDuration(),
       image_url: draft.image_url,
