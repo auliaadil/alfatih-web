@@ -451,9 +451,9 @@ const PosterMaker: React.FC = () => {
         return () => { document.body.style.overflow = ''; };
     }, []);
 
-    // Handle incoming navigation state from Template Manager
+    // Handle incoming navigation state from Template Manager or Text Campaign
     useEffect(() => {
-        const state = location.state as { templateId?: string; templateName?: string; starterId?: string } | null;
+        const state = location.state as { templateId?: string; templateName?: string; starterId?: string; generatedSlides?: string[] } | null;
         if (!state) return;
 
         // Open a custom (DB-saved) template for editing
@@ -476,6 +476,50 @@ const PosterMaker: React.FC = () => {
         if (state.starterId) {
             const starter = starterTemplates.find(t => t.id === state.starterId);
             if (starter) handlePickTemplate(starter);
+            return;
+        }
+
+        // Handle auto-generated slides from Text Campaign
+        if (state.generatedSlides && state.generatedSlides.length > 0) {
+            const starter = starterTemplates.find(t => t.id === 'content-post');
+            if (starter) {
+                const newSlides = state.generatedSlides.map((slideText, idx) => {
+                    // Extract Judul and Teks
+                    const judulMatch = slideText.match(/Judul:\s*(.+)/i);
+                    const teksMatch = slideText.match(/Teks:\s*([\s\S]+)/i);
+                    
+                    const judul = judulMatch ? judulMatch[1].trim() : '';
+                    const teks = teksMatch ? teksMatch[1].trim() : slideText;
+
+                    // Deep clone the starter JSON
+                    const slideJson = JSON.parse(JSON.stringify(starter.json));
+                    
+                    const numObj = slideJson.objects.find((o: any) => o.text === '01');
+                    if (numObj) numObj.text = String(idx + 1).padStart(2, '0');
+                    
+                    const titleObj = slideJson.objects.find((o: any) => o.fontFamily === 'Dancing Script' && o.text && o.text.includes('Niat yang'));
+                    if (titleObj) titleObj.text = judul;
+                    
+                    const bodyObj = slideJson.objects.find((o: any) => o.text && o.text.startsWith('Sebelum berangkat'));
+                    if (bodyObj) bodyObj.text = teks;
+
+                    return {
+                        id: `slide-${Date.now()}-${idx}`,
+                        json: slideJson,
+                        thumbnail: ''
+                    };
+                });
+
+                setLoadedTemplate(starter);
+                setCanvasSize('post');
+                setEditingTemplateId(null);
+                setEditingTemplateName(starter.name);
+                setSlides(newSlides);
+                setActiveSlideIndex(0);
+                setTimeout(() => canvasRef.current?.loadTemplate(newSlides[0].json), 200);
+                setIsNewDesignModalOpen(false);
+                setRightTab('ai');
+            }
         }
     }, [location.state, starterTemplates]);
 

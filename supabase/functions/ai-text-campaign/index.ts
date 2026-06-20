@@ -24,13 +24,16 @@ interface PackageData {
 }
 
 interface RequestBody {
-  type: 'paket-wisata' | 'hari-raya' | 'instagram'
+  type: 'paket-wisata' | 'konten-edukasi' | 'instagram'
   channel: 'whatsapp' | 'instagram'
   package?: PackageData
   occasion?: string
   occasionPackage?: PackageData | null
   theme?: string
   notes?: string
+  topic?: string
+  audience?: string
+  slideCount?: number
 }
 
 const buildPackageBlock = (pkg: PackageData): string => {
@@ -75,7 +78,7 @@ Deno.serve(async (req) => {
 
   try {
     const body: RequestBody = await req.json()
-    const { type, channel, occasion, theme, notes } = body
+    const { type, channel, occasion, theme, notes, topic, audience, slideCount } = body
     const pkg = body.package
     const occasionPkg = body.occasionPackage ?? null
 
@@ -109,35 +112,26 @@ Deno.serve(async (req) => {
 - Panjang: 100-180 kata (belum termasuk hashtag)
 - Nada: inspiratif, aspirasional, Islami`
       }
-    } else if (type === 'hari-raya') {
-      if (!occasion) {
-        return new Response(JSON.stringify({ error: 'Occasion required for hari-raya type' }), {
+    } else if (type === 'konten-edukasi') {
+      if (!topic) {
+        return new Response(JSON.stringify({ error: 'Topic required for konten-edukasi type' }), {
           status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         })
       }
-      contextBlock = `Hari Raya: ${occasion}`
-      if (occasionPkg) {
-        contextBlock += `\n\nPaket Promosi Sisipan:\n${buildPackageBlock(occasionPkg)}`
-      }
-      if (channel === 'whatsapp') {
-        instructionBlock = `Tulis pesan ucapan ${occasion} untuk WhatsApp dengan ketentuan:
-- Buka dengan takbir atau salam khusus hari raya + emoji
-- Paragraf ucapan: hangat, penuh makna, Islami — 3-4 kalimat
-${occasionPkg ? `- Sisipkan 1 paragraf singkat promosi paket "${occasionPkg.title}" secara natural (jangan terasa memaksakan)
-- Sertakan harga mulai dan link paket` : '- Tidak ada promosi produk, murni ucapan'}
-- Tutup dengan nama brand: Alfatih Dunia Wisata
-- Panjang: 80-150 kata
-- Nada: tulus, hangat, spiritual`
-      } else {
-        instructionBlock = `Tulis caption Instagram ucapan ${occasion} dengan ketentuan:
-- Buka dengan takbir atau kutipan Islami yang indah + emoji
-- Isi: ucapan yang bermakna, 2-3 kalimat yang menyentuh
-${occasionPkg ? `- Sisipkan mention promosi singkat paket "${occasionPkg.title}" dengan cara elegan
-- Sertakan harga mulai dan link paket` : '- Tidak ada promosi produk, murni ucapan'}
-- Tutup dengan 6-10 hashtag relevan (#IdulFitri #IdulAdha #AlfatihDuniaWisata dll sesuaikan dengan hari raya)
-- Panjang: 60-120 kata (belum termasuk hashtag)
-- Nada: puitis, spiritual, menyentuh`
-      }
+      contextBlock = `Topik: ${topic}\nTarget Audiens: ${audience || 'Umum'}\nJumlah Slide: ${slideCount || 1}`
+      
+      instructionBlock = `Tulis konten edukasi/interaksi (carousel/poster slides) dengan ketentuan:
+- Format jawaban WAJIB menggunakan marker slide seperti ini:
+[SLIDE 1]
+Judul: ...
+Teks: ...
+[SLIDE 2]
+Judul: ...
+Teks: ...
+- Buat tepat ${slideCount || 1} slide.
+- Slide 1 biasanya sebagai Hook/Judul Utama.
+- Slide terakhir biasanya Call to Action.
+- Jangan tambahkan teks apa pun di luar blok [SLIDE N].`
     } else if (type === 'instagram') {
       if (!pkg) {
         return new Response(JSON.stringify({ error: 'Package data required for instagram type' }), {
