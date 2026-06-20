@@ -13,7 +13,7 @@ import PropertiesPanel from '../../components/admin/PosterMaker/PropertiesPanel'
 import CanvasZoom from '../../components/admin/PosterMaker/CanvasZoom';
 import CanvasContextMenu from '../../components/admin/PosterMaker/CanvasContextMenu';
 import AssetPanel from '../../components/admin/PosterMaker/AssetPanel';
-import { STARTER_TEMPLATES, buildStarterTemplates, PosterTemplate, TemplateThumbnail } from '../../components/admin/PosterMaker/TemplatePanel';
+import { STARTER_TEMPLATES, buildStarterTemplates, PosterTemplate, TemplateThumbnail, TemplateType as PosterTemplateType } from '../../components/admin/PosterMaker/TemplatePanel';
 import { useSiteSettings } from '../../contexts/SiteSettingsContext';
 import { FabricObject, FabricImage } from 'fabric';
 
@@ -170,12 +170,17 @@ interface NewDesignModalProps {
     onClose: () => void;
 }
 
+const POSTER_TYPE_PILLS: Array<PosterTemplateType | 'All'> = ['All', 'Conversion', 'Tour Promotion', 'Documentation', 'Content'];
+
 const NewDesignModal: React.FC<NewDesignModalProps> = ({
     canDismiss, starterOverrides, customTemplates, drafts, starterTemplates,
     onPickBlank, onPickStarter, onPickCustom, onPickDraft, onDeleteDraft, onClose,
 }) => {
     const [size, setSize] = useState<CanvasSize>('post');
-    const visibleStarters = starterTemplates.filter(t => t.aspectRatio === size);
+    const [typeFilter, setTypeFilter] = useState<PosterTemplateType | 'All'>('All');
+    const visibleStarters = starterTemplates.filter(t =>
+        t.aspectRatio === size && (typeFilter === 'All' || t.type === typeFilter)
+    );
     const visibleCustom = customTemplates.filter(t => t.aspect_ratio === size);
 
     return (
@@ -250,7 +255,22 @@ const NewDesignModal: React.FC<NewDesignModalProps> = ({
 
                 {/* Template grid */}
                 <div className="flex-1 overflow-y-auto min-h-0">
-                    <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-3">Pilih Template</p>
+                    <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-2">Pilih Template</p>
+                    <div className="flex flex-wrap gap-1.5 mb-3">
+                        {POSTER_TYPE_PILLS.map(pill => (
+                            <button
+                                key={pill}
+                                onClick={() => setTypeFilter(pill)}
+                                className={`rounded-full px-3 py-1 text-[10px] font-semibold transition-colors ${
+                                    typeFilter === pill
+                                        ? 'bg-primary text-white'
+                                        : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                                }`}
+                            >
+                                {pill}
+                            </button>
+                        ))}
+                    </div>
                     <div className="grid grid-cols-4 gap-3">
                         {/* Blank canvas */}
                         <button
