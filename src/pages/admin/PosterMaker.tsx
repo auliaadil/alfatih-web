@@ -714,6 +714,7 @@ const PosterMaker: React.FC = () => {
         const canvas = canvasRef.current?.getCanvas();
         if (!canvas) return;
         const currentSlides = snapshotActiveSlide();
+        if (currentSlides.length === 0) return;
         const newDraft: PosterDraft = {
             id: `${Date.now()}`,
             name: `Draft ${new Date().toLocaleString('id-ID')}`,
