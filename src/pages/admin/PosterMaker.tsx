@@ -13,8 +13,9 @@ import PropertiesPanel from '../../components/admin/PosterMaker/PropertiesPanel'
 import CanvasZoom from '../../components/admin/PosterMaker/CanvasZoom';
 import CanvasContextMenu from '../../components/admin/PosterMaker/CanvasContextMenu';
 import AssetPanel from '../../components/admin/PosterMaker/AssetPanel';
-import { STARTER_TEMPLATES, PosterTemplate, TemplateThumbnail } from '../../components/admin/PosterMaker/TemplatePanel';
-import { FabricObject, FabricImage, Rect } from 'fabric';
+import { STARTER_TEMPLATES, buildStarterTemplates, PosterTemplate, TemplateThumbnail } from '../../components/admin/PosterMaker/TemplatePanel';
+import { useSiteSettings } from '../../contexts/SiteSettingsContext';
+import { FabricObject, FabricImage } from 'fabric';
 
 // ── Draft helpers ────────────────────────────────────────────────────────────
 interface PosterDraft {
@@ -160,6 +161,7 @@ interface NewDesignModalProps {
     starterOverrides: Map<string, SavedTemplate>;
     customTemplates: SavedTemplate[];
     drafts: PosterDraft[];
+    starterTemplates: PosterTemplate[];
     onPickBlank: (size: CanvasSize) => void;
     onPickStarter: (t: PosterTemplate) => void;
     onPickCustom: (t: SavedTemplate) => void;
@@ -169,11 +171,11 @@ interface NewDesignModalProps {
 }
 
 const NewDesignModal: React.FC<NewDesignModalProps> = ({
-    canDismiss, starterOverrides, customTemplates, drafts,
+    canDismiss, starterOverrides, customTemplates, drafts, starterTemplates,
     onPickBlank, onPickStarter, onPickCustom, onPickDraft, onDeleteDraft, onClose,
 }) => {
     const [size, setSize] = useState<CanvasSize>('post');
-    const visibleStarters = STARTER_TEMPLATES.filter(t => t.aspectRatio === size);
+    const visibleStarters = starterTemplates.filter(t => t.aspectRatio === size);
     const visibleCustom = customTemplates.filter(t => t.aspect_ratio === size);
 
     return (
@@ -320,6 +322,8 @@ const PosterMaker: React.FC = () => {
     const canvasRef = useRef<FabricCanvasRef>(null);
     const location = useLocation();
     const toast = useToast();
+    const siteSettings = useSiteSettings();
+    const starterTemplates = useMemo(() => buildStarterTemplates(siteSettings), [siteSettings]);
 
     const [loadedTemplate, setLoadedTemplate] = useState<PosterTemplate | null>(null);
     const [canvasSize, setCanvasSize] = useState<CanvasSize>('post');
@@ -429,10 +433,10 @@ const PosterMaker: React.FC = () => {
 
         // Pre-pick a built-in starter template
         if (state.starterId) {
-            const starter = STARTER_TEMPLATES.find(t => t.id === state.starterId);
+            const starter = starterTemplates.find(t => t.id === state.starterId);
             if (starter) handlePickTemplate(starter);
         }
-    }, [location.state]);
+    }, [location.state, starterTemplates]);
 
     const fetchPackages = async () => {
         const { data, error } = await supabase.from('packages').select('*').order('created_at', { ascending: false });
@@ -789,57 +793,63 @@ const PosterMaker: React.FC = () => {
 
             if (templateType === 'conversion' && inputs.package?.image_url) {
                 const imageObjects = cr.getObjects().filter(o => o.type === 'image');
-                imageObjects.forEach((imgObj: any) => {
-                    const imgElement = document.createElement('img');
-                    imgElement.crossOrigin = 'anonymous';
-                    imgElement.onload = () => {
-                        const originalWidth = imgObj.width * imgObj.scaleX;
-                        const originalHeight = imgObj.height * imgObj.scaleY;
-                        const originalIndex = cr.getObjects().indexOf(imgObj);
+                const imageUrl = inputs.package!.image_url!;
+                for (const imgObj of imageObjects) {
+                    // Resolve placeholder top-left corner and displayed size in canvas coords
+                    const targetW = (imgObj as any).width * (imgObj as any).scaleX;
+                    const targetH = (imgObj as any).height * (imgObj as any).scaleY;
+                    const ox = (imgObj as any).originX || 'left';
+                    const oy = (imgObj as any).originY || 'top';
+                    const anchorLeft = ox === 'center' ? (imgObj as any).left - targetW / 2
+                                     : ox === 'right'  ? (imgObj as any).left - targetW
+                                     : (imgObj as any).left;
+                    const anchorTop  = oy === 'center' ? (imgObj as any).top - targetH / 2
+                                     : oy === 'bottom' ? (imgObj as any).top - targetH
+                                     : (imgObj as any).top;
+                    const originalIndex = cr.getObjects().indexOf(imgObj);
 
-                        const newImg = new FabricImage(imgElement);
-                        const coverScale = Math.max(
-                            originalWidth / newImg.width!,
-                            originalHeight / newImg.height!,
-                        );
+                    await new Promise<void>((resolve) => {
+                        const imgElement = document.createElement('img');
+                        imgElement.crossOrigin = 'anonymous';
+                        imgElement.onload = () => {
+                            const nW = imgElement.naturalWidth;
+                            const nH = imgElement.naturalHeight;
+                            if (!nW || !nH) { resolve(); return; }
 
-                        // Resolve placeholder top-left corner regardless of originX/Y
-                        const ox = imgObj.originX || 'left';
-                        const oy = imgObj.originY || 'top';
-                        const anchorLeft = ox === 'center' ? imgObj.left - originalWidth / 2
-                                         : ox === 'right'  ? imgObj.left - originalWidth
-                                         : imgObj.left;
-                        const anchorTop  = oy === 'center' ? imgObj.top - originalHeight / 2
-                                         : oy === 'bottom' ? imgObj.top - originalHeight
-                                         : imgObj.top;
+                            // Cover scale: scale so image fills targetW × targetH
+                            const scale = Math.max(targetW / nW, targetH / nH);
 
-                        // Center the scaled image within the placeholder bounds
-                        const scaledW = newImg.width! * coverScale;
-                        const scaledH = newImg.height! * coverScale;
-                        newImg.set({
-                            left: anchorLeft + (originalWidth - scaledW) / 2,
-                            top: anchorTop + (originalHeight - scaledH) / 2,
-                            originX: 'left',
-                            originY: 'top',
-                            scaleX: coverScale,
-                            scaleY: coverScale,
-                            clipPath: new Rect({
+                            // Crop dimensions in source pixels (centered)
+                            const cropW = targetW / scale;
+                            const cropH = targetH / scale;
+                            const cropX = Math.round((nW - cropW) / 2);
+                            const cropY = Math.round((nH - cropH) / 2);
+
+                            const newImg = new FabricImage(imgElement, {
                                 left: anchorLeft,
                                 top: anchorTop,
-                                width: originalWidth,
-                                height: originalHeight,
-                                absolutePositioned: true,
-                            }),
-                        });
+                                originX: 'left',
+                                originY: 'top',
+                                cropX,
+                                cropY,
+                                width: cropW,
+                                height: cropH,
+                                scaleX: scale,
+                                scaleY: scale,
+                            } as any);
 
-                        cr.remove(imgObj);
-                        cr.add(newImg);
-                        cr.moveObjectTo(newImg, originalIndex);
-                        cr.requestRenderAll();
-                        refreshLayers();
-                    };
-                    imgElement.src = inputs.package!.image_url!;
-                });
+                            cr.remove(imgObj);
+                            cr.add(newImg);
+                            cr.moveObjectTo(newImg, originalIndex);
+                            newImg.setCoords();
+                            cr.requestRenderAll();
+                            refreshLayers();
+                            resolve();
+                        };
+                        imgElement.onerror = () => resolve();
+                        imgElement.src = imageUrl;
+                    });
+                }
             }
 
             cr.requestRenderAll();
@@ -1184,6 +1194,7 @@ const PosterMaker: React.FC = () => {
                     starterOverrides={starterOverrides}
                     customTemplates={customTemplates}
                     drafts={drafts}
+                    starterTemplates={starterTemplates}
                     onPickBlank={handlePickBlank}
                     onPickStarter={handlePickTemplate}
                     onPickCustom={handlePickCustomTemplate}
