@@ -572,14 +572,31 @@ const PosterMaker: React.FC = () => {
 
     const handleExport = async () => {
         setIsExporting(true);
+        const timestamp = Date.now();
         try {
-            const dataUrl = await canvasRef.current?.exportPng();
-            if (dataUrl) {
-                const link = document.createElement('a');
-                link.download = `alfatih-poster-${canvasSize}-${Date.now()}.png`;
-                link.href = dataUrl;
-                link.click();
+            const updated = snapshotActiveSlide();
+            const currentIndex = activeSlideIndex;
+
+            for (let i = 0; i < updated.length; i++) {
+                canvasRef.current?.loadTemplate(updated[i].json);
+                // Wait for Fabric.js to finish rendering
+                await new Promise<void>(resolve => setTimeout(resolve, 300));
+
+                const dataUrl = await canvasRef.current?.exportPng();
+                if (dataUrl) {
+                    const link = document.createElement('a');
+                    link.download = updated.length === 1
+                        ? `alfatih-poster-${canvasSize}-${timestamp}.png`
+                        : `alfatih-poster-slide-${i + 1}-${timestamp}.png`;
+                    link.href = dataUrl;
+                    link.click();
+                }
+                // Small gap between browser download triggers
+                await new Promise<void>(resolve => setTimeout(resolve, 100));
             }
+
+            // Restore active slide
+            canvasRef.current?.loadTemplate(updated[currentIndex].json);
         } finally {
             setIsExporting(false);
         }
