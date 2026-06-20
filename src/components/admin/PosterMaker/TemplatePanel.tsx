@@ -112,12 +112,12 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                 { top: 820, fill: '#0F172A', left: 390, text: 'Durasi\n12 Hari', type: 'Textbox', angle: 0, flipX: false, flipY: false, skewX: 0, skewY: 0, width: 300, height: 57.178, scaleX: 1, scaleY: 1, shadow: null, stroke: null, styles: [], opacity: 1, originX: 'left', originY: 'top', version: '7.2.0', visible: true, fillRule: 'nonzero', fontSize: 22, minWidth: 20, overline: false, pathSide: 'left', direction: 'ltr', fontStyle: 'normal', pathAlign: 'baseline', textAlign: 'center', underline: false, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', lineHeight: 1.3, paintFirst: 'fill', charSpacing: 0, linethrough: false, strokeWidth: 1, strokeLineCap: 'butt', strokeUniform: false, strokeLineJoin: 'miter', backgroundColor: '', pathStartOffset: 0, splitByGrapheme: false, strokeDashArray: null, strokeDashOffset: 0, strokeMiterLimit: 4, textBackgroundColor: '', textDecorationThickness: 66.667, globalCompositeOperation: 'source-over' },
                 { top: 820, fill: '#F59E0B', left: 720, text: 'Harga Mulai\nRp 32.5 Jt', type: 'Textbox', angle: 0, flipX: false, flipY: false, skewX: 0, skewY: 0, width: 300, height: 57.178, scaleX: 1, scaleY: 1, shadow: null, stroke: null, styles: [], opacity: 1, originX: 'left', originY: 'top', version: '7.2.0', visible: true, fillRule: 'nonzero', fontSize: 22, minWidth: 20, overline: false, pathSide: 'left', direction: 'ltr', fontStyle: 'normal', pathAlign: 'baseline', textAlign: 'center', underline: false, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', lineHeight: 1.3, paintFirst: 'fill', charSpacing: 0, linethrough: false, strokeWidth: 1, strokeLineCap: 'butt', strokeUniform: false, strokeLineJoin: 'miter', backgroundColor: '', pathStartOffset: 0, splitByGrapheme: false, strokeDashArray: null, strokeDashOffset: 0, strokeMiterLimit: 4, textBackgroundColor: '', textDecorationThickness: 66.667, globalCompositeOperation: 'source-over' },
                 { top: 920, fill: '#64748B', left: 60, text: 'Quad: Rp 32.500.000 | Triple: Rp 34.500.000 | Double: Rp 36.500.000', type: 'Textbox', angle: 0, flipX: false, flipY: false, skewX: 0, skewY: 0, width: 960, height: 20.34, scaleX: 1, scaleY: 1, shadow: null, stroke: null, styles: [], opacity: 1, originX: 'left', originY: 'top', version: '7.2.0', visible: true, fillRule: 'nonzero', fontSize: 18, minWidth: 20, overline: false, pathSide: 'left', direction: 'ltr', fontStyle: 'normal', pathAlign: 'baseline', textAlign: 'center', underline: false, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '600', lineHeight: 1.16, paintFirst: 'fill', charSpacing: 0, linethrough: false, strokeWidth: 1, strokeLineCap: 'butt', strokeUniform: false, strokeLineJoin: 'miter', backgroundColor: '', pathStartOffset: 0, splitByGrapheme: false, strokeDashArray: null, strokeDashOffset: 0, strokeMiterLimit: 4, textBackgroundColor: '', textDecorationThickness: 66.667, globalCompositeOperation: 'source-over' },
-                { top: 990, fill: '#F59E0B', left: 100, text: '◆\n◆\n◆\n◆\n◆', type: 'Textbox', angle: 0, flipX: false, flipY: false, skewX: 0, skewY: 0, width: 30, height: 137.2272, scaleX: 1, scaleY: 1, shadow: null, stroke: null, styles: [], opacity: 1, originX: 'left', originY: 'top', version: '7.2.0', visible: true, fillRule: 'nonzero', fontSize: 16, minWidth: 20, overline: false, pathSide: 'left', direction: 'ltr', fontStyle: 'normal', pathAlign: 'baseline', textAlign: 'center', underline: false, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', lineHeight: 2.28, paintFirst: 'fill', charSpacing: 0, linethrough: false, strokeWidth: 1, strokeLineCap: 'butt', strokeUniform: false, strokeLineJoin: 'miter', backgroundColor: '', pathStartOffset: 0, splitByGrapheme: false, strokeDashArray: null, strokeDashOffset: 0, strokeMiterLimit: 4, textBackgroundColor: '', textDecorationThickness: 66.667, globalCompositeOperation: 'source-over' },
+                { top: 970, fill: '#F59E0B', left: 100, text: '◆\n◆\n◆\n◆\n◆', type: 'Textbox', angle: 0, flipX: false, flipY: false, skewX: 0, skewY: 0, width: 30, height: 137.2272, scaleX: 1, scaleY: 1, shadow: null, stroke: null, styles: [], opacity: 1, originX: 'left', originY: 'top', version: '7.2.0', visible: true, fillRule: 'nonzero', fontSize: 12, minWidth: 20, overline: false, pathSide: 'left', direction: 'ltr', fontStyle: 'normal', pathAlign: 'baseline', textAlign: 'center', underline: false, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', lineHeight: 2.28, paintFirst: 'fill', charSpacing: 0, linethrough: false, strokeWidth: 1, strokeLineCap: 'butt', strokeUniform: false, strokeLineJoin: 'miter', backgroundColor: '', pathStartOffset: 0, splitByGrapheme: false, strokeDashArray: null, strokeDashOffset: 0, strokeMiterLimit: 4, textBackgroundColor: '', textDecorationThickness: 66.667, globalCompositeOperation: 'source-over' },
                 { top: 970, fill: '#0F172A', left: 142, text: 'Hotel Makkah: Anjum / Setaraf (*5)\nHotel Madinah: Front Taiba / Setaraf (*5)\nTiket Pesawat Saudia Airlines direct Jeddah\nMuthawwif Pembimbing Ibadah Berpengalaman\nAir Zamzam 5 Liter & Perlengkapan Umrah Lengkap', type: 'Textbox', angle: 0, flipX: false, flipY: false, skewX: 0, skewY: 0, width: 838, height: 142.38, scaleX: 1, scaleY: 1, shadow: null, stroke: null, styles: [], opacity: 1, originX: 'left', originY: 'top', version: '7.2.0', visible: true, fillRule: 'nonzero', fontSize: 18, minWidth: 20, overline: false, pathSide: 'left', direction: 'ltr', fontStyle: 'normal', pathAlign: 'baseline', textAlign: 'left', underline: false, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500', lineHeight: 1.5, paintFirst: 'fill', charSpacing: 0, linethrough: false, strokeWidth: 1, strokeLineCap: 'butt', strokeUniform: false, strokeLineJoin: 'miter', backgroundColor: '', pathStartOffset: 0, splitByGrapheme: false, strokeDashArray: null, strokeDashOffset: 0, strokeMiterLimit: 4, textBackgroundColor: '', textDecorationThickness: 66.667, globalCompositeOperation: 'source-over' },
                 { top: 1158, fill: '#FFFFFF', left: 340, text: 'DAFTAR SEKARANG', type: 'Textbox', angle: 0, flipX: false, flipY: false, skewX: 0, skewY: 0, width: 400, height: 20.34, scaleX: 1, scaleY: 1, shadow: null, stroke: null, styles: [], opacity: 1, originX: 'left', originY: 'top', version: '7.2.0', visible: true, fillRule: 'nonzero', fontSize: 18, minWidth: 20, overline: false, pathSide: 'left', direction: 'ltr', fontStyle: 'normal', pathAlign: 'baseline', textAlign: 'center', underline: false, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', lineHeight: 1.16, paintFirst: 'fill', charSpacing: 100, linethrough: false, strokeWidth: 1, strokeLineCap: 'butt', strokeUniform: false, strokeLineJoin: 'miter', backgroundColor: '', pathStartOffset: 0, splitByGrapheme: false, strokeDashArray: null, strokeDashOffset: 0, strokeMiterLimit: 4, textBackgroundColor: '', textDecorationThickness: 66.667, globalCompositeOperation: 'source-over' },
                 { top: 1235, fill: '#FFFFFF', left: 60, text: 'ALFATIH DUNIA WISATA', type: 'Textbox', angle: 0, flipX: false, flipY: false, skewX: 0, skewY: 0, width: 300, height: 18.08, scaleX: 1, scaleY: 1, shadow: null, stroke: null, styles: [], opacity: 1, originX: 'left', originY: 'top', version: '7.2.0', visible: true, fillRule: 'nonzero', fontSize: 16, minWidth: 20, overline: false, pathSide: 'left', direction: 'ltr', fontStyle: 'normal', pathAlign: 'baseline', textAlign: 'left', underline: false, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', lineHeight: 1.16, paintFirst: 'fill', charSpacing: 0, linethrough: false, strokeWidth: 1, strokeLineCap: 'butt', strokeUniform: false, strokeLineJoin: 'miter', backgroundColor: '', pathStartOffset: 0, splitByGrapheme: false, strokeDashArray: null, strokeDashOffset: 0, strokeMiterLimit: 4, textBackgroundColor: '', textDecorationThickness: 66.667, globalCompositeOperation: 'source-over' },
-                { top: 1235, fill: '#FFFFFF', left: 380, text: 'adwisata.com  |  @alfatih.umroh  |  +62 815-164-222-5', type: 'Textbox', angle: 0, flipX: false, flipY: false, skewX: 0, skewY: 0, width: 640, height: 16.95, scaleX: 1, scaleY: 1, shadow: null, stroke: null, styles: [], opacity: 1, originX: 'left', originY: 'top', version: '7.2.0', visible: true, fillRule: 'nonzero', fontSize: 16, minWidth: 20, overline: false, pathSide: 'left', direction: 'ltr', fontStyle: 'normal', pathAlign: 'baseline', textAlign: 'right', underline: false, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', lineHeight: 1.16, paintFirst: 'fill', charSpacing: 0, linethrough: false, strokeWidth: 1, strokeLineCap: 'butt', strokeUniform: false, strokeLineJoin: 'miter', backgroundColor: '', pathStartOffset: 0, splitByGrapheme: false, strokeDashArray: null, strokeDashOffset: 0, strokeMiterLimit: 4, textBackgroundColor: '', textDecorationThickness: 66.667, globalCompositeOperation: 'source-over' },
-                { top: 1280, fill: '#FFFFFF', left: 60, text: 'Penyelenggara Perjalanan Ibadah Umrah (PPIU) No. Izin: 1234/2024', type: 'Textbox', angle: 0, flipX: false, flipY: false, skewX: 0, skewY: 0, width: 960, height: 13.56, scaleX: 1, scaleY: 1, shadow: null, stroke: null, styles: [], opacity: 1, originX: 'left', originY: 'top', version: '7.2.0', visible: true, fillRule: 'nonzero', fontSize: 16, minWidth: 20, overline: false, pathSide: 'left', direction: 'ltr', fontStyle: 'normal', pathAlign: 'baseline', textAlign: 'center', underline: false, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500', lineHeight: 1.16, paintFirst: 'fill', charSpacing: 0, linethrough: false, strokeWidth: 1, strokeLineCap: 'butt', strokeUniform: false, strokeLineJoin: 'miter', backgroundColor: '', pathStartOffset: 0, splitByGrapheme: false, strokeDashArray: null, strokeDashOffset: 0, strokeMiterLimit: 4, textBackgroundColor: '', textDecorationThickness: 66.667, globalCompositeOperation: 'source-over' },
+                { top: 1235, fill: '#FFFFFF', left: 380, text: 'adwisata.com  |  @alfatih.umroh  |  +62 815-164-222-5', type: 'Textbox', angle: 0, flipX: false, flipY: false, skewX: 0, skewY: 0, width: 640, height: 16.95, scaleX: 1, scaleY: 1, shadow: null, stroke: null, styles: [], opacity: 1, originX: 'left', originY: 'top', version: '7.2.0', visible: true, fillRule: 'nonzero', fontSize: 18, minWidth: 20, overline: false, pathSide: 'left', direction: 'ltr', fontStyle: 'normal', pathAlign: 'baseline', textAlign: 'right', underline: false, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', lineHeight: 1.16, paintFirst: 'fill', charSpacing: 0, linethrough: false, strokeWidth: 1, strokeLineCap: 'butt', strokeUniform: false, strokeLineJoin: 'miter', backgroundColor: '', pathStartOffset: 0, splitByGrapheme: false, strokeDashArray: null, strokeDashOffset: 0, strokeMiterLimit: 4, textBackgroundColor: '', textDecorationThickness: 66.667, globalCompositeOperation: 'source-over' },
+                { top: 1280, fill: '#FFFFFF', left: 60, text: 'Penyelenggara Perjalanan Ibadah Umrah (PPIU) No. Izin: 1234/2024', type: 'Textbox', angle: 0, flipX: false, flipY: false, skewX: 0, skewY: 0, width: 960, height: 13.56, scaleX: 1, scaleY: 1, shadow: null, stroke: null, styles: [], opacity: 1, originX: 'left', originY: 'top', version: '7.2.0', visible: true, fillRule: 'nonzero', fontSize: 15, minWidth: 20, overline: false, pathSide: 'left', direction: 'ltr', fontStyle: 'normal', pathAlign: 'baseline', textAlign: 'center', underline: false, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500', lineHeight: 1.16, paintFirst: 'fill', charSpacing: 0, linethrough: false, strokeWidth: 1, strokeLineCap: 'butt', strokeUniform: false, strokeLineJoin: 'miter', backgroundColor: '', pathStartOffset: 0, splitByGrapheme: false, strokeDashArray: null, strokeDashOffset: 0, strokeMiterLimit: 4, textBackgroundColor: '', textDecorationThickness: 66.667, globalCompositeOperation: 'source-over' },
             ]
         }
     },
@@ -379,7 +379,7 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                     top: 1370,
                     width: 34,
                     text: '◆\n◆\n◆\n◆\n◆',
-                    fontSize: 16,
+                    fontSize: 13,
                     fontFamily: 'Plus Jakarta Sans, sans-serif',
                     fontWeight: '700',
                     fill: '#F59E0B',
@@ -462,7 +462,7 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                     top: 1825,
                     width: 920,
                     text: 'Penyelenggara Perjalanan Ibadah Umrah (PPIU) No. Izin: 1234/2024',
-                    fontSize: 16,
+                    fontSize: 17,
                     fontFamily: 'Plus Jakarta Sans, sans-serif',
                     fontWeight: '500',
                     fill: '#FFFFFF',
@@ -503,27 +503,27 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                 // Footer background
                 { type: 'rect', left: 0, top: 1210, width: 1080, height: 140, fill: '#0084FF', originX: 'left', originY: 'top', selectable: false, evented: false },
                 // Category
-                { type: 'textbox', left: 80, top: 78, width: 920, text: 'PROMO TERBATAS', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#0084FF', charSpacing: 180, originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 80, top: 78, width: 920, text: 'PROMO TERBATAS', fontSize: 17, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#0084FF', charSpacing: 180, originX: 'left', originY: 'top', editable: true },
                 // Title
                 { type: 'textbox', left: 80, top: 108, width: 920, text: 'Umrah Premium Syawal 1447H', fontSize: 50, fontFamily: 'Dancing Script', fontWeight: '800', fill: '#0F172A', lineHeight: 1.2, originX: 'left', originY: 'top', editable: true },
                 // Description
                 { type: 'textbox', left: 80, top: 214, width: 920, text: 'Nikmati perjalanan ibadah yang aman, nyaman, dan khusyuk bersama travel berizin resmi PPIU.', fontSize: 17, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 'normal', fill: '#64748B', lineHeight: 1.4, originX: 'left', originY: 'top', editable: true },
                 // HEMAT badge text
-                { type: 'textbox', left: 390, top: 681, width: 300, text: 'HEMAT 18%', fontSize: 17, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#FFFFFF', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 390, top: 685, width: 300, text: 'HEMAT 18%', fontSize: 17, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#FFFFFF', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
                 // Original price label
                 { type: 'textbox', left: 80, top: 728, width: 400, text: 'Harga Normal', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '600', fill: '#64748B', originX: 'left', originY: 'top', editable: true },
                 // Original price (strikethrough)
-                { type: 'textbox', left: 80, top: 747, width: 380, text: 'Rp 36.000.000', fontSize: 28, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '600', fill: '#94A3B8', linethrough: true, originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 80, top: 748, width: 380, text: 'Rp 36.000.000', fontSize: 28, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '600', fill: '#94A3B8', linethrough: true, originX: 'left', originY: 'top', editable: true },
                 // Discounted price label
                 { type: 'textbox', left: 580, top: 728, width: 420, text: 'Harga Promo', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '600', fill: '#0084FF', originX: 'left', originY: 'top', editable: true },
                 // Discounted price
-                { type: 'textbox', left: 555, top: 740, width: 445, text: 'Rp 29.500.000', fontSize: 38, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#0084FF', originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 580, top: 748, width: 445, text: 'Rp 29.500.000', fontSize: 38, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#0084FF', originX: 'left', originY: 'top', editable: true },
                 // Room pricing
-                { type: 'textbox', left: 60, top: 832, width: 960, text: 'Quad: Rp 29.500.000 | Triple: Rp 31.500.000 | Double: Rp 33.500.000', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '600', fill: '#64748B', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 60, top: 832, width: 960, text: 'Quad: Rp 29.500.000 | Triple: Rp 31.500.000 | Double: Rp 33.500.000', fontSize: 18, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '600', fill: '#64748B', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
                 // Urgency
                 { type: 'textbox', left: 60, top: 862, width: 960, text: '⚡ Sisa 8 Kursi Tersisa!', fontSize: 17, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#EF4444', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
                 // Feature bullet diamonds
-                { type: 'textbox', left: 100, top: 904, width: 30, text: '◆\n◆\n◆\n◆', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#0084FF', textAlign: 'center', lineHeight: 2.25, originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 100, top: 904, width: 30, text: '◆\n◆\n◆\n◆', fontSize: 12, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#0084FF', textAlign: 'center', lineHeight: 2.25, originX: 'left', originY: 'top', editable: true },
                 // Feature list
                 { type: 'textbox', left: 142, top: 904, width: 838, text: 'Hotel Makkah: Anjum / Setaraf (*5)\nHotel Madinah: Front Taiba / Setaraf (*5)\nTiket Pesawat Saudia Airlines direct Jeddah\nMuthawwif Pembimbing Ibadah Berpengalaman', fontSize: 17, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500', fill: '#0F172A', lineHeight: 1.5, originX: 'left', originY: 'top', editable: true },
                 // CTA text
@@ -531,9 +531,9 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                 // Footer brand
                 { type: 'textbox', left: 60, top: 1235, width: 300, text: 'ALFATIH DUNIA WISATA', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#FFFFFF', originX: 'left', originY: 'top', editable: true },
                 // Footer contact
-                { type: 'textbox', left: 380, top: 1235, width: 640, text: 'adwisata.com  |  @alfatih.umroh  |  +62 815-164-222-5', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#FFFFFF', textAlign: 'right', originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 380, top: 1235, width: 640, text: 'adwisata.com  |  @alfatih.umroh  |  +62 815-164-222-5', fontSize: 18, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#FFFFFF', textAlign: 'right', originX: 'left', originY: 'top', editable: true },
                 // Footer license
-                { type: 'textbox', left: 60, top: 1280, width: 960, text: 'Penyelenggara Perjalanan Ibadah Umrah (PPIU) No. Izin: 1234/2024', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500', fill: '#FFFFFF', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 60, top: 1280, width: 960, text: 'Penyelenggara Perjalanan Ibadah Umrah (PPIU) No. Izin: 1234/2024', fontSize: 15, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500', fill: '#FFFFFF', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
             ]
         }
     },
@@ -574,19 +574,19 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                 // HEMAT badge text
                 { type: 'textbox', left: 390, top: 993, width: 300, text: 'HEMAT 18%', fontSize: 20, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#FFFFFF', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
                 // Original price label
-                { type: 'textbox', left: 80, top: 1052, width: 420, text: 'Harga Normal', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '600', fill: '#64748B', originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 80, top: 1052, width: 420, text: 'Harga Normal', fontSize: 18, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '600', fill: '#64748B', originX: 'left', originY: 'top', editable: true },
                 // Original price (strikethrough)
                 { type: 'textbox', left: 80, top: 1072, width: 400, text: 'Rp 36.000.000', fontSize: 32, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '600', fill: '#94A3B8', linethrough: true, originX: 'left', originY: 'top', editable: true },
                 // Discounted price label
-                { type: 'textbox', left: 580, top: 1052, width: 420, text: 'Harga Promo', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '600', fill: '#0084FF', originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 580, top: 1052, width: 420, text: 'Harga Promo', fontSize: 18, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '600', fill: '#0084FF', originX: 'left', originY: 'top', editable: true },
                 // Discounted price
-                { type: 'textbox', left: 555, top: 1062, width: 445, text: 'Rp 29.500.000', fontSize: 44, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#0084FF', originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 580, top: 1072, width: 445, text: 'Rp 29.500.000', fontSize: 44, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#0084FF', originX: 'left', originY: 'top', editable: true },
                 // Room pricing
                 { type: 'textbox', left: 60, top: 1240, width: 960, text: 'Quad: Rp 29.500.000 | Triple: Rp 31.500.000 | Double: Rp 33.500.000', fontSize: 19, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '600', fill: '#64748B', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
                 // Urgency
                 { type: 'textbox', left: 60, top: 1278, width: 960, text: '⚡ Sisa 8 Kursi Tersisa!', fontSize: 21, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#EF4444', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
                 // Feature bullet diamonds
-                { type: 'textbox', left: 100, top: 1325, width: 34, text: '◆\n◆\n◆\n◆', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#0084FF', textAlign: 'center', lineHeight: 2.3, originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 100, top: 1325, width: 34, text: '◆\n◆\n◆\n◆', fontSize: 13, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#0084FF', textAlign: 'center', lineHeight: 2.3, originX: 'left', originY: 'top', editable: true },
                 // Feature list
                 { type: 'textbox', left: 146, top: 1325, width: 834, text: 'Hotel Makkah: Anjum / Setaraf (*5)\nHotel Madinah: Front Taiba / Setaraf (*5)\nTiket Pesawat Saudia Airlines direct Jeddah\nMuthawwif Pembimbing Ibadah Berpengalaman', fontSize: 20, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500', fill: '#0F172A', lineHeight: 1.5, originX: 'left', originY: 'top', editable: true },
                 // CTA text
@@ -596,7 +596,7 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                 // Footer contact
                 { type: 'textbox', left: 420, top: 1770, width: 580, text: 'adwisata.com  |  @alfatih.umroh  |  +62 815-164-222-5', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#FFFFFF', textAlign: 'right', originX: 'left', originY: 'top', editable: true },
                 // Footer license
-                { type: 'textbox', left: 80, top: 1844, width: 920, text: 'Penyelenggara Perjalanan Ibadah Umrah (PPIU) No. Izin: 1234/2024', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500', fill: '#FFFFFF', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 80, top: 1844, width: 920, text: 'Penyelenggara Perjalanan Ibadah Umrah (PPIU) No. Izin: 1234/2024', fontSize: 17, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500', fill: '#FFFFFF', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
             ]
         }
     },
@@ -639,7 +639,7 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                 // Footer background
                 { type: 'rect', left: 0, top: 1210, width: 1080, height: 140, fill: '#0084FF', originX: 'left', originY: 'top', selectable: false, evented: false },
                 // Category
-                { type: 'textbox', left: 80, top: 80, width: 920, text: 'HOTEL & MASKAPAI', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#F59E0B', charSpacing: 180, originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 80, top: 80, width: 920, text: 'HOTEL & MASKAPAI', fontSize: 17, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#F59E0B', charSpacing: 180, originX: 'left', originY: 'top', editable: true },
                 // Title
                 { type: 'textbox', left: 80, top: 114, width: 920, text: 'Umrah Premium Syawal 1447H', fontSize: 48, fontFamily: 'Dancing Script', fontWeight: '800', fill: '#0F172A', lineHeight: 1.2, originX: 'left', originY: 'top', editable: true },
                 // Description
@@ -655,9 +655,9 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                 // Card 3 text (price — emerald)
                 { type: 'textbox', left: 725, top: 752, width: 295, text: 'Harga Mulai\nRp 32.5 Jt', fontSize: 20, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#F59E0B', textAlign: 'center', lineHeight: 1.3, originX: 'left', originY: 'top', editable: true },
                 // Room pricing
-                { type: 'textbox', left: 60, top: 860, width: 960, text: 'Quad: Rp 32.500.000 | Triple: Rp 34.500.000 | Double: Rp 36.500.000', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '600', fill: '#64748B', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 60, top: 860, width: 960, text: 'Quad: Rp 32.500.000 | Triple: Rp 34.500.000 | Double: Rp 36.500.000', fontSize: 18, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '600', fill: '#64748B', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
                 // Feature bullet diamonds
-                { type: 'textbox', left: 100, top: 898, width: 30, text: '◆\n◆\n◆', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#F59E0B', textAlign: 'center', lineHeight: 2.55, originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 100, top: 898, width: 30, text: '◆\n◆\n◆', fontSize: 12, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#F59E0B', textAlign: 'center', lineHeight: 2.55, originX: 'left', originY: 'top', editable: true },
                 // Feature list
                 { type: 'textbox', left: 142, top: 898, width: 838, text: 'Hotel Makkah: Anjum / Setaraf (*5) & Madinah: Front Taiba / Setaraf (*5)\nMaskapai Penerbangan Langsung Jeddah tanpa Transit\nMuthawwif Pembimbing Ibadah Berpengalaman', fontSize: 17, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500', fill: '#0F172A', lineHeight: 1.55, originX: 'left', originY: 'top', editable: true },
                 // CTA text
@@ -665,9 +665,9 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                 // Footer brand
                 { type: 'textbox', left: 60, top: 1235, width: 300, text: 'ALFATIH DUNIA WISATA', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#FFFFFF', originX: 'left', originY: 'top', editable: true },
                 // Footer contact
-                { type: 'textbox', left: 380, top: 1235, width: 640, text: 'adwisata.com  |  @alfatih.umroh  |  +62 815-164-222-5', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#FFFFFF', textAlign: 'right', originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 380, top: 1235, width: 640, text: 'adwisata.com  |  @alfatih.umroh  |  +62 815-164-222-5', fontSize: 18, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#FFFFFF', textAlign: 'right', originX: 'left', originY: 'top', editable: true },
                 // Footer license
-                { type: 'textbox', left: 60, top: 1280, width: 960, text: 'Penyelenggara Perjalanan Ibadah Umrah (PPIU) No. Izin: 1234/2024', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500', fill: '#FFFFFF', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 60, top: 1280, width: 960, text: 'Penyelenggara Perjalanan Ibadah Umrah (PPIU) No. Izin: 1234/2024', fontSize: 15, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500', fill: '#FFFFFF', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
             ]
         }
     },
@@ -716,9 +716,9 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                 // Description
                 { type: 'textbox', left: 80, top: 282, width: 920, text: 'Nikmati pengalaman ibadah dengan fasilitas premium — hotel bintang 5 dan penerbangan langsung.', fontSize: 19, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 'normal', fill: '#64748B', lineHeight: 1.4, originX: 'left', originY: 'top', editable: true },
                 // Hotel image label (on overlay)
-                { type: 'textbox', left: 0, top: 994, width: 505, text: '🏨 Hotel Bintang 5 Makkah', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#FFFFFF', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 0, top: 994, width: 505, text: '🏨 Hotel Bintang 5 Makkah', fontSize: 18, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#FFFFFF', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
                 // Airline image label (on overlay)
-                { type: 'textbox', left: 555, top: 994, width: 525, text: '✈ Penerbangan Langsung Jeddah', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#FFFFFF', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 555, top: 994, width: 525, text: '✈ Penerbangan Langsung Jeddah', fontSize: 18, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#FFFFFF', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
                 // Card 1 text (date)
                 { type: 'textbox', left: 60, top: 1075, width: 295, text: 'Keberangkatan\n12 Okt 2026', fontSize: 24, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#0F172A', textAlign: 'center', lineHeight: 1.3, originX: 'left', originY: 'top', editable: true },
                 // Card 2 text (duration)
@@ -728,7 +728,7 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                 // Room pricing
                 { type: 'textbox', left: 60, top: 1196, width: 960, text: 'Quad: Rp 32.500.000 | Triple: Rp 34.500.000 | Double: Rp 36.500.000', fontSize: 18, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '600', fill: '#64748B', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
                 // Feature bullet diamonds
-                { type: 'textbox', left: 100, top: 1238, width: 34, text: '◆\n◆\n◆', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#F59E0B', textAlign: 'center', lineHeight: 2.57, originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 100, top: 1238, width: 34, text: '◆\n◆\n◆', fontSize: 17, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#F59E0B', textAlign: 'center', lineHeight: 2.57, originX: 'left', originY: 'top', editable: true },
                 // Feature list
                 { type: 'textbox', left: 148, top: 1238, width: 832, text: 'Hotel Makkah: Anjum / Setaraf (*5) & Madinah: Front Taiba (*5)\nMaskapai Penerbangan Langsung Jeddah tanpa Transit\nMuthawwif Pembimbing Ibadah Berpengalaman', fontSize: 21, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500', fill: '#0F172A', lineHeight: 1.6, originX: 'left', originY: 'top', editable: true },
                 // CTA text
@@ -738,7 +738,7 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                 // Footer contact
                 { type: 'textbox', left: 420, top: 1770, width: 580, text: 'adwisata.com  |  @alfatih.umroh  |  +62 815-164-222-5', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#FFFFFF', textAlign: 'right', originX: 'left', originY: 'top', editable: true },
                 // Footer license
-                { type: 'textbox', left: 80, top: 1844, width: 920, text: 'Penyelenggara Perjalanan Ibadah Umrah (PPIU) No. Izin: 1234/2024', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500', fill: '#FFFFFF', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 80, top: 1844, width: 920, text: 'Penyelenggara Perjalanan Ibadah Umrah (PPIU) No. Izin: 1234/2024', fontSize: 17, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500', fill: '#FFFFFF', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
             ]
         }
     },
@@ -777,23 +777,23 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                 // Footer background
                 { type: 'rect', left: 0, top: 1210, width: 1080, height: 140, fill: '#0084FF', originX: 'left', originY: 'top', selectable: false, evented: false },
                 // Header: Category
-                { type: 'textbox', left: 80, top: 78, width: 920, text: 'KEUNGGULAN PAKET', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#0084FF', charSpacing: 200, originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 80, top: 78, width: 920, text: 'KEUNGGULAN PAKET', fontSize: 17, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#0084FF', charSpacing: 200, originX: 'left', originY: 'top', editable: true },
                 // Header: Title
                 { type: 'textbox', left: 80, top: 108, width: 920, text: 'Umrah Premium Syawal 1447H', fontSize: 48, fontFamily: 'Dancing Script', fontWeight: '800', fill: '#0F172A', lineHeight: 1.2, originX: 'left', originY: 'top', editable: true },
                 // Card 1: field label
-                { type: 'textbox', left: 550, top: 258, width: 510, text: 'HOTEL BERBINTANG 5', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#F59E0B', textAlign: 'center', charSpacing: 150, originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 550, top: 258, width: 510, text: 'HOTEL BERBINTANG 5', fontSize: 15, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#F59E0B', textAlign: 'center', charSpacing: 150, originX: 'left', originY: 'top', editable: true },
                 // Card 1: value
                 { type: 'textbox', left: 550, top: 280, width: 510, text: 'Anjum / Setaraf Makkah & Madinah', fontSize: 18, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#0F172A', textAlign: 'center', lineHeight: 1.3, originX: 'left', originY: 'top', editable: true },
                 // Card 1: sub
                 { type: 'textbox', left: 550, top: 330, width: 510, text: 'Lokasi premium dekat Masjidil Haram', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '400', fill: '#64748B', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
                 // Card 2: field label
-                { type: 'textbox', left: 550, top: 438, width: 510, text: 'MASKAPAI PENERBANGAN', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#F59E0B', textAlign: 'center', charSpacing: 150, originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 550, top: 438, width: 510, text: 'MASKAPAI PENERBANGAN', fontSize: 15, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#F59E0B', textAlign: 'center', charSpacing: 150, originX: 'left', originY: 'top', editable: true },
                 // Card 2: value
                 { type: 'textbox', left: 550, top: 460, width: 510, text: 'Saudia Airlines / Direct Jeddah', fontSize: 18, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#0F172A', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
                 // Card 2: sub
                 { type: 'textbox', left: 550, top: 510, width: 510, text: 'Penerbangan langsung tanpa transit', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '400', fill: '#64748B', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
                 // Card 3: field label
-                { type: 'textbox', left: 550, top: 618, width: 510, text: 'DURASI & KEBERANGKATAN', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#F59E0B', textAlign: 'center', charSpacing: 150, originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 550, top: 618, width: 510, text: 'DURASI & KEBERANGKATAN', fontSize: 15, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#F59E0B', textAlign: 'center', charSpacing: 150, originX: 'left', originY: 'top', editable: true },
                 // Card 3: value
                 { type: 'textbox', left: 550, top: 640, width: 510, text: '12 Hari · 12 Okt 2026', fontSize: 18, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#0F172A', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
                 // Card 3: sub
@@ -803,19 +803,19 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                 // Card 4 (price): value (white)
                 { type: 'textbox', left: 550, top: 826, width: 510, text: 'Rp 32.500.000', fontSize: 32, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#FFFFFF', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
                 // Card 4 (price): sub (white)
-                { type: 'textbox', left: 550, top: 876, width: 510, text: 'per pax · Quad room', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '400', fill: '#FFFFFF', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 550, top: 876, width: 510, text: 'per pax · Quad room', fontSize: 17, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '400', fill: '#FFFFFF', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
                 // Card 4 (price): note (white)
-                { type: 'textbox', left: 550, top: 910, width: 510, text: 'Hubungi kami untuk penawaran terbaik', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '400', fill: '#FFFFFF', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 550, top: 910, width: 510, text: 'Hubungi kami untuk penawaran terbaik', fontSize: 15, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '400', fill: '#FFFFFF', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
                 // Room pricing
-                { type: 'textbox', left: 550, top: 975, width: 510, text: 'Quad: Rp 32.5 Jt | Triple: Rp 34.5 Jt | Double: Rp 36.5 Jt', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '600', fill: '#64748B', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 550, top: 975, width: 510, text: 'Quad: Rp 32.5 Jt | Triple: Rp 34.5 Jt | Double: Rp 36.5 Jt', fontSize: 15, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '600', fill: '#64748B', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
                 // CTA text
                 { type: 'textbox', left: 550, top: 1054, width: 510, text: 'DAFTAR SEKARANG', fontSize: 17, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#FFFFFF', textAlign: 'center', charSpacing: 100, originX: 'left', originY: 'top', editable: true },
                 // Footer brand
                 { type: 'textbox', left: 60, top: 1235, width: 300, text: 'ALFATIH DUNIA WISATA', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#FFFFFF', originX: 'left', originY: 'top', editable: true },
                 // Footer contact
-                { type: 'textbox', left: 380, top: 1235, width: 640, text: 'adwisata.com  |  @alfatih.umroh  |  +62 815-164-222-5', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#FFFFFF', textAlign: 'right', originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 380, top: 1235, width: 640, text: 'adwisata.com  |  @alfatih.umroh  |  +62 815-164-222-5', fontSize: 18, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#FFFFFF', textAlign: 'right', originX: 'left', originY: 'top', editable: true },
                 // Footer license
-                { type: 'textbox', left: 60, top: 1280, width: 960, text: 'Penyelenggara Perjalanan Ibadah Umrah (PPIU) No. Izin: 1234/2024', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500', fill: '#FFFFFF', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 60, top: 1280, width: 960, text: 'Penyelenggara Perjalanan Ibadah Umrah (PPIU) No. Izin: 1234/2024', fontSize: 15, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500', fill: '#FFFFFF', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
             ]
         }
     },
@@ -858,33 +858,33 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                 // Header: Title
                 { type: 'textbox', left: 80, top: 144, width: 920, text: 'Umrah Premium Syawal 1447H', fontSize: 58, fontFamily: 'Dancing Script', fontWeight: '800', fill: '#0F172A', lineHeight: 1.2, originX: 'left', originY: 'top', editable: true },
                 // Card 1: field label
-                { type: 'textbox', left: 550, top: 364, width: 510, text: 'HOTEL BERBINTANG 5', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#F59E0B', textAlign: 'center', charSpacing: 150, originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 550, top: 364, width: 510, text: 'HOTEL BERBINTANG 5', fontSize: 17, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#F59E0B', textAlign: 'center', charSpacing: 150, originX: 'left', originY: 'top', editable: true },
                 // Card 1: value
                 { type: 'textbox', left: 550, top: 390, width: 510, text: 'Anjum / Setaraf Makkah & Madinah', fontSize: 22, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#0F172A', textAlign: 'center', lineHeight: 1.3, originX: 'left', originY: 'top', editable: true },
                 // Card 1: sub
-                { type: 'textbox', left: 550, top: 458, width: 510, text: 'Lokasi premium dekat Masjidil Haram', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '400', fill: '#64748B', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 550, top: 458, width: 510, text: 'Lokasi premium dekat Masjidil Haram', fontSize: 18, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '400', fill: '#64748B', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
                 // Card 2: field label
-                { type: 'textbox', left: 550, top: 598, width: 510, text: 'MASKAPAI PENERBANGAN', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#F59E0B', textAlign: 'center', charSpacing: 150, originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 550, top: 598, width: 510, text: 'MASKAPAI PENERBANGAN', fontSize: 17, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#F59E0B', textAlign: 'center', charSpacing: 150, originX: 'left', originY: 'top', editable: true },
                 // Card 2: value
                 { type: 'textbox', left: 550, top: 624, width: 510, text: 'Saudia Airlines / Direct Jeddah', fontSize: 22, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#0F172A', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
                 // Card 2: sub
-                { type: 'textbox', left: 550, top: 692, width: 510, text: 'Penerbangan langsung tanpa transit', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '400', fill: '#64748B', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 550, top: 692, width: 510, text: 'Penerbangan langsung tanpa transit', fontSize: 18, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '400', fill: '#64748B', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
                 // Card 3: field label
-                { type: 'textbox', left: 550, top: 832, width: 510, text: 'DURASI & KEBERANGKATAN', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#F59E0B', textAlign: 'center', charSpacing: 150, originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 550, top: 832, width: 510, text: 'DURASI & KEBERANGKATAN', fontSize: 17, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#F59E0B', textAlign: 'center', charSpacing: 150, originX: 'left', originY: 'top', editable: true },
                 // Card 3: value
                 { type: 'textbox', left: 550, top: 858, width: 510, text: '12 Hari · 12 Okt 2026', fontSize: 22, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#0F172A', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
                 // Card 3: sub
-                { type: 'textbox', left: 550, top: 926, width: 510, text: '8 hari beribadah di Tanah Suci', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '400', fill: '#64748B', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 550, top: 926, width: 510, text: '8 hari beribadah di Tanah Suci', fontSize: 18, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '400', fill: '#64748B', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
                 // Card 4 (price): field label (white)
-                { type: 'textbox', left: 550, top: 1068, width: 510, text: 'HARGA MULAI', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#FFFFFF', textAlign: 'center', charSpacing: 150, originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 550, top: 1068, width: 510, text: 'HARGA MULAI', fontSize: 18, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#FFFFFF', textAlign: 'center', charSpacing: 150, originX: 'left', originY: 'top', editable: true },
                 // Card 4 (price): value (white)
                 { type: 'textbox', left: 550, top: 1098, width: 510, text: 'Rp 32.500.000', fontSize: 38, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#FFFFFF', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
                 // Card 4 (price): sub (white)
                 { type: 'textbox', left: 550, top: 1152, width: 510, text: 'per pax · Quad room', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '400', fill: '#FFFFFF', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
                 // Card 4 (price): note (white)
-                { type: 'textbox', left: 550, top: 1194, width: 510, text: 'Hubungi kami untuk penawaran terbaik', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '400', fill: '#FFFFFF', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 550, top: 1194, width: 510, text: 'Hubungi kami untuk penawaran terbaik', fontSize: 17, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '400', fill: '#FFFFFF', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
                 // Room pricing
-                { type: 'textbox', left: 550, top: 1310, width: 510, text: 'Quad: Rp 32.5 Jt | Triple: Rp 34.5 Jt', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '600', fill: '#64748B', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 550, top: 1310, width: 510, text: 'Quad: Rp 32.5 Jt | Triple: Rp 34.5 Jt', fontSize: 18, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '600', fill: '#64748B', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
                 // CTA text
                 { type: 'textbox', left: 550, top: 1501, width: 510, text: 'DAFTAR SEKARANG', fontSize: 20, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#FFFFFF', textAlign: 'center', charSpacing: 100, originX: 'left', originY: 'top', editable: true },
                 // Footer brand
@@ -892,7 +892,7 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                 // Footer contact
                 { type: 'textbox', left: 420, top: 1770, width: 580, text: 'adwisata.com  |  @alfatih.umroh  |  +62 815-164-222-5', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#FFFFFF', textAlign: 'right', originX: 'left', originY: 'top', editable: true },
                 // Footer license
-                { type: 'textbox', left: 80, top: 1844, width: 920, text: 'Penyelenggara Perjalanan Ibadah Umrah (PPIU) No. Izin: 1234/2024', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500', fill: '#FFFFFF', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 80, top: 1844, width: 920, text: 'Penyelenggara Perjalanan Ibadah Umrah (PPIU) No. Izin: 1234/2024', fontSize: 17, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500', fill: '#FFFFFF', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
             ]
         }
     },
@@ -931,29 +931,29 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                 // Footer background
                 { type: 'rect', left: 0, top: 1210, width: 1080, height: 140, fill: '#0084FF', originX: 'left', originY: 'top', selectable: false, evented: false },
                 // Category
-                { type: 'textbox', left: 80, top: 78, width: 920, text: 'UMRAH REGULER', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#F59E0B', charSpacing: 180, originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 80, top: 78, width: 920, text: 'UMRAH REGULER', fontSize: 17, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#F59E0B', charSpacing: 180, originX: 'left', originY: 'top', editable: true },
                 // Title
                 { type: 'textbox', left: 80, top: 112, width: 920, text: 'Umrah Premium Syawal 1447H', fontSize: 50, fontFamily: 'Dancing Script', fontWeight: '800', fill: '#0F172A', lineHeight: 1.2, originX: 'left', originY: 'top', editable: true },
                 // Description
                 { type: 'textbox', left: 80, top: 208, width: 920, text: 'Bergabunglah bersama ribuan jamaah berpengalaman dalam perjalanan ibadah Umrah terbaik.', fontSize: 17, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 'normal', fill: '#64748B', lineHeight: 1.4, originX: 'left', originY: 'top', editable: true },
                 // "KEBERANGKATAN" label (on overlay, left)
-                { type: 'textbox', left: 80, top: 609, width: 430, text: 'KEBERANGKATAN', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#F59E0B', charSpacing: 180, originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 80, top: 609, width: 430, text: 'KEBERANGKATAN', fontSize: 15, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#F59E0B', charSpacing: 180, originX: 'left', originY: 'top', editable: true },
                 // "SYAWAL 1447H" label (on overlay, right)
-                { type: 'textbox', left: 570, top: 609, width: 430, text: 'SYAWAL 1447H', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#F59E0B', charSpacing: 180, textAlign: 'right', originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 570, top: 609, width: 430, text: 'SYAWAL 1447H', fontSize: 15, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#F59E0B', charSpacing: 180, textAlign: 'right', originX: 'left', originY: 'top', editable: true },
                 // Large date (on overlay, centered)
                 { type: 'textbox', left: 80, top: 628, width: 920, text: '12 OKT 2026', fontSize: 64, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#0F172A', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
                 // Price card: label
-                { type: 'textbox', left: 60, top: 760, width: 455, text: 'HARGA MULAI', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#F59E0B', textAlign: 'center', charSpacing: 150, originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 60, top: 760, width: 455, text: 'HARGA MULAI', fontSize: 15, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#F59E0B', textAlign: 'center', charSpacing: 150, originX: 'left', originY: 'top', editable: true },
                 // Price card: value
                 { type: 'textbox', left: 60, top: 784, width: 455, text: 'Rp 32.500.000', fontSize: 28, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#F59E0B', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
                 // Duration card: label
-                { type: 'textbox', left: 565, top: 760, width: 455, text: 'DURASI PAKET', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '600', fill: '#64748B', textAlign: 'center', charSpacing: 150, originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 565, top: 760, width: 455, text: 'DURASI PAKET', fontSize: 15, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '600', fill: '#64748B', textAlign: 'center', charSpacing: 150, originX: 'left', originY: 'top', editable: true },
                 // Duration card: value
                 { type: 'textbox', left: 565, top: 784, width: 455, text: '12 Hari 9 Malam', fontSize: 28, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#0F172A', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
                 // Room pricing
-                { type: 'textbox', left: 60, top: 876, width: 960, text: 'Quad: Rp 32.500.000 | Triple: Rp 34.500.000 | Double: Rp 36.500.000', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '600', fill: '#64748B', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 60, top: 876, width: 960, text: 'Quad: Rp 32.500.000 | Triple: Rp 34.500.000 | Double: Rp 36.500.000', fontSize: 18, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '600', fill: '#64748B', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
                 // Feature bullet diamonds
-                { type: 'textbox', left: 100, top: 908, width: 30, text: '◆\n◆\n◆', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#F59E0B', textAlign: 'center', lineHeight: 2.55, originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 100, top: 908, width: 30, text: '◆\n◆\n◆', fontSize: 15, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#F59E0B', textAlign: 'center', lineHeight: 2.55, originX: 'left', originY: 'top', editable: true },
                 // Feature list
                 { type: 'textbox', left: 142, top: 908, width: 838, text: 'Hotel Makkah & Madinah Bintang 5 dekat Masjidil Haram\nTiket Pesawat Saudia Airlines direct Jeddah\nMuthawwif Pembimbing Ibadah Berpengalaman', fontSize: 17, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500', fill: '#0F172A', lineHeight: 1.55, originX: 'left', originY: 'top', editable: true },
                 // CTA text
@@ -961,9 +961,9 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                 // Footer brand
                 { type: 'textbox', left: 60, top: 1235, width: 300, text: 'ALFATIH DUNIA WISATA', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#FFFFFF', originX: 'left', originY: 'top', editable: true },
                 // Footer contact
-                { type: 'textbox', left: 380, top: 1235, width: 640, text: 'adwisata.com  |  @alfatih.umroh  |  +62 815-164-222-5', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#FFFFFF', textAlign: 'right', originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 380, top: 1235, width: 640, text: 'adwisata.com  |  @alfatih.umroh  |  +62 815-164-222-5', fontSize: 18, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#FFFFFF', textAlign: 'right', originX: 'left', originY: 'top', editable: true },
                 // Footer license
-                { type: 'textbox', left: 60, top: 1280, width: 960, text: 'Penyelenggara Perjalanan Ibadah Umrah (PPIU) No. Izin: 1234/2024', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500', fill: '#FFFFFF', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 60, top: 1280, width: 960, text: 'Penyelenggara Perjalanan Ibadah Umrah (PPIU) No. Izin: 1234/2024', fontSize: 15, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500', fill: '#FFFFFF', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
             ]
         }
     },
@@ -1014,17 +1014,17 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                 // Large date (on overlay, centered)
                 { type: 'textbox', left: 80, top: 893, width: 920, text: '12 OKT 2026', fontSize: 80, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#0F172A', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
                 // Price card: label
-                { type: 'textbox', left: 60, top: 1062, width: 455, text: 'HARGA MULAI', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#F59E0B', textAlign: 'center', charSpacing: 150, originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 60, top: 1062, width: 455, text: 'HARGA MULAI', fontSize: 17, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#F59E0B', textAlign: 'center', charSpacing: 150, originX: 'left', originY: 'top', editable: true },
                 // Price card: value
                 { type: 'textbox', left: 60, top: 1090, width: 455, text: 'Rp 32.500.000', fontSize: 32, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#F59E0B', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
                 // Duration card: label
-                { type: 'textbox', left: 565, top: 1062, width: 455, text: 'DURASI PAKET', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '600', fill: '#64748B', textAlign: 'center', charSpacing: 150, originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 565, top: 1062, width: 455, text: 'DURASI PAKET', fontSize: 17, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '600', fill: '#64748B', textAlign: 'center', charSpacing: 150, originX: 'left', originY: 'top', editable: true },
                 // Duration card: value
                 { type: 'textbox', left: 565, top: 1090, width: 455, text: '12 Hari 9 Malam', fontSize: 32, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#0F172A', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
                 // Room pricing
                 { type: 'textbox', left: 60, top: 1196, width: 960, text: 'Quad: Rp 32.500.000 | Triple: Rp 34.500.000 | Double: Rp 36.500.000', fontSize: 18, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '600', fill: '#64748B', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
                 // Feature bullet diamonds
-                { type: 'textbox', left: 100, top: 1240, width: 34, text: '◆\n◆\n◆', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#F59E0B', textAlign: 'center', lineHeight: 2.4, originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 100, top: 1240, width: 34, text: '◆\n◆\n◆', fontSize: 17, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#F59E0B', textAlign: 'center', lineHeight: 2.4, originX: 'left', originY: 'top', editable: true },
                 // Feature list
                 { type: 'textbox', left: 148, top: 1240, width: 832, text: 'Hotel Makkah & Madinah Bintang 5 dekat Masjidil Haram\nTiket Pesawat Saudia Airlines direct Jeddah\nMuthawwif Pembimbing Ibadah Berpengalaman', fontSize: 21, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500', fill: '#0F172A', lineHeight: 1.6, originX: 'left', originY: 'top', editable: true },
                 // CTA text
@@ -1034,7 +1034,7 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                 // Footer contact
                 { type: 'textbox', left: 420, top: 1770, width: 580, text: 'adwisata.com  |  @alfatih.umroh  |  +62 815-164-222-5', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#FFFFFF', textAlign: 'right', originX: 'left', originY: 'top', editable: true },
                 // Footer license
-                { type: 'textbox', left: 80, top: 1844, width: 920, text: 'Penyelenggara Perjalanan Ibadah Umrah (PPIU) No. Izin: 1234/2024', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500', fill: '#FFFFFF', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 80, top: 1844, width: 920, text: 'Penyelenggara Perjalanan Ibadah Umrah (PPIU) No. Izin: 1234/2024', fontSize: 17, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500', fill: '#FFFFFF', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
             ]
         }
     },
@@ -1063,7 +1063,7 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                 // Footer background
                 { type: 'rect', left: 0, top: 1210, width: 1080, height: 140, fill: '#0084FF', originX: 'left', originY: 'top', selectable: false, evented: false },
                 // Category label
-                { type: 'textbox', left: 80, top: 80, width: 920, text: 'DESTINASI PILIHAN', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#F59E0B', charSpacing: 180, originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 80, top: 80, width: 920, text: 'DESTINASI PILIHAN', fontSize: 17, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#F59E0B', charSpacing: 180, originX: 'left', originY: 'top', editable: true },
                 // Title
                 { type: 'textbox', left: 80, top: 112, width: 920, text: 'Madinah Al-Munawwarah', fontSize: 52, fontFamily: 'Dancing Script', fontWeight: '800', fill: '#0F172A', lineHeight: 1.15, originX: 'left', originY: 'top', editable: true },
                 // Description
@@ -1077,9 +1077,9 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                 // Footer brand
                 { type: 'textbox', left: 60, top: 1235, width: 300, text: 'ALFATIH DUNIA WISATA', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#FFFFFF', originX: 'left', originY: 'top', editable: true },
                 // Footer contact (injected by injectFooterData)
-                { type: 'textbox', left: 380, top: 1235, width: 640, text: 'adwisata.com  |  @alfatih.umroh  |  +62 815-164-222-5', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#FFFFFF', textAlign: 'right', originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 380, top: 1235, width: 640, text: 'adwisata.com  |  @alfatih.umroh  |  +62 815-164-222-5', fontSize: 18, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#FFFFFF', textAlign: 'right', originX: 'left', originY: 'top', editable: true },
                 // Footer license (injected by injectFooterData)
-                { type: 'textbox', left: 60, top: 1280, width: 960, text: 'Penyelenggara Perjalanan Ibadah Umrah (PPIU) No. Izin: 1234/2024', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500', fill: '#FFFFFF', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 60, top: 1280, width: 960, text: 'Penyelenggara Perjalanan Ibadah Umrah (PPIU) No. Izin: 1234/2024', fontSize: 15, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500', fill: '#FFFFFF', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
             ]
         }
     },
@@ -1124,7 +1124,7 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                 // Footer contact (injected)
                 { type: 'textbox', left: 420, top: 1770, width: 580, text: 'adwisata.com  |  @alfatih.umroh  |  +62 815-164-222-5', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#FFFFFF', textAlign: 'right', originX: 'left', originY: 'top', editable: true },
                 // Footer license (injected)
-                { type: 'textbox', left: 80, top: 1844, width: 920, text: 'Penyelenggara Perjalanan Ibadah Umrah (PPIU) No. Izin: 1234/2024', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500', fill: '#FFFFFF', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 80, top: 1844, width: 920, text: 'Penyelenggara Perjalanan Ibadah Umrah (PPIU) No. Izin: 1234/2024', fontSize: 17, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500', fill: '#FFFFFF', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
             ]
         }
     },
@@ -1154,11 +1154,11 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                 { type: 'textbox', left: 540, top: 270, width: 500, text: 'Subhanallah, perjalanan umrah bersama Alfatih sangat luar biasa. Pembimbing ibadah yang sabar, hotel dekat Masjidil Haram, dan pelayanan yang penuh kasih. InsyaAllah kami ingin kembali.', fontSize: 20, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 'normal', fill: '#0F172A', lineHeight: 1.55, originX: 'left', originY: 'top', editable: true },
                 { type: 'textbox', left: 540, top: 524, width: 500, text: '⭐⭐⭐⭐⭐', fontSize: 18, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '400', fill: '#F59E0B', originX: 'left', originY: 'top', editable: true },
                 { type: 'textbox', left: 540, top: 578, width: 500, text: 'Ibu Sari Wulandari', fontSize: 20, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#F59E0B', originX: 'left', originY: 'top', editable: true },
-                { type: 'textbox', left: 540, top: 612, width: 500, text: 'Umrah Premium Syawal 1447H', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500', fill: '#64748B', originX: 'left', originY: 'top', editable: true },
-                { type: 'textbox', left: 540, top: 638, width: 500, text: '12 – 24 Oktober 2026', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '400', fill: '#94A3B8', originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 540, top: 612, width: 500, text: 'Umrah Premium Syawal 1447H', fontSize: 18, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500', fill: '#64748B', originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 540, top: 638, width: 500, text: '12 – 24 Oktober 2026', fontSize: 17, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '400', fill: '#94A3B8', originX: 'left', originY: 'top', editable: true },
                 { type: 'textbox', left: 60, top: 1235, width: 300, text: 'ALFATIH DUNIA WISATA', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#FFFFFF', originX: 'left', originY: 'top', editable: true },
-                { type: 'textbox', left: 380, top: 1235, width: 640, text: 'adwisata.com  |  @alfatih.umroh  |  +62 815-164-222-5', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#FFFFFF', textAlign: 'right', originX: 'left', originY: 'top', editable: true },
-                { type: 'textbox', left: 60, top: 1280, width: 960, text: 'Penyelenggara Perjalanan Ibadah Umrah (PPIU) No. Izin: 1234/2024', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500', fill: '#FFFFFF', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 380, top: 1235, width: 640, text: 'adwisata.com  |  @alfatih.umroh  |  +62 815-164-222-5', fontSize: 18, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#FFFFFF', textAlign: 'right', originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 60, top: 1280, width: 960, text: 'Penyelenggara Perjalanan Ibadah Umrah (PPIU) No. Izin: 1234/2024', fontSize: 15, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500', fill: '#FFFFFF', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
             ]
         }
     },
@@ -1181,7 +1181,7 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                 { type: 'rect', left: 0, top: 960, width: 1080, height: 6, fill: '#F59E0B', originX: 'left', originY: 'top', selectable: false, evented: false },
                 { type: 'rect', left: 80, top: 1430, width: 280, height: 4, fill: '#F59E0B', originX: 'left', originY: 'top', selectable: false, evented: false },
                 { type: 'rect', left: 0, top: 1740, width: 1080, height: 180, fill: '#0084FF', originX: 'left', originY: 'top', selectable: false, evented: false },
-                { type: 'textbox', left: 80, top: 832, width: 920, text: 'KISAH JAMAAH', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#F59E0B', charSpacing: 180, originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 80, top: 832, width: 920, text: 'KISAH JAMAAH', fontSize: 18, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#F59E0B', charSpacing: 180, originX: 'left', originY: 'top', editable: true },
                 { type: 'textbox', left: 80, top: 864, width: 920, text: 'Cerita dari Tanah Suci', fontSize: 36, fontFamily: 'Dancing Script', fontWeight: '800', fill: '#FFFFFF', originX: 'left', originY: 'top', editable: true },
                 { type: 'textbox', left: 76, top: 988, width: 920, text: '❝', fontSize: 100, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#F59E0B', lineHeight: 1, originX: 'left', originY: 'top', editable: false },
                 { type: 'textbox', left: 80, top: 1112, width: 920, text: 'Subhanallah, perjalanan umrah bersama Alfatih sangat luar biasa. Pembimbing ibadah yang sabar, hotel dekat Masjidil Haram, dan pelayanan yang penuh kasih sayang. InsyaAllah kami ingin kembali bersama keluarga.', fontSize: 26, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 'normal', fill: '#0F172A', lineHeight: 1.6, originX: 'left', originY: 'top', editable: true },
@@ -1191,7 +1191,7 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                 { type: 'textbox', left: 80, top: 1526, width: 920, text: '12 – 24 Oktober 2026', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '400', fill: '#94A3B8', originX: 'left', originY: 'top', editable: true },
                 { type: 'textbox', left: 80, top: 1770, width: 320, text: 'ALFATIH DUNIA WISATA', fontSize: 18, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#FFFFFF', originX: 'left', originY: 'top', editable: true },
                 { type: 'textbox', left: 420, top: 1770, width: 580, text: 'adwisata.com  |  @alfatih.umroh  |  +62 815-164-222-5', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#FFFFFF', textAlign: 'right', originX: 'left', originY: 'top', editable: true },
-                { type: 'textbox', left: 80, top: 1844, width: 920, text: 'Penyelenggara Perjalanan Ibadah Umrah (PPIU) No. Izin: 1234/2024', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500', fill: '#FFFFFF', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 80, top: 1844, width: 920, text: 'Penyelenggara Perjalanan Ibadah Umrah (PPIU) No. Izin: 1234/2024', fontSize: 17, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500', fill: '#FFFFFF', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
             ]
         }
     },
@@ -1228,11 +1228,11 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                 // Body text
                 { type: 'textbox', left: 120, top: 642, width: 900, text: 'Sebelum berangkat, pastikan niat Anda murni karena Allah SWT semata. Ibadah yang diterima bukan hanya tentang fisik yang hadir di Tanah Suci — tetapi tentang hati yang hadir dan khusyuk dalam setiap doa dan amalan selama di sana.', fontSize: 22, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 'normal', fill: '#94A3B8', lineHeight: 1.65, originX: 'left', originY: 'top', editable: true },
                 // Brand name
-                { type: 'textbox', left: 120, top: 1096, width: 600, text: 'ALFATIH DUNIA WISATA', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#F59E0B', charSpacing: 150, originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 120, top: 1096, width: 600, text: 'ALFATIH DUNIA WISATA', fontSize: 17, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#F59E0B', charSpacing: 150, originX: 'left', originY: 'top', editable: true },
                 // Contact (injected by injectFooterData)
                 { type: 'textbox', left: 120, top: 1126, width: 840, text: 'adwisata.com  |  @alfatih.umroh  |  +62 815-164-222-5', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '600', fill: '#64748B', originX: 'left', originY: 'top', editable: true },
                 // License (injected by injectFooterData)
-                { type: 'textbox', left: 120, top: 1154, width: 840, text: 'Penyelenggara Perjalanan Ibadah Umrah (PPIU) No. Izin: 1234/2024', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '400', fill: '#475569', originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 120, top: 1154, width: 840, text: 'Penyelenggara Perjalanan Ibadah Umrah (PPIU) No. Izin: 1234/2024', fontSize: 17, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '400', fill: '#475569', originX: 'left', originY: 'top', editable: true },
             ]
         }
     },
@@ -1271,7 +1271,7 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                 // Brand name
                 { type: 'textbox', left: 120, top: 1612, width: 800, text: 'ALFATIH DUNIA WISATA', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#F59E0B', charSpacing: 150, originX: 'left', originY: 'top', editable: true },
                 // Contact (injected)
-                { type: 'textbox', left: 120, top: 1648, width: 840, text: 'adwisata.com  |  @alfatih.umroh  |  +62 815-164-222-5', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '600', fill: '#64748B', originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 120, top: 1648, width: 840, text: 'adwisata.com  |  @alfatih.umroh  |  +62 815-164-222-5', fontSize: 18, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '600', fill: '#64748B', originX: 'left', originY: 'top', editable: true },
                 // License (injected)
                 { type: 'textbox', left: 120, top: 1686, width: 840, text: 'Penyelenggara Perjalanan Ibadah Umrah (PPIU) No. Izin: 1234/2024', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '400', fill: '#475569', originX: 'left', originY: 'top', editable: true },
             ]
