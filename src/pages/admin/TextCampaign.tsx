@@ -24,13 +24,11 @@ interface HistoryItem {
 
 const TYPE_LABELS: Record<CampaignType, string> = {
     'paket-wisata': 'Paket Wisata',
-    'konten-edukasi': 'Konten Edukasi & Interaksi',
     'instagram':    'Instagram',
 };
 
 const TYPE_BADGE: Record<CampaignType, string> = {
     'paket-wisata': 'bg-yellow-100 text-yellow-700',
-    'konten-edukasi': 'bg-blue-100 text-blue-700',
     'instagram':    'bg-purple-100 text-purple-700',
 };
 
@@ -49,9 +47,7 @@ const TextCampaign: React.FC = () => {
     const [messageType, setMessageType] = useState<CampaignType>('paket-wisata');
     const [channel, setChannel] = useState<CampaignChannel>('whatsapp');
     const [selectedPackageId, setSelectedPackageId] = useState('');
-    const [topic, setTopic] = useState('');
-    const [audience, setAudience] = useState('');
-    const [slideCount, setSlideCount] = useState(3);
+
     const [theme, setTheme] = useState('');
     const [notes, setNotes] = useState('');
 
@@ -97,10 +93,7 @@ const TextCampaign: React.FC = () => {
             toast('warning', 'Pilih paket wisata terlebih dahulu.');
             return;
         }
-        if (messageType === 'konten-edukasi' && (!topic || !audience)) {
-            toast('warning', 'Isi topik dan audiens terlebih dahulu.');
-            return;
-        }
+
 
         setIsGenerating(true);
         setOutput('');
@@ -109,9 +102,6 @@ const TextCampaign: React.FC = () => {
                 type: messageType,
                 channel,
                 package: selectedPackage ?? undefined,
-                topic: topic || undefined,
-                audience: audience || undefined,
-                slideCount: messageType === "konten-edukasi" ? slideCount : undefined,
                 theme: theme || undefined,
                 notes: notes || undefined,
             });
@@ -123,11 +113,7 @@ const TextCampaign: React.FC = () => {
         }
     };
 
-    
-    const parsedSlides = useMemo(() => {
-        if (messageType !== 'konten-edukasi' || !output) return [];
-        return output.split(/\[SLIDE \d+\]/i).map(s => s.trim()).filter(Boolean);
-    }, [output, messageType]);
+
 
     const handleCopy = () => {
         if (!output) return;
@@ -137,9 +123,7 @@ const TextCampaign: React.FC = () => {
 
     const handleSave = () => {
         if (!output) return;
-        const title =
-            messageType === 'konten-edukasi' ? (topic || 'Konten Edukasi') :
-                                          (selectedPackage?.title ?? 'Caption Instagram');
+        const title = selectedPackage?.title ?? 'Caption Instagram';
         setHistory(prev => [{
             id: Date.now().toString(),
             type: messageType,
@@ -216,7 +200,6 @@ const TextCampaign: React.FC = () => {
                             <div className="space-y-2">
                                 {([
                                     { value: 'paket-wisata', icon: '📦', label: 'Broadcast Paket Wisata', desc: 'Promosi paket wisata dari database' },
-                                    { value: 'konten-edukasi', icon: '💡', label: 'Konten Edukasi & Interaksi', desc: 'Tips, quote, atau reminder interaktif' },
                                     { value: 'instagram',    icon: '📸', label: 'Caption Instagram',      desc: 'Caption + hashtag siap posting' },
                                 ] as const).map(opt => (
                                     <button
@@ -283,39 +266,7 @@ const TextCampaign: React.FC = () => {
                                 </div>
                             )}
 
-                            {messageType === 'konten-edukasi' && (<>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Topik / Ide Utama</label>
-                                    <input
-                                        type="text"
-                                        value={topic}
-                                        onChange={e => setTopic(e.target.value)}
-                                        placeholder="misal: 5 tips umrah bareng anak"
-                                        className={inputClass}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Target Audiens</label>
-                                    <input
-                                        type="text"
-                                        value={audience}
-                                        onChange={e => setAudience(e.target.value)}
-                                        placeholder="misal: ibu muda, pekerja kantoran"
-                                        className={inputClass}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Jumlah Slide</label>
-                                    <input
-                                        type="number"
-                                        min="1"
-                                        max="10"
-                                        value={slideCount}
-                                        onChange={e => setSlideCount(parseInt(e.target.value) || 3)}
-                                        className={inputClass}
-                                    />
-                                </div>
-                            </>)}
+
 
                             {messageType === 'instagram' && (
                                 <div>
@@ -364,27 +315,11 @@ const TextCampaign: React.FC = () => {
                 <div className="flex-1 bg-white rounded-2xl border border-gray-200 shadow-sm flex flex-col p-5 gap-4 min-h-[520px]">
 
                     {output ? (
-                        messageType === 'konten-edukasi' && parsedSlides.length > 0 ? (
-                            <div className="flex-1 overflow-y-auto space-y-4 pb-4">
-                                {parsedSlides.map((slide, idx) => (
-                                    <div key={idx} className="bg-gray-50 border border-gray-200 rounded-xl p-4">
-                                        <div className="text-xs font-bold text-gray-400 mb-2">SLIDE {idx + 1}</div>
-                                        <p className="text-sm text-gray-700 whitespace-pre-wrap">{slide}</p>
-                                    </div>
-                                ))}
-                                <textarea
-                                    value={output}
-                                    onChange={e => setOutput(e.target.value)}
-                                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-gray-800 text-sm leading-relaxed resize-y focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors font-mono min-h-32 mt-4"
-                                />
-                            </div>
-                        ) : (
-                            <textarea
-                                value={output}
-                                onChange={e => setOutput(e.target.value)}
-                                className="flex-1 min-h-72 w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-gray-800 text-sm leading-relaxed resize-none focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors font-mono"
-                            />
-                        )
+                        <textarea
+                            value={output}
+                            onChange={e => setOutput(e.target.value)}
+                            className="flex-1 min-h-72 w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-gray-800 text-sm leading-relaxed resize-none focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors font-mono"
+                        />
                     ) : (
                         <div className="flex-1 min-h-72 flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-xl text-center gap-3">
                             {isGenerating ? (
@@ -439,15 +374,7 @@ const TextCampaign: React.FC = () => {
                                 <Save className="w-4 h-4" />
                                 Simpan ke Riwayat
                             </button>
-                            {messageType === 'konten-edukasi' && parsedSlides.length > 0 && (
-                                <button
-                                    onClick={() => navigate('/admin/poster-maker', { state: { generatedSlides: parsedSlides } })}
-                                    className="w-full flex items-center justify-center gap-2 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl transition-colors shrink-0 mt-2"
-                                >
-                                    <ImageIcon className="w-4 h-4" />
-                                    Desain ke Poster
-                                </button>
-                            )}
+
                         </>
                     )}
                 </div>
@@ -484,7 +411,7 @@ const TextCampaign: React.FC = () => {
                             >
                                 <option value="all">Semua Tipe</option>
                                 <option value="paket-wisata">Paket Wisata</option>
-                                <option value="konten-edukasi">Konten Edukasi</option>
+
                                 <option value="instagram">Instagram</option>
                             </select>
                             <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />

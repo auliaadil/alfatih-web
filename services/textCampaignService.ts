@@ -3,7 +3,7 @@ import { TourPackage } from '../types'
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL
 
-export type CampaignType = 'paket-wisata' | 'konten-edukasi' | 'instagram'
+export type CampaignType = 'paket-wisata' | 'instagram'
 export type CampaignChannel = 'whatsapp' | 'instagram'
 
 export interface GenerateCampaignInput {
@@ -14,9 +14,6 @@ export interface GenerateCampaignInput {
   occasionPackage?: TourPackage | null
   theme?: string
   notes?: string
-  topic?: string
-  audience?: string
-  slideCount?: number
 }
 
 export const generateCampaignText = async (input: GenerateCampaignInput): Promise<string> => {
