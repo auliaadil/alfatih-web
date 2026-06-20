@@ -18,6 +18,8 @@ import AssetPanel from '../../components/admin/PosterMaker/AssetPanel';
 import { STARTER_TEMPLATES, buildStarterTemplates, PosterTemplate, TemplateThumbnail, TemplateType as PosterTemplateType } from '../../components/admin/PosterMaker/TemplatePanel';
 import { useSiteSettings } from '../../contexts/SiteSettingsContext';
 import { FabricObject, FabricImage } from 'fabric';
+import ContentPosterModal from '../../components/admin/PosterMaker/ContentPosterModal';
+import { ContentSlide, CoverSlide, TipSlide } from '../../../services/contentPosterService';
 
 // ── Draft helpers ────────────────────────────────────────────────────────────
 interface PosterDraft {
@@ -413,6 +415,9 @@ const PosterMaker: React.FC = () => {
     // Save modal
     const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
+
+    // Content poster modal
+    const [isContentModalOpen, setIsContentModalOpen] = useState(false);
 
     // AI inputs
     const [topic, setTopic] = useState('');
@@ -1056,6 +1061,62 @@ const PosterMaker: React.FC = () => {
 
     const templateType = useMemo(() => loadedTemplate ? getTemplateType(loadedTemplate) : null, [loadedTemplate]);
 
+    const handleContentPosterApply = (aiSlides: ContentSlide[], aspectRatio: 'post' | 'story', category: string) => {
+        const coverTemplateId = `content-cover-${aspectRatio}`;
+        const tipTemplateId = `content-${aspectRatio}`;
+        const coverTemplate = starterTemplates.find(t => t.id === coverTemplateId);
+        const tipTemplate = starterTemplates.find(t => t.id === tipTemplateId);
+        if (!coverTemplate || !tipTemplate) {
+            toast('error', 'Template konten tidak ditemukan.');
+            return;
+        }
+
+        const newSlides: PosterSlide[] = aiSlides.map((slide, idx) => {
+            const isCover = slide.slideType === 'cover';
+            const baseJson = JSON.parse(JSON.stringify(isCover ? coverTemplate.json : tipTemplate.json));
+            const objs: any[] = baseJson.objects ?? [];
+
+            // Category label (charSpacing 180 + amber fill)
+            const catObj = objs.find((o: any) => o.charSpacing === 180 && o.fill === '#F59E0B');
+            if (catObj) catObj.text = category;
+
+            if (isCover) {
+                const coverSlide = slide as CoverSlide;
+                // Title (Dancing Script)
+                const titleObj = objs.find((o: any) => o.fontFamily === 'Dancing Script');
+                if (titleObj) titleObj.text = coverSlide.title;
+                // Subtitle (starts with 'Kalimat pendukung')
+                const subObj = objs.find((o: any) => o.text && o.text.startsWith('Kalimat pendukung'));
+                if (subObj) subObj.text = coverSlide.subtitle;
+            } else {
+                const tipSlide = slide as TipSlide;
+                // Tip number
+                const numObj = objs.find((o: any) => o.text === '01');
+                if (numObj) numObj.text = String(tipSlide.number).padStart(2, '0');
+                // Title (Dancing Script)
+                const titleObj = objs.find((o: any) => o.fontFamily === 'Dancing Script');
+                if (titleObj) titleObj.text = tipSlide.title;
+                // Body (starts with 'Sebelum berangkat')
+                const bodyObj = objs.find((o: any) => o.text && o.text.startsWith('Sebelum berangkat'));
+                if (bodyObj) bodyObj.text = tipSlide.body;
+            }
+
+            return { id: `slide-${Date.now()}-${idx}`, json: baseJson, thumbnail: '' };
+        });
+
+        const coverStarter = coverTemplate;
+        setLoadedTemplate(coverStarter);
+        setCanvasSize(aspectRatio);
+        setEditingTemplateId(null);
+        setEditingTemplateName(coverStarter.name);
+        setSlides(newSlides);
+        setActiveSlideIndex(0);
+        setTimeout(() => canvasRef.current?.loadTemplate(newSlides[0].json), 200);
+        setIsNewDesignModalOpen(false);
+        setIsContentModalOpen(false);
+        setRightTab('ai');
+    };
+
     const renderAiInputs = () => {
         switch (templateType) {
             case 'conversion':
@@ -1115,6 +1176,12 @@ const PosterMaker: React.FC = () => {
                             className="w-full text-sm border-gray-300 rounded-lg shadow-sm focus:border-primary focus:ring-primary"
                         />
                     </div>
+                );
+            case 'content':
+                return (
+                    <p className="text-xs text-gray-500 leading-relaxed">
+                        Klik tombol di bawah untuk membuat konten carousel AI — tentukan topik, jumlah tips, dan gaya penulisan sebelum kanvas di-generate.
+                    </p>
                 );
             default:
                 return null;
@@ -1350,17 +1417,27 @@ const PosterMaker: React.FC = () => {
                                         AI Content
                                     </h3>
                                     {renderAiInputs()}
-                                    <button
-                                        onClick={handleGenerateAndApply}
-                                        disabled={isGenerating}
-                                        className="w-full flex items-center justify-center gap-2 py-2.5 bg-primary text-white rounded-lg text-sm font-semibold hover:bg-blue-600 transition disabled:opacity-50"
-                                    >
-                                        {isGenerating
-                                            ? <Loader2 className="w-4 h-4 animate-spin" />
-                                            : <Sparkles className="w-4 h-4" />
-                                        }
-                                        Generate & Terapkan
-                                    </button>
+                                    {templateType === 'content' ? (
+                                        <button
+                                            onClick={() => setIsContentModalOpen(true)}
+                                            className="w-full flex items-center justify-center gap-2 py-2.5 bg-primary text-white rounded-lg text-sm font-semibold hover:bg-blue-600 transition"
+                                        >
+                                            <Sparkles className="w-4 h-4" />
+                                            Buat Konten AI
+                                        </button>
+                                    ) : (
+                                        <button
+                                            onClick={handleGenerateAndApply}
+                                            disabled={isGenerating}
+                                            className="w-full flex items-center justify-center gap-2 py-2.5 bg-primary text-white rounded-lg text-sm font-semibold hover:bg-blue-600 transition disabled:opacity-50"
+                                        >
+                                            {isGenerating
+                                                ? <Loader2 className="w-4 h-4 animate-spin" />
+                                                : <Sparkles className="w-4 h-4" />
+                                            }
+                                            Generate & Terapkan
+                                        </button>
+                                    )}
                                 </div>
                             )}
                         </div>
@@ -1395,6 +1472,15 @@ const PosterMaker: React.FC = () => {
                     onPickDraft={handlePickDraft}
                     onDeleteDraft={handleDeleteDraft}
                     onClose={() => setIsNewDesignModalOpen(false)}
+                />
+            )}
+
+            {/* Content Poster Modal */}
+            {isContentModalOpen && (
+                <ContentPosterModal
+                    initialAspectRatio={canvasSize}
+                    onClose={() => setIsContentModalOpen(false)}
+                    onApply={handleContentPosterApply}
                 />
             )}
 
