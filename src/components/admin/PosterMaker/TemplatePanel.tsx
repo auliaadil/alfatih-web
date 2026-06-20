@@ -1037,6 +1037,96 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                 { type: 'textbox', left: 80, top: 1844, width: 920, text: 'Penyelenggara Perjalanan Ibadah Umrah (PPIU) No. Izin: 1234/2024', fontSize: 14, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500', fill: '#FFFFFF', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
             ]
         }
+    },
+    {
+        id: 'tour-promo-post',
+        name: 'Destinasi Pilihan (Post)',
+        description: 'Showcase destinasi dengan foto dramatis dan tagline editorial. Tanpa harga atau CTA.',
+        type: 'Tour Promotion',
+        previewColors: ['#0F172A', '#F59E0B', '#D4A373'],
+        aspectRatio: 'post',
+        json: {
+            version: '7.2.0',
+            width: 1080,
+            height: 1350,
+            objects: [
+                // Background
+                { type: 'rect', left: 0, top: 0, width: 1080, height: 1350, fill: '#F8FAFC', originX: 'left', originY: 'top', selectable: false, evented: false },
+                // Full-bleed image
+                { type: 'image', left: 0, top: 270, width: 1080, height: 940, scaleX: 1, scaleY: 1, src: 'https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&w=1080&h=940&q=80', crossOrigin: 'anonymous', originX: 'left', originY: 'top', selectable: true },
+                // Dark overlay on bottom of image (for tagline readability)
+                { type: 'rect', left: 0, top: 970, width: 1080, height: 240, fill: '#0F172A', opacity: 0.80, originX: 'left', originY: 'top', selectable: false, evented: false },
+                // Top amber accent bar (renders over image top edge)
+                { type: 'rect', left: 0, top: 0, width: 1080, height: 14, fill: '#F59E0B', originX: 'left', originY: 'top', selectable: false, evented: false },
+                // Gold divider under header text
+                { type: 'rect', left: 80, top: 212, width: 200, height: 4, fill: '#D4A373', originX: 'left', originY: 'top', selectable: true },
+                // Footer background
+                { type: 'rect', left: 0, top: 1210, width: 1080, height: 140, fill: '#0084FF', originX: 'left', originY: 'top', selectable: false, evented: false },
+                // Category label
+                { type: 'textbox', left: 80, top: 80, width: 920, text: 'DESTINASI PILIHAN', fontSize: 14, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#F59E0B', charSpacing: 180, originX: 'left', originY: 'top', editable: true },
+                // Title
+                { type: 'textbox', left: 80, top: 112, width: 920, text: 'Madinah Al-Munawwarah', fontSize: 52, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#0F172A', lineHeight: 1.15, originX: 'left', originY: 'top', editable: true },
+                // Description
+                { type: 'textbox', left: 80, top: 228, width: 920, text: 'Kota cahaya yang menyejukkan hati setiap hamba yang rindu kepada-Nya.', fontSize: 18, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 'normal', fill: '#64748B', lineHeight: 1.4, originX: 'left', originY: 'top', editable: true },
+                // Tagline on dark overlay
+                { type: 'textbox', left: 80, top: 988, width: 920, text: 'Kota Cahaya yang Menyejukkan Hati', fontSize: 32, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#FFFFFF', lineHeight: 1.2, originX: 'left', originY: 'top', editable: true },
+                // Sub-tagline on overlay
+                { type: 'textbox', left: 80, top: 1042, width: 920, text: 'Rasakan ketenangan beribadah bersama ribuan jamaah terpilih Alfatih Dunia Wisata.', fontSize: 17, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 'normal', fill: '#CBD5E1', lineHeight: 1.4, originX: 'left', originY: 'top', editable: true },
+                // Amber highlight on overlay
+                { type: 'rect', left: 80, top: 1130, width: 120, height: 4, fill: '#F59E0B', originX: 'left', originY: 'top', selectable: false, evented: false },
+                // Footer brand
+                { type: 'textbox', left: 60, top: 1235, width: 300, text: 'ALFATIH DUNIA WISATA', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#FFFFFF', originX: 'left', originY: 'top', editable: true },
+                // Footer contact (injected by injectFooterData)
+                { type: 'textbox', left: 380, top: 1235, width: 640, text: 'adwisata.com  |  @alfatih.umroh  |  +62 815-164-222-5', fontSize: 15, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#FFFFFF', textAlign: 'right', originX: 'left', originY: 'top', editable: true },
+                // Footer license (injected by injectFooterData)
+                { type: 'textbox', left: 60, top: 1280, width: 960, text: 'Penyelenggara Perjalanan Ibadah Umrah (PPIU) No. Izin: 1234/2024', fontSize: 12, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500', fill: '#FFFFFF', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
+            ]
+        }
+    },
+    {
+        id: 'tour-promo-story',
+        name: 'Destinasi Pilihan (Story)',
+        description: 'Showcase destinasi dengan foto dramatis dan tagline editorial, format Story. Tanpa harga atau CTA.',
+        type: 'Tour Promotion',
+        previewColors: ['#0F172A', '#F59E0B', '#D4A373'],
+        aspectRatio: 'story',
+        json: {
+            version: '7.2.0',
+            width: 1080,
+            height: 1920,
+            objects: [
+                // Background
+                { type: 'rect', left: 0, top: 0, width: 1080, height: 1920, fill: '#F8FAFC', originX: 'left', originY: 'top', selectable: false, evented: false },
+                // Full-bleed image (from below header to footer)
+                { type: 'image', left: 0, top: 320, width: 1080, height: 1420, scaleX: 1, scaleY: 1, src: 'https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&w=1080&h=1420&q=80', crossOrigin: 'anonymous', originX: 'left', originY: 'top', selectable: true },
+                // Dark overlay on bottom of image
+                { type: 'rect', left: 0, top: 1390, width: 1080, height: 350, fill: '#0F172A', opacity: 0.82, originX: 'left', originY: 'top', selectable: false, evented: false },
+                // Top amber accent bar
+                { type: 'rect', left: 0, top: 0, width: 1080, height: 20, fill: '#F59E0B', originX: 'left', originY: 'top', selectable: false, evented: false },
+                // Gold divider under header text
+                { type: 'rect', left: 80, top: 290, width: 220, height: 5, fill: '#D4A373', originX: 'left', originY: 'top', selectable: true },
+                // Footer background
+                { type: 'rect', left: 0, top: 1740, width: 1080, height: 180, fill: '#0084FF', originX: 'left', originY: 'top', selectable: false, evented: false },
+                // Category label
+                { type: 'textbox', left: 80, top: 110, width: 920, text: 'DESTINASI PILIHAN', fontSize: 18, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#F59E0B', charSpacing: 180, originX: 'left', originY: 'top', editable: true },
+                // Title
+                { type: 'textbox', left: 80, top: 148, width: 920, text: 'Madinah Al-Munawwarah', fontSize: 62, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#0F172A', lineHeight: 1.15, originX: 'left', originY: 'top', editable: true },
+                // Description
+                { type: 'textbox', left: 80, top: 308, width: 920, text: 'Kota cahaya yang menyejukkan hati setiap hamba yang rindu kepada-Nya.', fontSize: 20, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 'normal', fill: '#64748B', lineHeight: 1.4, originX: 'left', originY: 'top', editable: true },
+                // Tagline on dark overlay
+                { type: 'textbox', left: 80, top: 1408, width: 920, text: 'Kota Cahaya yang Menyejukkan Hati', fontSize: 42, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#FFFFFF', lineHeight: 1.2, originX: 'left', originY: 'top', editable: true },
+                // Sub-tagline on overlay
+                { type: 'textbox', left: 80, top: 1472, width: 920, text: 'Rasakan ketenangan beribadah bersama ribuan jamaah terpilih Alfatih Dunia Wisata.', fontSize: 20, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 'normal', fill: '#CBD5E1', lineHeight: 1.4, originX: 'left', originY: 'top', editable: true },
+                // Amber highlight on overlay
+                { type: 'rect', left: 80, top: 1612, width: 140, height: 5, fill: '#F59E0B', originX: 'left', originY: 'top', selectable: false, evented: false },
+                // Footer brand
+                { type: 'textbox', left: 80, top: 1770, width: 320, text: 'ALFATIH DUNIA WISATA', fontSize: 18, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#FFFFFF', originX: 'left', originY: 'top', editable: true },
+                // Footer contact (injected)
+                { type: 'textbox', left: 420, top: 1770, width: 580, text: 'adwisata.com  |  @alfatih.umroh  |  +62 815-164-222-5', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#FFFFFF', textAlign: 'right', originX: 'left', originY: 'top', editable: true },
+                // Footer license (injected)
+                { type: 'textbox', left: 80, top: 1844, width: 920, text: 'Penyelenggara Perjalanan Ibadah Umrah (PPIU) No. Izin: 1234/2024', fontSize: 14, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500', fill: '#FFFFFF', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
+            ]
+        }
     }
 ];
 
