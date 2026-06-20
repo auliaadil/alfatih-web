@@ -1194,6 +1194,88 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                 { type: 'textbox', left: 80, top: 1844, width: 920, text: 'Penyelenggara Perjalanan Ibadah Umrah (PPIU) No. Izin: 1234/2024', fontSize: 14, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500', fill: '#FFFFFF', textAlign: 'center', originX: 'left', originY: 'top', editable: true },
             ]
         }
+    },
+    {
+        id: 'content-post',
+        name: 'Tips Umrah (Post)',
+        description: 'Konten edukatif bergaya editorial — tipografi besar di atas latar navy gelap. Tanpa foto.',
+        type: 'Content',
+        previewColors: ['#0F172A', '#F59E0B', '#94A3B8'],
+        aspectRatio: 'post',
+        json: {
+            version: '7.2.0',
+            width: 1080,
+            height: 1350,
+            objects: [
+                // Dark navy background
+                { type: 'rect', left: 0, top: 0, width: 1080, height: 1350, fill: '#0F172A', originX: 'left', originY: 'top', selectable: false, evented: false },
+                // Top amber accent bar
+                { type: 'rect', left: 0, top: 0, width: 1080, height: 14, fill: '#F59E0B', originX: 'left', originY: 'top', selectable: false, evented: false },
+                // Bottom amber accent bar
+                { type: 'rect', left: 0, top: 1300, width: 1080, height: 14, fill: '#F59E0B', originX: 'left', originY: 'top', selectable: false, evented: false },
+                // Left amber vertical accent strip
+                { type: 'rect', left: 80, top: 160, width: 6, height: 880, fill: '#F59E0B', originX: 'left', originY: 'top', selectable: false, evented: false },
+                // Gold separator below big number
+                { type: 'rect', left: 120, top: 430, width: 440, height: 4, fill: '#D4A373', originX: 'left', originY: 'top', selectable: false, evented: false },
+                // Thin amber divider before brand
+                { type: 'rect', left: 120, top: 1080, width: 160, height: 2, fill: '#F59E0B', opacity: 0.6, originX: 'left', originY: 'top', selectable: false, evented: false },
+                // Category label
+                { type: 'textbox', left: 120, top: 148, width: 900, text: 'TIPS UMRAH', fontSize: 13, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#F59E0B', charSpacing: 180, originX: 'left', originY: 'top', editable: true },
+                // Large tip number
+                { type: 'textbox', left: 100, top: 178, width: 400, text: '01', fontSize: 200, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#F59E0B', lineHeight: 1, originX: 'left', originY: 'top', editable: true },
+                // Tip title
+                { type: 'textbox', left: 120, top: 460, width: 900, text: 'Niat yang Ikhlas\nadalah Kunci Ibadah', fontSize: 52, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#FFFFFF', lineHeight: 1.2, originX: 'left', originY: 'top', editable: true },
+                // Body text
+                { type: 'textbox', left: 120, top: 642, width: 900, text: 'Sebelum berangkat, pastikan niat Anda murni karena Allah SWT semata. Ibadah yang diterima bukan hanya tentang fisik yang hadir di Tanah Suci — tetapi tentang hati yang hadir dan khusyuk dalam setiap doa dan amalan selama di sana.', fontSize: 22, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 'normal', fill: '#94A3B8', lineHeight: 1.65, originX: 'left', originY: 'top', editable: true },
+                // Brand name
+                { type: 'textbox', left: 120, top: 1096, width: 600, text: 'ALFATIH DUNIA WISATA', fontSize: 14, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#F59E0B', charSpacing: 150, originX: 'left', originY: 'top', editable: true },
+                // Contact (injected by injectFooterData)
+                { type: 'textbox', left: 120, top: 1126, width: 840, text: 'adwisata.com  |  @alfatih.umroh  |  +62 815-164-222-5', fontSize: 13, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '600', fill: '#64748B', originX: 'left', originY: 'top', editable: true },
+                // License (injected by injectFooterData)
+                { type: 'textbox', left: 120, top: 1154, width: 840, text: 'Penyelenggara Perjalanan Ibadah Umrah (PPIU) No. Izin: 1234/2024', fontSize: 11, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '400', fill: '#475569', originX: 'left', originY: 'top', editable: true },
+            ]
+        }
+    },
+    {
+        id: 'content-story',
+        name: 'Tips Umrah (Story)',
+        description: 'Konten edukatif bergaya editorial — tipografi besar di atas latar navy gelap, format Story.',
+        type: 'Content',
+        previewColors: ['#0F172A', '#F59E0B', '#94A3B8'],
+        aspectRatio: 'story',
+        json: {
+            version: '7.2.0',
+            width: 1080,
+            height: 1920,
+            objects: [
+                // Dark navy background
+                { type: 'rect', left: 0, top: 0, width: 1080, height: 1920, fill: '#0F172A', originX: 'left', originY: 'top', selectable: false, evented: false },
+                // Top amber accent bar
+                { type: 'rect', left: 0, top: 0, width: 1080, height: 20, fill: '#F59E0B', originX: 'left', originY: 'top', selectable: false, evented: false },
+                // Bottom amber accent bar
+                { type: 'rect', left: 0, top: 1858, width: 1080, height: 20, fill: '#F59E0B', originX: 'left', originY: 'top', selectable: false, evented: false },
+                // Left amber vertical accent strip
+                { type: 'rect', left: 80, top: 200, width: 6, height: 1340, fill: '#F59E0B', originX: 'left', originY: 'top', selectable: false, evented: false },
+                // Gold separator below big number
+                { type: 'rect', left: 120, top: 640, width: 500, height: 5, fill: '#D4A373', originX: 'left', originY: 'top', selectable: false, evented: false },
+                // Thin amber divider before brand
+                { type: 'rect', left: 120, top: 1594, width: 200, height: 3, fill: '#F59E0B', opacity: 0.6, originX: 'left', originY: 'top', selectable: false, evented: false },
+                // Category label
+                { type: 'textbox', left: 120, top: 188, width: 900, text: 'TIPS UMRAH', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#F59E0B', charSpacing: 180, originX: 'left', originY: 'top', editable: true },
+                // Large tip number
+                { type: 'textbox', left: 96, top: 226, width: 500, text: '01', fontSize: 280, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#F59E0B', lineHeight: 1, originX: 'left', originY: 'top', editable: true },
+                // Tip title
+                { type: 'textbox', left: 120, top: 678, width: 900, text: 'Niat yang Ikhlas\nadalah Kunci Ibadah', fontSize: 62, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#FFFFFF', lineHeight: 1.2, originX: 'left', originY: 'top', editable: true },
+                // Body text
+                { type: 'textbox', left: 120, top: 946, width: 900, text: 'Sebelum berangkat, pastikan niat Anda murni karena Allah SWT semata. Ibadah yang diterima bukan hanya tentang fisik yang hadir di Tanah Suci — tetapi tentang hati yang hadir dan khusyuk dalam setiap doa dan amalan selama di sana.\n\nPersiapkan diri Anda dengan memperbanyak doa, tilawah, dan meningkatkan akhlak sebelum keberangkatan.', fontSize: 26, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 'normal', fill: '#94A3B8', lineHeight: 1.65, originX: 'left', originY: 'top', editable: true },
+                // Brand name
+                { type: 'textbox', left: 120, top: 1612, width: 800, text: 'ALFATIH DUNIA WISATA', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#F59E0B', charSpacing: 150, originX: 'left', originY: 'top', editable: true },
+                // Contact (injected)
+                { type: 'textbox', left: 120, top: 1648, width: 840, text: 'adwisata.com  |  @alfatih.umroh  |  +62 815-164-222-5', fontSize: 15, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '600', fill: '#64748B', originX: 'left', originY: 'top', editable: true },
+                // License (injected)
+                { type: 'textbox', left: 120, top: 1686, width: 840, text: 'Penyelenggara Perjalanan Ibadah Umrah (PPIU) No. Izin: 1234/2024', fontSize: 13, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '400', fill: '#475569', originX: 'left', originY: 'top', editable: true },
+            ]
+        }
     }
 ];
 
