@@ -1116,6 +1116,7 @@ const PosterMaker: React.FC = () => {
                 cursorMode={cursorMode}
                 onSetCursorMode={handleSetCursorMode}
                 onAddText={() => { handleSetCursorMode('select'); canvasRef.current?.addText(); }}
+                onAddBulletList={() => { handleSetCursorMode('select'); canvasRef.current?.addBulletList(); }}
                 onAddRect={() => { handleSetCursorMode('select'); canvasRef.current?.addRect(); setActiveDrawTool('rect'); setIsFreehandActive(false); }}
                 onAddCircle={() => { handleSetCursorMode('select'); canvasRef.current?.addCircle(); setActiveDrawTool('circle'); setIsFreehandActive(false); }}
                 onAddLine={() => { handleSetCursorMode('select'); canvasRef.current?.addLine(); setActiveDrawTool('line'); setIsFreehandActive(false); }}

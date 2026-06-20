@@ -3,6 +3,7 @@ import { Canvas, FabricObject, Rect, FabricImage, filters as fabricFilters } fro
 import { Bold, Italic, Underline, Plus, Minus, AlignLeft, AlignCenter, AlignRight, AlignJustify, Link, Unlink, ChevronDown, ChevronRight } from 'lucide-react';
 import { ShadowState, DEFAULT_SHADOW, readShadowState, applyShadow } from './fabricShadow';
 import { getCornerRadius, setCornerRadius } from './fabricCornerRadius';
+import { BulletListConfig, changeBulletStyle, changeBulletColor } from './fabricBulletList';
 
 const GOOGLE_FONTS = [
     // Sans-serif
@@ -157,6 +158,9 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ canvas, selectedObjec
     // Blur (Image)
     const [blur, setBlur] = useState(0);
 
+    // Bullet List
+    const [bulletListConfig, setBulletListConfig] = useState<BulletListConfig | null>(null);
+
     const isText = selectedObject?.type === 'textbox' || selectedObject?.type === 'text' || selectedObject?.type === 'i-text';
     const isRect = selectedObject instanceof Rect;
     const isImage = selectedObject instanceof FabricImage;
@@ -203,6 +207,9 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ canvas, selectedObjec
             const blurFilter = filters.find((f: any) => f.type === 'Blur' || f.constructor?.name === 'Blur');
             setBlur(blurFilter ? Math.round((blurFilter.blur ?? 0) * 100) : 0);
         }
+
+        const bl = (selectedObject as any).bulletList as BulletListConfig | undefined;
+        setBulletListConfig(bl ?? null);
     }, [selectedObject, refreshKey]);
 
     const applyProp = (props: Record<string, any>) => {
@@ -301,6 +308,18 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ canvas, selectedObjec
         }
         img.applyFilters();
         canvas.requestRenderAll();
+    };
+
+    const handleBulletStyleChange = (style: 'diamond' | 'number') => {
+        if (!canvas || !selectedObject || !bulletListConfig) return;
+        setBulletListConfig(prev => prev ? { ...prev, style } : null);
+        changeBulletStyle(selectedObject as any, style, canvas);
+    };
+
+    const handleBulletColorChange = (color: string) => {
+        if (!canvas || !selectedObject || !bulletListConfig) return;
+        setBulletListConfig(prev => prev ? { ...prev, bulletColor: color } : null);
+        changeBulletColor(selectedObject as any, color, canvas);
     };
 
     if (!selectedObject) {
@@ -423,9 +442,49 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ canvas, selectedObjec
                 </>
             )}
 
+            {/* Bullet List */}
+            {bulletListConfig && (
+                <div>
+                    <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Bullet List</label>
+                    <div className="flex gap-1 mb-3">
+                        <button
+                            onClick={() => handleBulletStyleChange('diamond')}
+                            className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-semibold transition ${bulletListConfig.style === 'diamond' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                        >
+                            ◆ Diamond
+                        </button>
+                        <button
+                            onClick={() => handleBulletStyleChange('number')}
+                            className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-semibold transition ${bulletListConfig.style === 'number' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                        >
+                            1. Numbered
+                        </button>
+                    </div>
+
+                    <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Bullet Color</label>
+                    <div className="flex items-center gap-2 mb-2">
+                        <input type="color" value={bulletListConfig.bulletColor}
+                            onChange={(e) => handleBulletColorChange(e.target.value)}
+                            className="w-8 h-8 rounded-md border border-gray-300 cursor-pointer p-0" />
+                        <input type="text" value={bulletListConfig.bulletColor}
+                            onChange={(e) => handleBulletColorChange(e.target.value)}
+                            className="flex-1 text-xs font-mono border border-gray-300 rounded-lg px-2 py-1.5 focus:border-primary focus:ring-1 focus:ring-primary outline-none" />
+                    </div>
+                    <div className="grid grid-cols-10 gap-1 mb-2">
+                        {PRESET_COLORS.map(c => (
+                            <button key={c} onClick={() => handleBulletColorChange(c)}
+                                className={`w-6 h-6 rounded-md border-2 transition hover:scale-110 ${bulletListConfig.bulletColor === c ? 'border-primary' : 'border-gray-200'}`}
+                                style={{ backgroundColor: c }} />
+                        ))}
+                    </div>
+                </div>
+            )}
+
             {/* Fill Color */}
             <div>
-                <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Fill Color</label>
+                <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">
+                    {bulletListConfig ? 'Text Color' : 'Fill Color'}
+                </label>
                 <div className="flex items-center gap-2 mb-2">
                     <input type="color" value={fillColor} onChange={(e) => handleFillChange(e.target.value)}
                         className="w-8 h-8 rounded-md border border-gray-300 cursor-pointer p-0" />

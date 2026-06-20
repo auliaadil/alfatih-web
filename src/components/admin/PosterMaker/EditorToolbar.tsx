@@ -1,11 +1,11 @@
 import React from 'react';
 import {
     Type, Square, Circle, Minus, ImagePlus, Trash2,
-    AlignLeft, AlignCenter, AlignRight,
-    ChevronUp, ChevronDown, ChevronsUp, ChevronsDown,
+    AlignLeft, AlignCenter, AlignRight, AlignJustify, Link, Unlink,
+    ChevronDown, ChevronRight, ChevronUp, ChevronsUp, ChevronsDown,
     Download, Loader2, RectangleHorizontal, RectangleVertical,
     Undo, Redo, Copy, Clipboard, CopyPlus,
-    MoveRight, Pencil, Waves, MousePointer2, Hand
+    MoveRight, Pencil, Waves, MousePointer2, Hand, List
 } from 'lucide-react';
 import { CanvasSize } from './FabricCanvas';
 
@@ -13,6 +13,7 @@ interface EditorToolbarProps {
     canvasSize: CanvasSize;
     isExporting: boolean;
     onAddText: () => void;
+    onAddBulletList: () => void;
     onAddRect: () => void;
     onAddCircle: () => void;
     onAddLine: () => void;
@@ -72,7 +73,7 @@ const Divider = () => <div className="w-px h-8 bg-gray-200 mx-1" />;
 
 const EditorToolbar: React.FC<EditorToolbarProps> = ({
     canvasSize, isExporting,
-    onAddText, onAddRect, onAddCircle, onAddLine, onAddImage,
+    onAddText, onAddBulletList, onAddRect, onAddCircle, onAddLine, onAddImage,
     onDelete, onAlignLeft, onAlignCenter, onAlignRight,
     onBringForward, onSendBackward, onSendToFront, onSendToBack,
     onCopy, onPaste, onDuplicate,
@@ -108,6 +109,7 @@ const EditorToolbar: React.FC<EditorToolbarProps> = ({
 
             {/* Insert Tools */}
             <ToolBtn onClick={onAddText} title="Add Text"><Type className="w-4 h-4" /></ToolBtn>
+            <ToolBtn onClick={onAddBulletList} title="Add Bullet List"><List className="w-4 h-4" /></ToolBtn>
             <ToolBtn onClick={onAddRect}    title="Add Rectangle"            active={activeDrawTool === 'rect'}><Square className="w-4 h-4" /></ToolBtn>
             <ToolBtn onClick={onAddCircle}  title="Add Circle"               active={activeDrawTool === 'circle'}><Circle className="w-4 h-4" /></ToolBtn>
             <ToolBtn onClick={onAddLine}    title="Add Line"                 active={activeDrawTool === 'line'}><Minus className="w-4 h-4" /></ToolBtn>
