@@ -32,7 +32,7 @@ Deno.serve(async (req) => {
     if (!recaptchaData.success || recaptchaData.score < 0.3) {
       console.error('reCAPTCHA failed:', JSON.stringify(recaptchaData))
       return new Response(
-        JSON.stringify({ error: 'reCAPTCHA verification failed' }),
+        JSON.stringify({ error: 'reCAPTCHA verification failed', details: recaptchaData }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
@@ -75,10 +75,13 @@ Make it feel personalized and luxurious, but clearly state it's a draft referenc
     }
 
     const geminiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
       {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'X-goog-api-key': apiKey,
+        },
         body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
       }
     )

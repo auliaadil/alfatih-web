@@ -34,12 +34,15 @@ async function getRecaptchaToken(): Promise<string | null> {
   }
   const g = (window as any).grecaptcha
   if (!g?.execute) return null
-  return new Promise<string | null>((resolve) => {
+  return new Promise<string | null>((resolve, reject) => {
     g.ready(() =>
       g
         .execute(SITE_KEY, { action: 'generate_itinerary' })
         .then((token: string) => resolve(token))
-        .catch(() => resolve(null))
+        .catch((err: any) => {
+          console.error('reCAPTCHA execution error (domain not whitelisted or invalid key):', err)
+          resolve(null)
+        })
     )
   })
 }
@@ -47,6 +50,9 @@ async function getRecaptchaToken(): Promise<string | null> {
 export const generateItinerary = async (input: AIPlannerInput): Promise<string> => {
   try {
     const recaptchaToken = await getRecaptchaToken()
+    if (!recaptchaToken) {
+      throw new Error('Gagal mendapatkan token reCAPTCHA. Pastikan domain aplikasi sudah diizinkan di Google reCAPTCHA Console.')
+    }
     const res = await fetch(`${SUPABASE_URL}/functions/v1/ai-itinerary`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
