@@ -47,8 +47,8 @@ Note: The `@` alias resolves to the project root.
 The project has a **split structure**: root-level `components/` holds public-facing UI, while `src/` holds everything else including the admin area.
 
 - `components/` (root) — Public UI: `Hero`, `Navbar`, `Footer`, `TourCard`, `TourDetail`, `AIPlanner`, `CompanyProfile`
-- `src/pages/` — Page components: `Home.tsx`, `PackageDetailPage.tsx`, and `admin/` (Dashboard, Packages, Orders, PrivateTrips, Airlines, Hotels, PosterMaker, SiteSettings, Login)
-- `src/components/admin/PosterMaker/` — Fabric.js canvas editor broken into: `FabricCanvas`, `LayerPanel`, `PropertiesPanel`, `TemplatePanel`, `DraftPanel`, `EditorToolbar`, `TemplateSelector`, and a `blocks/` subdirectory for individual poster elements (`PosterHeader`, `PosterFooter`, `PosterDetails`, `PosterImageBlock`, `PosterPromo`)
+- `src/pages/` — Page components: `Home.tsx`, `PackageDetailPage.tsx`, and `admin/` (Dashboard, Packages, Orders, PrivateTrips, Airlines, Hotels, PosterMaker, TextCampaign, SiteSettings, Login)
+- `src/components/admin/PosterMaker/` — Fabric.js canvas editor broken into: `FabricCanvas`, `LayerPanel`, `PropertiesPanel`, `TemplatePanel`, `AssetPanel`, `EditorToolbar`, `TemplateSelector`, `SlideStrip`, `CanvasContextMenu`, `CanvasZoom`, fabric helpers (`fabricBulletList`, `fabricCornerRadius`, `fabricShadow`, `fabricSnap`), `templateThumbnail`, and a `blocks/` subdirectory for poster elements (`PosterHeader`, `PosterFooter`, `PosterDetails`, `PosterImageBlock`, `PosterPromo`)
 - `src/components/AuthGuard.tsx` — Wraps admin routes; checks Supabase auth session
 
 ### Data Layer
@@ -56,6 +56,11 @@ The project has a **split structure**: root-level `components/` holds public-fac
 - `src/lib/supabase.ts` — Single Supabase client (uses `VITE_SUPABASE_API_KEY`, not `VITE_SUPABASE_ANON_KEY`)
 - `services/itineraryService.ts` — Thin fetch wrapper that calls the `ai-itinerary` Supabase Edge Function for itinerary generation
 - `services/posterAutofillService.ts` — Thin fetch wrapper that calls the `ai-poster-autofill` Supabase Edge Function for AI Magic Auto-Fill in the Poster Maker
+- `services/textCampaignService.ts` — Thin fetch wrapper that calls the `ai-text-campaign` Edge Function to generate multi-slide social-media copy
+- `services/imageSearchService.ts` — Calls the `image-search` Edge Function (Unsplash + Pixabay) for in-editor image search
+- `services/posterTemplates.ts` — Shared template/slide generation helpers used by PosterMaker and TextCampaign
+- `services/itineraryPdfService.ts` — Calls the `generate-itinerary-pdf` Edge Function
+- `services/packageContentService.ts` — Calls the `ai-package-content` Edge Function for AI-generated package descriptions
 - `constants.ts` (root) — Static testimonials and interest lists
 - `types.ts` (root) — Shared TypeScript types: `TourPackage`, `TourCategory`, `AIPlannerInput`, `Testimonial`
 - `src/types/poster.ts` — Poster-specific types: `AspectRatio`, `LayoutType`, `TemplateConfig`
@@ -66,11 +71,23 @@ Supabase Edge Functions live in `supabase/functions/`. They run on Deno and call
 
 - `supabase/functions/ai-itinerary/` — Public endpoint. Verifies reCAPTCHA v3 token (score ≥ 0.5), builds the Halal itinerary prompt, calls Gemini, returns `{ itinerary: string }`.
 - `supabase/functions/ai-poster-autofill/` — Admin-only endpoint. Verifies Supabase JWT, builds poster copywriting prompt per template type, calls Gemini, returns updated `textNodes` array.
+- `supabase/functions/ai-text-campaign/` — Admin-only. Generates multi-slide social-media copy (e.g. tip series) and returns an array of slide text objects for the Content poster templates.
+- `supabase/functions/ai-package-content/` — Admin-only. Generates marketing copy for tour package descriptions.
+- `supabase/functions/generate-itinerary-pdf/` — Admin-only. Renders and returns an itinerary PDF.
+- `supabase/functions/image-search/` — Admin-only. Proxies Unsplash and Pixabay search for the PosterMaker asset panel.
+- `supabase/functions/invite-user/` — Admin-only. Sends a Supabase auth invite email.
+- `supabase/functions/remove-user/` — Admin-only. Deletes a Supabase auth user.
 
 Deploy commands:
 ```bash
 supabase functions deploy ai-itinerary
 supabase functions deploy ai-poster-autofill
+supabase functions deploy ai-text-campaign
+supabase functions deploy ai-package-content
+supabase functions deploy generate-itinerary-pdf
+supabase functions deploy image-search
+supabase functions deploy invite-user
+supabase functions deploy remove-user
 ```
 
 ### Contexts
@@ -87,6 +104,16 @@ Home page manually joins packages with airlines/hotels by filtering on `airline_
 ### Poster Maker
 
 Built on Fabric.js v7. The canvas editor (`FabricCanvas.tsx`) manages a `fabric.Canvas` instance. `PosterCanvas.tsx` orchestrates the full editor layout. Undo/redo uses a custom history stack. Drafts are saved to Supabase with auto-generated thumbnails. Templates are defined as `TemplateConfig` objects with layout and styling options.
+
+**Brand color palette used in templates:**
+- Primary (Blue): `#0084ff` — used for footer bars in Content templates, links, CTA accents
+- Secondary (Amber): `#F59E0B` — used for tip numbers, accent bars, callouts
+- Neutral dark: `#0F172A` — heading text on light backgrounds
+- White background: `#F8FAFC` — Content template backgrounds (redesigned from navy dark)
+
+**Content templates** (`Tips Umrah` — post and story): white background, top amber accent bar, left amber vertical strip, blue footer bar (`#0084FF`) with white brand/contact text. Generated via the `ai-text-campaign` edge function which returns a `generatedSlides` array — each slide maps to one canvas JSON snapshot in the PosterMaker.
+
+**Hijri date**: Package forms and the `ai-poster-autofill` prompt include automatic Hijri date calculation alongside the Gregorian departure date.
 
 ## Key Conventions
 
