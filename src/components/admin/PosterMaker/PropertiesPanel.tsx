@@ -4,32 +4,7 @@ import { Bold, Italic, Underline, Plus, Minus, AlignLeft, AlignCenter, AlignRigh
 import { ShadowState, DEFAULT_SHADOW, readShadowState, applyShadow } from './fabricShadow';
 import { getCornerRadius, setCornerRadius } from './fabricCornerRadius';
 import { BulletListConfig, changeBulletStyle, changeBulletColor } from './fabricBulletList';
-
-const GOOGLE_FONTS = [
-    // Sans-serif
-    'Plus Jakarta Sans', 'Inter', 'Poppins', 'Montserrat', 'Raleway',
-    'Work Sans', 'DM Sans', 'Nunito', 'Rubik', 'Outfit', 'Lato',
-    'Open Sans', 'Ubuntu', 'Figtree',
-    // Serif
-    'Playfair Display', 'Merriweather', 'Lora', 'Source Serif 4',
-    // Display / Bold
-    'Bebas Neue', 'Anton', 'Oswald',
-    // Decorative / Script
-    'Great Vibes', 'Pacifico', 'Dancing Script', 'Caveat',
-    // Arabic
-    'Amiri', 'Noto Sans Arabic', 'Cairo', 'Tajawal',
-];
-
-const loadedFonts = new Set<string>();
-const loadGoogleFont = (fontName: string) => {
-    if (loadedFonts.has(fontName)) return;
-    loadedFonts.add(fontName);
-    const link = document.createElement('link');
-    link.href = `https://fonts.googleapis.com/css2?family=${fontName.replace(/ /g, '+')}:wght@400;600;700;800;900&display=swap`;
-    link.rel = 'stylesheet';
-    document.head.appendChild(link);
-};
-['Plus Jakarta Sans', ...GOOGLE_FONTS.slice(0, 9)].forEach(loadGoogleFont);
+import { GOOGLE_FONTS, loadGoogleFont, ensureFontReady } from './fontLoader';
 
 interface PropertiesPanelProps {
     canvas: Canvas | null;
@@ -137,7 +112,7 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ canvas, selectedObjec
     const [sizeH, setSizeH] = useState('0');
     const [lockAspect, setLockAspect] = useState(false);
     const aspectRatio = useRef(1);
-    const fontTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const pendingFontRef = useRef<string | null>(null);
 
     // Text
     const [fontFamily, setFontFamily] = useState('Plus Jakarta Sans');
@@ -250,18 +225,13 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ canvas, selectedObjec
 
     const handleFontChange = (font: string) => {
         setFontFamily(font);
-        loadGoogleFont(font);
-        if (fontTimerRef.current) clearTimeout(fontTimerRef.current);
-        fontTimerRef.current = setTimeout(() => {
-            applyProp({ fontFamily: font });
-        }, 300);
+        pendingFontRef.current = font;
+        ensureFontReady(font).then(() => {
+            if (pendingFontRef.current === font) {
+                applyProp({ fontFamily: font });
+            }
+        });
     };
-
-    useEffect(() => {
-        return () => {
-            if (fontTimerRef.current) clearTimeout(fontTimerRef.current);
-        };
-    }, []);
 
     const handleFontSizeChange = (size: number) => {
         const clamped = Math.max(8, Math.min(200, size));
@@ -331,11 +301,12 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ canvas, selectedObjec
     }
 
     const PRESET_COLORS = [
-        '#000000', '#ffffff', '#1a1a1a', '#6b7280',
-        '#10b981', '#059669', '#14b8a6', '#06b6d4',
-        '#3b82f6', '#6366f1', '#8b5cf6', '#a855f7',
-        '#ec4899', '#ef4444', '#f97316', '#f59e0b',
-        '#eab308', '#84cc16', '#22c55e', '#d4af37',
+        // Neutrals
+        '#ffffff', '#f9fafb', '#f3f4f6', '#e5e7eb', '#d1d5db', '#9ca3af', '#6b7280', '#374151', '#1f2937', '#000000',
+        // Primary (Blue) — light → dark
+        '#eff6ff', '#dbeafe', '#bfdbfe', '#93c5fd', '#60a5fa', '#0084ff', '#0066cc', '#1d4ed8', '#1e40af', '#0f172a',
+        // Secondary (Amber) — light → dark
+        '#fffbeb', '#fef3c7', '#fde68a', '#fcd34d', '#fbbf24', '#f59e0b', '#d97706', '#b45309', '#78350f', '#92400e',
     ];
 
     const inputCls = 'w-full text-xs border border-gray-300 rounded-lg px-2 py-1.5 focus:border-primary focus:ring-1 focus:ring-primary outline-none';

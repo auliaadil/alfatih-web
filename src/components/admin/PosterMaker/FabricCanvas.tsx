@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useImperativeHandle, forwardRef, useState } f
 import { Canvas, Rect, Textbox, Circle, Line, Path, PencilBrush, FabricImage, FabricObject } from 'fabric';
 import { installSceneSnap } from './fabricSnap';
 import { createBulletListTextbox, normalizeBulletList } from './fabricBulletList';
+import { preloadTemplateFonts } from './fontLoader';
 
 export type CanvasSize = 'post' | 'story';
 
@@ -954,9 +955,11 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
                         if (obj.type === 'image') obj.crossOrigin = 'anonymous';
                     });
                 }
-                c.loadFromJSON(safeJson).then(() => {
-                    c.requestRenderAll();
-                    onCanvasModified?.();
+                preloadTemplateFonts(safeJson).then(() => {
+                    c.loadFromJSON(safeJson).then(() => {
+                        c.requestRenderAll();
+                        onCanvasModified?.();
+                    });
                 });
             },
 
