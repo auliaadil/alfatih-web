@@ -106,7 +106,7 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                 { rx: 30, ry: 30, top: 1140, fill: '#0084FF', left: 340, type: 'Rect', angle: 0, flipX: false, flipY: false, skewX: 0, skewY: 0, width: 400, height: 60, scaleX: 1, scaleY: 1, shadow: null, stroke: null, opacity: 1, originX: 'left', originY: 'top', version: '7.2.0', visible: true, fillRule: 'nonzero', paintFirst: 'fill', strokeWidth: 1, strokeLineCap: 'butt', strokeUniform: false, strokeLineJoin: 'miter', backgroundColor: '', strokeDashArray: null, strokeDashOffset: 0, strokeMiterLimit: 4, globalCompositeOperation: 'source-over' },
                 { rx: 0, ry: 0, top: 1210, fill: '#0084FF', left: 0, type: 'Rect', angle: 0, flipX: false, flipY: false, skewX: 0, skewY: 0, width: 1080, height: 140, scaleX: 1, scaleY: 1, shadow: null, stroke: null, opacity: 1, originX: 'left', originY: 'top', version: '7.2.0', visible: true, fillRule: 'nonzero', paintFirst: 'fill', strokeWidth: 1, strokeLineCap: 'butt', strokeUniform: false, strokeLineJoin: 'miter', backgroundColor: '', strokeDashArray: null, strokeDashOffset: 0, strokeMiterLimit: 4, globalCompositeOperation: 'source-over' },
                 { top: 100, fill: '#F59E0B', left: 60, text: 'UMRAH REGULER', type: 'Textbox', angle: 0, flipX: false, flipY: false, skewX: 0, skewY: 0, width: 960, height: 20.34, scaleX: 1, scaleY: 1, shadow: null, stroke: null, styles: [], opacity: 1, originX: 'left', originY: 'top', version: '7.2.0', visible: true, fillRule: 'nonzero', fontSize: 18, minWidth: 20, overline: false, pathSide: 'left', direction: 'ltr', fontStyle: 'normal', pathAlign: 'baseline', textAlign: 'left', underline: false, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', lineHeight: 1.16, paintFirst: 'fill', charSpacing: 150, linethrough: false, strokeWidth: 1, strokeLineCap: 'butt', strokeUniform: false, strokeLineJoin: 'miter', backgroundColor: '', pathStartOffset: 0, splitByGrapheme: false, strokeDashArray: null, strokeDashOffset: 0, strokeMiterLimit: 4, textBackgroundColor: '', textDecorationThickness: 66.667, globalCompositeOperation: 'source-over' },
-                { top: 140, fill: '#0F172A', left: 60, text: 'Umrah Premium Syawal 1447H', type: 'Textbox', angle: 0, flipX: false, flipY: false, skewX: 0, skewY: 0, width: 960, height: 61.02, scaleX: 1, scaleY: 1, shadow: null, stroke: null, styles: [], opacity: 1, originX: 'left', originY: 'top', version: '7.2.0', visible: true, fillRule: 'nonzero', fontSize: 54, minWidth: 20, overline: false, pathSide: 'left', direction: 'ltr', fontStyle: 'normal', pathAlign: 'baseline', textAlign: 'left', underline: false, fontFamily: 'Dancing Script', fontWeight: '700', lineHeight: 1.2, paintFirst: 'fill', charSpacing: 0, linethrough: false, strokeWidth: 1, strokeLineCap: 'butt', strokeUniform: false, strokeLineJoin: 'miter', backgroundColor: '', pathStartOffset: 0, splitByGrapheme: false, strokeDashArray: null, strokeDashOffset: 0, strokeMiterLimit: 4, textBackgroundColor: '', textDecorationThickness: 66.667, globalCompositeOperation: 'source-over' },
+                { top: 140, fill: '#0F172A', left: 60, text: 'Umrah Premium Syawal 1447H', type: 'Textbox', angle: 0, flipX: false, flipY: false, skewX: 0, skewY: 0, width: 960, height: 61.02, scaleX: 1, scaleY: 1, shadow: null, stroke: null, styles: [], opacity: 1, originX: 'left', originY: 'top', version: '7.2.0', visible: true, fillRule: 'nonzero', fontSize: 54, minWidth: 20, overline: false, pathSide: 'left', direction: 'ltr', fontStyle: 'normal', pathAlign: 'baseline', textAlign: 'left', underline: false, fontFamily: 'Dancing Script', fontWeight: '800', lineHeight: 1.2, paintFirst: 'fill', charSpacing: 0, linethrough: false, strokeWidth: 1, strokeLineCap: 'butt', strokeUniform: false, strokeLineJoin: 'miter', backgroundColor: '', pathStartOffset: 0, splitByGrapheme: false, strokeDashArray: null, strokeDashOffset: 0, strokeMiterLimit: 4, textBackgroundColor: '', textDecorationThickness: 66.667, globalCompositeOperation: 'source-over' },
                 { top: 270, fill: '#64748B', left: 60, text: 'Nikmati perjalanan ibadah yang aman, nyaman, dan khusyuk bersama travel berizin resmi PPIU. Fasilitas hotel bintang 5 dekat dengan Masjidil Haram.', type: 'Textbox', angle: 0, flipX: false, flipY: false, skewX: 0, skewY: 0, width: 960, height: 54.24, scaleX: 1, scaleY: 1, shadow: null, stroke: null, styles: [], opacity: 1, originX: 'left', originY: 'top', version: '7.2.0', visible: true, fillRule: 'nonzero', fontSize: 20, minWidth: 20, overline: false, pathSide: 'left', direction: 'ltr', fontStyle: 'normal', pathAlign: 'baseline', textAlign: 'left', underline: false, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 'normal', lineHeight: 1.4, paintFirst: 'fill', charSpacing: 0, linethrough: false, strokeWidth: 1, strokeLineCap: 'butt', strokeUniform: false, strokeLineJoin: 'miter', backgroundColor: '', pathStartOffset: 0, splitByGrapheme: false, strokeDashArray: null, strokeDashOffset: 0, strokeMiterLimit: 4, textBackgroundColor: '', textDecorationThickness: 66.667, globalCompositeOperation: 'source-over' },
                 { top: 820, fill: '#0F172A', left: 60, text: 'Keberangkatan\n12 Okt 2026', type: 'Textbox', angle: 0, flipX: false, flipY: false, skewX: 0, skewY: 0, width: 300, height: 57.178, scaleX: 1, scaleY: 1, shadow: null, stroke: null, styles: [], opacity: 1, originX: 'left', originY: 'top', version: '7.2.0', visible: true, fillRule: 'nonzero', fontSize: 22, minWidth: 20, overline: false, pathSide: 'left', direction: 'ltr', fontStyle: 'normal', pathAlign: 'baseline', textAlign: 'center', underline: false, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', lineHeight: 1.3, paintFirst: 'fill', charSpacing: 0, linethrough: false, strokeWidth: 1, strokeLineCap: 'butt', strokeUniform: false, strokeLineJoin: 'miter', backgroundColor: '', pathStartOffset: 0, splitByGrapheme: false, strokeDashArray: null, strokeDashOffset: 0, strokeMiterLimit: 4, textBackgroundColor: '', textDecorationThickness: 66.667, globalCompositeOperation: 'source-over' },
                 { top: 820, fill: '#0F172A', left: 390, text: 'Durasi\n12 Hari', type: 'Textbox', angle: 0, flipX: false, flipY: false, skewX: 0, skewY: 0, width: 300, height: 57.178, scaleX: 1, scaleY: 1, shadow: null, stroke: null, styles: [], opacity: 1, originX: 'left', originY: 'top', version: '7.2.0', visible: true, fillRule: 'nonzero', fontSize: 22, minWidth: 20, overline: false, pathSide: 'left', direction: 'ltr', fontStyle: 'normal', pathAlign: 'baseline', textAlign: 'center', underline: false, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', lineHeight: 1.3, paintFirst: 'fill', charSpacing: 0, linethrough: false, strokeWidth: 1, strokeLineCap: 'butt', strokeUniform: false, strokeLineJoin: 'miter', backgroundColor: '', pathStartOffset: 0, splitByGrapheme: false, strokeDashArray: null, strokeDashOffset: 0, strokeMiterLimit: 4, textBackgroundColor: '', textDecorationThickness: 66.667, globalCompositeOperation: 'source-over' },
@@ -457,7 +457,7 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                 // Background
                 { type: 'rect', left: 0, top: 0, width: 1080, height: 1350, fill: '#F8FAFC', originX: 'left', originY: 'top', selectable: false, evented: false },
                 // Top accent bar (teal)
-                { type: 'rect', left: 0, top: 0, width: 1080, height: 14, fill: '#0084FF', originX: 'left', originY: 'top', selectable: false, evented: false },
+                { type: 'rect', left: 0, top: 0, width: 1080, height: 14, fill: '#F59E0B', originX: 'left', originY: 'top', selectable: false, evented: false },
                 // Teal divider under header
                 { type: 'rect', left: 80, top: 200, width: 180, height: 3, fill: '#0084FF', originX: 'left', originY: 'top', selectable: true },
                 // Full-bleed image (edge-to-edge)
@@ -473,7 +473,7 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                 // Category
                 { type: 'textbox', left: 80, top: 78, width: 920, text: 'PROMO TERBATAS', fontSize: 17, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#0084FF', charSpacing: 180, originX: 'left', originY: 'top', editable: true },
                 // Title
-                { type: 'textbox', left: 80, top: 108, width: 920, text: 'Umrah Premium Syawal 1447H', fontSize: 50, fontFamily: 'Dancing Script', fontWeight: '700', fill: '#0F172A', lineHeight: 1.2, originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 80, top: 108, width: 920, text: 'Umrah Premium Syawal 1447H', fontSize: 50, fontFamily: 'Dancing Script', fontWeight: '800', fill: '#0F172A', lineHeight: 1.2, originX: 'left', originY: 'top', editable: true },
                 // Description
                 { type: 'textbox', left: 80, top: 214, width: 920, text: 'Nikmati perjalanan ibadah yang aman, nyaman, dan khusyuk bersama travel berizin resmi PPIU.', fontSize: 17, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 'normal', fill: '#64748B', lineHeight: 1.4, originX: 'left', originY: 'top', editable: true },
                 // HEMAT badge text
@@ -518,7 +518,7 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                 // Background
                 { type: 'rect', left: 0, top: 0, width: 1080, height: 1920, fill: '#F8FAFC', originX: 'left', originY: 'top', selectable: false, evented: false },
                 // Top accent bar (teal)
-                { type: 'rect', left: 0, top: 0, width: 1080, height: 20, fill: '#0084FF', originX: 'left', originY: 'top', selectable: false, evented: false },
+                { type: 'rect', left: 0, top: 0, width: 1080, height: 20, fill: '#F59E0B', originX: 'left', originY: 'top', selectable: false, evented: false },
                 // Teal divider under header
                 { type: 'rect', left: 80, top: 300, width: 220, height: 4, fill: '#0084FF', originX: 'left', originY: 'top', selectable: true },
                 // Full-bleed image (edge-to-edge)
@@ -534,7 +534,7 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                 // Category
                 { type: 'textbox', left: 80, top: 110, width: 920, text: 'PROMO TERBATAS', fontSize: 18, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#0084FF', charSpacing: 180, originX: 'left', originY: 'top', editable: true },
                 // Title
-                { type: 'textbox', left: 80, top: 148, width: 920, text: 'Umrah Premium Syawal 1447H', fontSize: 58, fontFamily: 'Dancing Script', fontWeight: '700', fill: '#0F172A', lineHeight: 1.2, originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 80, top: 148, width: 920, text: 'Umrah Premium Syawal 1447H', fontSize: 58, fontFamily: 'Dancing Script', fontWeight: '800', fill: '#0F172A', lineHeight: 1.2, originX: 'left', originY: 'top', editable: true },
                 // Description
                 { type: 'textbox', left: 80, top: 316, width: 920, text: 'Nikmati perjalanan ibadah yang aman, nyaman, dan khusyuk bersama travel berizin resmi PPIU.', fontSize: 20, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 'normal', fill: '#64748B', lineHeight: 1.4, originX: 'left', originY: 'top', editable: true },
                 // HEMAT badge text
@@ -605,7 +605,7 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                 // Category
                 { type: 'textbox', left: 80, top: 80, width: 920, text: 'HOTEL & MASKAPAI', fontSize: 17, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#F59E0B', charSpacing: 180, originX: 'left', originY: 'top', editable: true },
                 // Title
-                { type: 'textbox', left: 80, top: 114, width: 920, text: 'Umrah Premium Syawal 1447H', fontSize: 48, fontFamily: 'Dancing Script', fontWeight: '700', fill: '#0F172A', lineHeight: 1.2, originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 80, top: 114, width: 920, text: 'Umrah Premium Syawal 1447H', fontSize: 48, fontFamily: 'Dancing Script', fontWeight: '800', fill: '#0F172A', lineHeight: 1.2, originX: 'left', originY: 'top', editable: true },
                 // Description
                 { type: 'textbox', left: 80, top: 200, width: 920, text: 'Nikmati pengalaman ibadah dengan fasilitas premium — hotel bintang 5 dan penerbangan langsung.', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 'normal', fill: '#64748B', lineHeight: 1.4, originX: 'left', originY: 'top', editable: true },
                 // Hotel image label (on overlay)
@@ -674,7 +674,7 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                 // Category
                 { type: 'textbox', left: 80, top: 88, width: 920, text: 'HOTEL & MASKAPAI', fontSize: 18, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#F59E0B', charSpacing: 180, originX: 'left', originY: 'top', editable: true },
                 // Title
-                { type: 'textbox', left: 80, top: 126, width: 920, text: 'Umrah Premium Syawal 1447H', fontSize: 56, fontFamily: 'Dancing Script', fontWeight: '700', fill: '#0F172A', lineHeight: 1.2, originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 80, top: 126, width: 920, text: 'Umrah Premium Syawal 1447H', fontSize: 56, fontFamily: 'Dancing Script', fontWeight: '800', fill: '#0F172A', lineHeight: 1.2, originX: 'left', originY: 'top', editable: true },
                 // Description
                 { type: 'textbox', left: 80, top: 282, width: 920, text: 'Nikmati pengalaman ibadah dengan fasilitas premium — hotel bintang 5 dan penerbangan langsung.', fontSize: 19, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 'normal', fill: '#64748B', lineHeight: 1.4, originX: 'left', originY: 'top', editable: true },
                 // Hotel image label (on overlay)
@@ -717,7 +717,7 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                 // Background
                 { type: 'rect', left: 0, top: 0, width: 1080, height: 1350, fill: '#F8FAFC', originX: 'left', originY: 'top', selectable: false, evented: false },
                 // Top accent bar (indigo)
-                { type: 'rect', left: 0, top: 0, width: 1080, height: 14, fill: '#0084FF', originX: 'left', originY: 'top', selectable: false, evented: false },
+                { type: 'rect', left: 0, top: 0, width: 1080, height: 14, fill: '#F59E0B', originX: 'left', originY: 'top', selectable: false, evented: false },
                 // Indigo divider under header
                 { type: 'rect', left: 80, top: 182, width: 180, height: 3, fill: '#0084FF', originX: 'left', originY: 'top', selectable: true },
                 // Left panel: tall portrait image
@@ -739,7 +739,7 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                 // Header: Category
                 { type: 'textbox', left: 80, top: 78, width: 920, text: 'KEUNGGULAN PAKET', fontSize: 17, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#0084FF', charSpacing: 200, originX: 'left', originY: 'top', editable: true },
                 // Header: Title
-                { type: 'textbox', left: 80, top: 108, width: 920, text: 'Umrah Premium Syawal 1447H', fontSize: 48, fontFamily: 'Dancing Script', fontWeight: '700', fill: '#0F172A', lineHeight: 1.2, originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 80, top: 108, width: 920, text: 'Umrah Premium Syawal 1447H', fontSize: 48, fontFamily: 'Dancing Script', fontWeight: '800', fill: '#0F172A', lineHeight: 1.2, originX: 'left', originY: 'top', editable: true },
                 // Card 1: field label
                 { type: 'textbox', left: 550, top: 258, width: 510, text: 'HOTEL BERBINTANG 5', fontSize: 15, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#F59E0B', textAlign: 'center', charSpacing: 150, originX: 'left', originY: 'top', editable: true },
                 // Card 1: value
@@ -794,7 +794,7 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                 // Background
                 { type: 'rect', left: 0, top: 0, width: 1080, height: 1920, fill: '#F8FAFC', originX: 'left', originY: 'top', selectable: false, evented: false },
                 // Top accent bar (indigo)
-                { type: 'rect', left: 0, top: 0, width: 1080, height: 20, fill: '#0084FF', originX: 'left', originY: 'top', selectable: false, evented: false },
+                { type: 'rect', left: 0, top: 0, width: 1080, height: 20, fill: '#F59E0B', originX: 'left', originY: 'top', selectable: false, evented: false },
                 // Indigo divider under header
                 { type: 'rect', left: 80, top: 295, width: 200, height: 4, fill: '#0084FF', originX: 'left', originY: 'top', selectable: true },
                 // Left panel: tall portrait image
@@ -816,7 +816,7 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                 // Header: Category
                 { type: 'textbox', left: 80, top: 110, width: 920, text: 'KEUNGGULAN PAKET', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#0084FF', charSpacing: 200, originX: 'left', originY: 'top', editable: true },
                 // Header: Title
-                { type: 'textbox', left: 80, top: 144, width: 920, text: 'Umrah Premium Syawal 1447H', fontSize: 58, fontFamily: 'Dancing Script', fontWeight: '700', fill: '#0F172A', lineHeight: 1.2, originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 80, top: 144, width: 920, text: 'Umrah Premium Syawal 1447H', fontSize: 58, fontFamily: 'Dancing Script', fontWeight: '800', fill: '#0F172A', lineHeight: 1.2, originX: 'left', originY: 'top', editable: true },
                 // Card 1: field label
                 { type: 'textbox', left: 550, top: 364, width: 510, text: 'HOTEL BERBINTANG 5', fontSize: 17, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '700', fill: '#F59E0B', textAlign: 'center', charSpacing: 150, originX: 'left', originY: 'top', editable: true },
                 // Card 1: value
@@ -893,7 +893,7 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                 // Category
                 { type: 'textbox', left: 80, top: 78, width: 920, text: 'UMRAH REGULER', fontSize: 17, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#F59E0B', charSpacing: 180, originX: 'left', originY: 'top', editable: true },
                 // Title
-                { type: 'textbox', left: 80, top: 112, width: 920, text: 'Umrah Premium Syawal 1447H', fontSize: 50, fontFamily: 'Dancing Script', fontWeight: '700', fill: '#0F172A', lineHeight: 1.2, originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 80, top: 112, width: 920, text: 'Umrah Premium Syawal 1447H', fontSize: 50, fontFamily: 'Dancing Script', fontWeight: '800', fill: '#0F172A', lineHeight: 1.2, originX: 'left', originY: 'top', editable: true },
                 // Description
                 { type: 'textbox', left: 80, top: 208, width: 920, text: 'Bergabunglah bersama ribuan jamaah berpengalaman dalam perjalanan ibadah Umrah terbaik.', fontSize: 17, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 'normal', fill: '#64748B', lineHeight: 1.4, originX: 'left', originY: 'top', editable: true },
                 // "KEBERANGKATAN" label (on overlay, left)
@@ -962,7 +962,7 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                 // Category
                 { type: 'textbox', left: 80, top: 120, width: 920, text: 'UMRAH REGULER', fontSize: 18, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#F59E0B', charSpacing: 180, originX: 'left', originY: 'top', editable: true },
                 // Title
-                { type: 'textbox', left: 80, top: 158, width: 920, text: 'Umrah Premium Syawal 1447H', fontSize: 58, fontFamily: 'Dancing Script', fontWeight: '700', fill: '#0F172A', lineHeight: 1.2, originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 80, top: 158, width: 920, text: 'Umrah Premium Syawal 1447H', fontSize: 58, fontFamily: 'Dancing Script', fontWeight: '800', fill: '#0F172A', lineHeight: 1.2, originX: 'left', originY: 'top', editable: true },
                 // Description
                 { type: 'textbox', left: 80, top: 308, width: 920, text: 'Bergabunglah bersama ribuan jamaah berpengalaman dalam perjalanan ibadah Umrah terbaik.', fontSize: 20, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 'normal', fill: '#64748B', lineHeight: 1.4, originX: 'left', originY: 'top', editable: true },
                 // "KEBERANGKATAN" label (on overlay, left)
@@ -1021,7 +1021,7 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                 // Category label
                 { type: 'textbox', left: 80, top: 80, width: 920, text: 'DESTINASI PILIHAN', fontSize: 17, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#F59E0B', charSpacing: 180, originX: 'left', originY: 'top', editable: true },
                 // Title
-                { type: 'textbox', left: 80, top: 112, width: 920, text: 'Madinah Al-Munawwarah', fontSize: 52, fontFamily: 'Dancing Script', fontWeight: '700', fill: '#0F172A', lineHeight: 1.15, originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 80, top: 112, width: 920, text: 'Madinah Al-Munawwarah', fontSize: 52, fontFamily: 'Dancing Script', fontWeight: '800', fill: '#0F172A', lineHeight: 1.15, originX: 'left', originY: 'top', editable: true },
                 // Description
                 { type: 'textbox', left: 80, top: 228, width: 920, text: 'Kota cahaya yang menyejukkan hati setiap hamba yang rindu kepada-Nya.', fontSize: 18, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 'normal', fill: '#64748B', lineHeight: 1.4, originX: 'left', originY: 'top', editable: true },
                 // Tagline on dark overlay
@@ -1066,7 +1066,7 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                 // Category label
                 { type: 'textbox', left: 80, top: 110, width: 920, text: 'DESTINASI PILIHAN', fontSize: 18, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#F59E0B', charSpacing: 180, originX: 'left', originY: 'top', editable: true },
                 // Title
-                { type: 'textbox', left: 80, top: 148, width: 920, text: 'Madinah Al-Munawwarah', fontSize: 62, fontFamily: 'Dancing Script', fontWeight: '700', fill: '#0F172A', lineHeight: 1.15, originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 80, top: 148, width: 920, text: 'Madinah Al-Munawwarah', fontSize: 62, fontFamily: 'Dancing Script', fontWeight: '800', fill: '#0F172A', lineHeight: 1.15, originX: 'left', originY: 'top', editable: true },
                 // Description
                 { type: 'textbox', left: 80, top: 270, width: 920, text: 'Kota cahaya yang menyejukkan hati setiap hamba yang rindu kepada-Nya.', fontSize: 20, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 'normal', fill: '#64748B', lineHeight: 1.4, originX: 'left', originY: 'top', editable: true },
                 // Tagline on dark overlay
@@ -1105,7 +1105,7 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                 { type: 'rect', left: 540, top: 560, width: 220, height: 3, fill: '#F59E0B', originX: 'left', originY: 'top', selectable: false, evented: false },
                 { type: 'rect', left: 0, top: 1210, width: 1080, height: 140, fill: '#0084FF', originX: 'left', originY: 'top', selectable: false, evented: false },
                 { type: 'textbox', left: 540, top: 70, width: 500, text: 'KISAH JAMAAH', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#F59E0B', charSpacing: 180, originX: 'left', originY: 'top', editable: true },
-                { type: 'textbox', left: 540, top: 98, width: 500, text: 'Cerita dari Tanah Suci', fontSize: 32, fontFamily: 'Dancing Script', fontWeight: '700', fill: '#0F172A', lineHeight: 1.2, originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 540, top: 98, width: 500, text: 'Cerita dari Tanah Suci', fontSize: 32, fontFamily: 'Dancing Script', fontWeight: '800', fill: '#0F172A', lineHeight: 1.2, originX: 'left', originY: 'top', editable: true },
                 { type: 'textbox', left: 536, top: 162, width: 520, text: '❝', fontSize: 90, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#F59E0B', lineHeight: 1, originX: 'left', originY: 'top', editable: false },
                 { type: 'textbox', left: 540, top: 270, width: 500, text: 'Subhanallah, perjalanan umrah bersama Alfatih sangat luar biasa. Pembimbing ibadah yang sabar, hotel dekat Masjidil Haram, dan pelayanan yang penuh kasih. InsyaAllah kami ingin kembali.', fontSize: 20, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 'normal', fill: '#0F172A', lineHeight: 1.55, originX: 'left', originY: 'top', editable: true },
                 { type: 'textbox', left: 540, top: 524, width: 500, text: '⭐⭐⭐⭐⭐', fontSize: 18, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '400', fill: '#F59E0B', originX: 'left', originY: 'top', editable: true },
@@ -1138,7 +1138,7 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                 { type: 'rect', left: 80, top: 1430, width: 280, height: 4, fill: '#F59E0B', originX: 'left', originY: 'top', selectable: false, evented: false },
                 { type: 'rect', left: 0, top: 1740, width: 1080, height: 180, fill: '#0084FF', originX: 'left', originY: 'top', selectable: false, evented: false },
                 { type: 'textbox', left: 80, top: 842, width: 920, text: 'KISAH JAMAAH', fontSize: 18, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#F59E0B', charSpacing: 180, originX: 'left', originY: 'top', editable: true },
-                { type: 'textbox', left: 80, top: 874, width: 920, text: 'Cerita dari Tanah Suci', fontSize: 36, fontFamily: 'Dancing Script', fontWeight: '700', fill: '#FFFFFF', originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 80, top: 874, width: 920, text: 'Cerita dari Tanah Suci', fontSize: 36, fontFamily: 'Dancing Script', fontWeight: '800', fill: '#FFFFFF', originX: 'left', originY: 'top', editable: true },
                 { type: 'textbox', left: 76, top: 988, width: 920, text: '❝', fontSize: 100, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#F59E0B', lineHeight: 1, originX: 'left', originY: 'top', editable: false },
                 { type: 'textbox', left: 80, top: 1112, width: 920, text: 'Subhanallah, perjalanan umrah bersama Alfatih sangat luar biasa. Pembimbing ibadah yang sabar, hotel dekat Masjidil Haram, dan pelayanan yang penuh kasih sayang. InsyaAllah kami ingin kembali bersama keluarga.', fontSize: 26, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 'normal', fill: '#0F172A', lineHeight: 1.6, originX: 'left', originY: 'top', editable: true },
                 { type: 'textbox', left: 80, top: 1390, width: 920, text: '⭐⭐⭐⭐⭐', fontSize: 22, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '400', fill: '#F59E0B', originX: 'left', originY: 'top', editable: true },
@@ -1180,7 +1180,7 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                 // Large tip number
                 { type: 'textbox', left: 100, top: 178, width: 400, text: '01', fontSize: 200, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#F59E0B', lineHeight: 1, originX: 'left', originY: 'top', editable: true },
                 // Tip title
-                { type: 'textbox', left: 120, top: 460, width: 900, text: 'Niat yang Ikhlas\nadalah Kunci Ibadah', fontSize: 52, fontFamily: 'Dancing Script', fontWeight: '700', fill: '#0F172A', lineHeight: 1.2, originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 120, top: 460, width: 900, text: 'Niat yang Ikhlas\nadalah Kunci Ibadah', fontSize: 52, fontFamily: 'Dancing Script', fontWeight: '800', fill: '#0F172A', lineHeight: 1.2, originX: 'left', originY: 'top', editable: true },
                 // Body text
                 { type: 'textbox', left: 120, top: 642, width: 900, text: 'Sebelum berangkat, pastikan niat Anda murni karena Allah SWT semata. Ibadah yang diterima bukan hanya tentang fisik yang hadir di Tanah Suci — tetapi tentang hati yang hadir dan khusyuk dalam setiap doa dan amalan selama di sana.', fontSize: 22, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 'normal', fill: '#64748B', lineHeight: 1.65, originX: 'left', originY: 'top', editable: true },
                 // Brand name
@@ -1221,7 +1221,7 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                 // Large tip number
                 { type: 'textbox', left: 96, top: 226, width: 500, text: '01', fontSize: 280, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#F59E0B', lineHeight: 1, originX: 'left', originY: 'top', editable: true },
                 // Tip title
-                { type: 'textbox', left: 120, top: 678, width: 900, text: 'Niat yang Ikhlas\nadalah Kunci Ibadah', fontSize: 62, fontFamily: 'Dancing Script', fontWeight: '700', fill: '#0F172A', lineHeight: 1.2, originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 120, top: 678, width: 900, text: 'Niat yang Ikhlas\nadalah Kunci Ibadah', fontSize: 62, fontFamily: 'Dancing Script', fontWeight: '800', fill: '#0F172A', lineHeight: 1.2, originX: 'left', originY: 'top', editable: true },
                 // Body text
                 { type: 'textbox', left: 120, top: 946, width: 900, text: 'Sebelum berangkat, pastikan niat Anda murni karena Allah SWT semata. Ibadah yang diterima bukan hanya tentang fisik yang hadir di Tanah Suci — tetapi tentang hati yang hadir dan khusyuk dalam setiap doa dan amalan selama di sana.\n\nPersiapkan diri Anda dengan memperbanyak doa, tilawah, dan meningkatkan akhlak sebelum keberangkatan.', fontSize: 26, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 'normal', fill: '#64748B', lineHeight: 1.65, originX: 'left', originY: 'top', editable: true },
                 // Brand name
@@ -1253,7 +1253,7 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                 { type: 'rect', left: 120, top: 720, width: 300, height: 2, fill: '#F59E0B', opacity: 0.6, originX: 'left', originY: 'top', selectable: false, evented: false },
                 { type: 'rect', left: 120, top: 1080, width: 160, height: 2, fill: '#F59E0B', opacity: 0.6, originX: 'left', originY: 'top', selectable: false, evented: false },
                 { type: 'textbox', left: 120, top: 148, width: 900, text: 'TIPS UMRAH', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#F59E0B', charSpacing: 180, originX: 'left', originY: 'top', editable: true },
-                { type: 'textbox', left: 120, top: 380, width: 900, text: 'Judul Konten\nCarousel Anda', fontSize: 72, fontFamily: 'Dancing Script', fontWeight: '700', fill: '#0F172A', lineHeight: 1.2, originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 120, top: 380, width: 900, text: 'Judul Konten\nCarousel Anda', fontSize: 72, fontFamily: 'Dancing Script', fontWeight: '800', fill: '#0F172A', lineHeight: 1.2, originX: 'left', originY: 'top', editable: true },
                 { type: 'textbox', left: 120, top: 740, width: 900, text: 'Kalimat pendukung yang menggambarkan isi carousel ini.', fontSize: 24, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 'normal', fill: '#64748B', lineHeight: 1.55, originX: 'left', originY: 'top', editable: true },
                 { type: 'textbox', left: 60, top: 1228, width: 300, text: 'ALFATIH DUNIA WISATA', fontSize: 17, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#FFFFFF', charSpacing: 150, originX: 'left', originY: 'top', editable: true },
                 { type: 'textbox', left: 380, top: 1228, width: 640, text: 'adwisata.com  |  @alfatih.umroh  |  +62 815-164-222-5', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '600', fill: '#FFFFFF', textAlign: 'right', originX: 'left', originY: 'top', editable: true },
@@ -1281,7 +1281,7 @@ const BASE_TEMPLATES: PosterTemplate[] = [
                 { type: 'rect', left: 120, top: 990, width: 360, height: 3, fill: '#F59E0B', opacity: 0.6, originX: 'left', originY: 'top', selectable: false, evented: false },
                 { type: 'rect', left: 120, top: 1594, width: 200, height: 3, fill: '#F59E0B', opacity: 0.6, originX: 'left', originY: 'top', selectable: false, evented: false },
                 { type: 'textbox', left: 120, top: 188, width: 900, text: 'TIPS UMRAH', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#F59E0B', charSpacing: 180, originX: 'left', originY: 'top', editable: true },
-                { type: 'textbox', left: 120, top: 548, width: 900, text: 'Judul Konten\nCarousel Anda', fontSize: 90, fontFamily: 'Dancing Script', fontWeight: '700', fill: '#0F172A', lineHeight: 1.2, originX: 'left', originY: 'top', editable: true },
+                { type: 'textbox', left: 120, top: 548, width: 900, text: 'Judul Konten\nCarousel Anda', fontSize: 90, fontFamily: 'Dancing Script', fontWeight: '800', fill: '#0F172A', lineHeight: 1.2, originX: 'left', originY: 'top', editable: true },
                 { type: 'textbox', left: 120, top: 1016, width: 900, text: 'Kalimat pendukung yang menggambarkan isi carousel ini.', fontSize: 28, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 'normal', fill: '#64748B', lineHeight: 1.55, originX: 'left', originY: 'top', editable: true },
                 { type: 'textbox', left: 80, top: 1758, width: 300, text: 'ALFATIH DUNIA WISATA', fontSize: 16, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '800', fill: '#FFFFFF', charSpacing: 150, originX: 'left', originY: 'top', editable: true },
                 { type: 'textbox', left: 400, top: 1758, width: 640, text: 'adwisata.com  |  @alfatih.umroh  |  +62 815-164-222-5', fontSize: 18, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '600', fill: '#FFFFFF', textAlign: 'right', originX: 'left', originY: 'top', editable: true },

@@ -5,12 +5,23 @@ const cache = new Map<string, string>();
 // Sequential queue — one canvas at a time to avoid memory spikes
 let queue = Promise.resolve();
 
+// Fast djb2 hash so cache is invalidated when template JSON changes
+const jsonHash = (json: object): string => {
+    const s = JSON.stringify(json);
+    let h = 5381;
+    for (let i = 0; i < s.length; i++) {
+        h = (((h << 5) + h) ^ s.charCodeAt(i)) | 0;
+    }
+    return (h >>> 0).toString(36);
+};
+
 export const generateTemplateThumbnail = (id: string, json: object): Promise<string> => {
-    if (cache.has(id)) return Promise.resolve(cache.get(id)!);
+    const cacheKey = `${id}-${jsonHash(json)}`;
+    if (cache.has(cacheKey)) return Promise.resolve(cache.get(cacheKey)!);
 
     const task = queue.then(async (): Promise<string> => {
         // Re-check cache in case a parallel call already generated this
-        if (cache.has(id)) return cache.get(id)!;
+        if (cache.has(cacheKey)) return cache.get(cacheKey)!;
 
         const { width = 1080, height = 1350 } = json as Record<string, number>;
 
@@ -54,7 +65,7 @@ export const generateTemplateThumbnail = (id: string, json: object): Promise<str
             } catch {
                 return '';
             }
-            cache.set(id, dataUrl);
+            cache.set(cacheKey, dataUrl);
             return dataUrl;
         } finally {
             fabricCanvas.dispose();
