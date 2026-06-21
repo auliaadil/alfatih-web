@@ -77,6 +77,7 @@ const LayerPanel: React.FC<LayerPanelProps> = ({ canvas, refreshKey }) => {
     const handleToggleVisible = (obj: FabricObject) => {
         obj.set({ visible: !obj.visible });
         canvas.requestRenderAll();
+        canvas.fire('object:modified', { target: obj });
         setObjects([...canvas.getObjects().slice().reverse()]);
     };
 
@@ -95,6 +96,7 @@ const LayerPanel: React.FC<LayerPanelProps> = ({ canvas, refreshKey }) => {
         });
         if ('editable' in obj) (obj as any).editable = !next;
         canvas.requestRenderAll();
+        canvas.fire('object:modified', { target: obj });
         setObjects([...canvas.getObjects().slice().reverse()]);
     };
 
@@ -137,6 +139,7 @@ const LayerPanel: React.FC<LayerPanelProps> = ({ canvas, refreshKey }) => {
 
         canvas.moveObjectTo(obj, newFabricIndex);
         canvas.requestRenderAll();
+        canvas.fire('object:modified', { target: obj });
         setObjects([...canvas.getObjects().slice().reverse()]);
 
         setDraggedIdx(null);

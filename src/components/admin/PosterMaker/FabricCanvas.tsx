@@ -853,28 +853,28 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
                 const c = fabricRef.current;
                 if (!c) return;
                 const active = c.getActiveObject();
-                if (active) { c.bringObjectForward(active); c.requestRenderAll(); }
+                if (active) { c.bringObjectForward(active); c.requestRenderAll(); c.fire('object:modified', { target: active }); }
             },
 
             sendBackward: () => {
                 const c = fabricRef.current;
                 if (!c) return;
                 const active = c.getActiveObject();
-                if (active) { c.sendObjectBackwards(active); c.requestRenderAll(); }
+                if (active) { c.sendObjectBackwards(active); c.requestRenderAll(); c.fire('object:modified', { target: active }); }
             },
 
             sendToFront: () => {
                 const c = fabricRef.current;
                 if (!c) return;
                 const active = c.getActiveObject();
-                if (active) { c.bringObjectToFront(active); c.requestRenderAll(); }
+                if (active) { c.bringObjectToFront(active); c.requestRenderAll(); c.fire('object:modified', { target: active }); }
             },
 
             sendToBack: () => {
                 const c = fabricRef.current;
                 if (!c) return;
                 const active = c.getActiveObject();
-                if (active) { c.sendObjectToBack(active); c.requestRenderAll(); }
+                if (active) { c.sendObjectToBack(active); c.requestRenderAll(); c.fire('object:modified', { target: active }); }
             },
 
             copySelected: () => {
@@ -917,14 +917,14 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
                 const c = fabricRef.current;
                 if (!c) return;
                 const active = c.getActiveObject();
-                if (active) { active.set({ left: 0 }); c.requestRenderAll(); }
+                if (active) { active.set({ left: 0 }); c.requestRenderAll(); c.fire('object:modified', { target: active }); }
             },
 
             alignCenter: () => {
                 const c = fabricRef.current;
                 if (!c) return;
                 const active = c.getActiveObject();
-                if (active) { c.centerObjectH(active); c.requestRenderAll(); }
+                if (active) { c.centerObjectH(active); c.requestRenderAll(); c.fire('object:modified', { target: active }); }
             },
 
             alignRight: () => {
@@ -934,6 +934,7 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
                 if (active) {
                     active.set({ left: c.width! - active.getScaledWidth() });
                     c.requestRenderAll();
+                    c.fire('object:modified', { target: active });
                 }
             },
 
@@ -959,6 +960,7 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
                     c.loadFromJSON(safeJson).then(() => {
                         c.requestRenderAll();
                         onCanvasModified?.();
+                        saveHistory(c);
                     });
                 });
             },

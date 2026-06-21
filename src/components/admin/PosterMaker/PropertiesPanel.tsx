@@ -191,6 +191,7 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ canvas, selectedObjec
         if (!canvas || !selectedObject) return;
         selectedObject.set(props);
         canvas.requestRenderAll();
+        canvas.fire('object:modified', { target: selectedObject });
     };
 
     const handleFillChange = (color: string) => { setFillColor(color); applyProp({ fill: color }); };

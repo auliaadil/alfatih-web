@@ -52,21 +52,25 @@ const ToolBtn: React.FC<{
     danger?: boolean;
     children: React.ReactNode;
 }> = ({ onClick, title, active, disabled, danger, children }) => (
-    <button
-        onClick={onClick}
-        title={title}
-        disabled={disabled}
-        className={`p-2 rounded-lg transition-all text-sm ${danger
-            ? 'text-red-500 hover:bg-red-50 hover:text-red-600'
-            : disabled
-                ? 'text-gray-300 cursor-not-allowed'
-                : active
-                    ? 'bg-primary text-white shadow-sm'
-                    : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-            }`}
-    >
-        {children}
-    </button>
+    <div className="relative group">
+        <button
+            onClick={onClick}
+            disabled={disabled}
+            className={`p-2 rounded-lg transition-all text-sm ${danger
+                ? 'text-red-500 hover:bg-red-50 hover:text-red-600'
+                : disabled
+                    ? 'text-gray-300 cursor-not-allowed'
+                    : active
+                        ? 'bg-primary text-white shadow-sm'
+                        : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                }`}
+        >
+            {children}
+        </button>
+        <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 px-2 py-1 bg-gray-800 text-white text-[10px] font-medium rounded whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none z-50 transition-opacity">
+            {title}
+        </div>
+    </div>
 );
 
 const Divider = () => <div className="w-px h-8 bg-gray-200 mx-1" />;
