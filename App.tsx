@@ -18,6 +18,7 @@ import SiteSettings from './src/pages/admin/SiteSettings';
 import PosterMaker from './src/pages/admin/PosterMaker';
 import PosterTemplates from './src/pages/admin/PosterTemplates';
 import TextCampaign from './src/pages/admin/TextCampaign';
+import DealHunter from './src/pages/admin/DealHunter';
 import PackageWizard from './src/pages/admin/PackageWizard';
 import Airports from './src/pages/admin/Airports';
 import Categories from './src/pages/admin/Categories';
@@ -56,6 +57,9 @@ const App: React.FC = () => {
                                     <Route path="poster-maker" element={<PosterMaker />} />
                                     <Route path="poster-templates" element={<PosterTemplates />} />
                                     <Route path="text-campaign" element={<TextCampaign />} />
+                                    <Route element={<RoleGuard roles={['admin', 'superadmin']} />}>
+                                      <Route path="deal-hunter" element={<DealHunter />} />
+                                    </Route>
                                     <Route path="settings" element={<SiteSettings />} />
                                     <Route element={<RoleGuard roles={['superadmin']} />}>
                                         <Route path="users" element={<Users />} />

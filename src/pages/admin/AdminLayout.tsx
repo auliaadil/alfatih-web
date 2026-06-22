@@ -3,7 +3,7 @@ import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Package, Map, Plane, Building2, ShoppingCart,
   Settings, LogOut, Menu, X, Image as ImageIcon, Layers, ChevronRight,
-  Megaphone, Users, PlaneTakeoff, Tag,
+  Megaphone, Users, PlaneTakeoff, Tag, Target,
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { ToastProvider } from '../../components/admin/ui';
@@ -50,6 +50,7 @@ const NAV_GROUPS: NavGroup[] = [
       { path: '/admin/poster-maker', icon: ImageIcon, label: 'Poster Maker' },
       { path: '/admin/poster-templates', icon: Layers, label: 'Templates' },
       { path: '/admin/text-campaign', icon: Megaphone, label: 'Text Campaign' },
+      { path: '/admin/deal-hunter', icon: Target, label: 'Deal Hunter', allowedRoles: ['admin', 'superadmin'] },
     ],
   },
   {
