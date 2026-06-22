@@ -169,7 +169,10 @@ async function sendAlertEmail(alert: PendingAlert, watchlist: WatchlistRow): Pro
 
 Deno.serve(async (req) => {
   const cronSecret = Deno.env.get('CRON_SECRET')
-  if (cronSecret && req.headers.get('Authorization') !== `Bearer ${cronSecret}`) {
+  if (!cronSecret) {
+    return new Response('Server misconfiguration: CRON_SECRET not set', { status: 500 })
+  }
+  if (req.headers.get('Authorization') !== `Bearer ${cronSecret}`) {
     return new Response('Unauthorized', { status: 401 })
   }
 
