@@ -40,6 +40,12 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialData, onClose, onSuccess }
   const [customerEmail, setCustomerEmail] = useState(initialData?.customer_email || '');
   const [paymentStatus, setPaymentStatus] = useState(initialData?.payment_status || 'Down Payment');
   const [notes, setNotes] = useState(initialData?.notes || '');
+  const [amountPaid, setAmountPaid] = useState<number>(initialData?.amount_paid ?? 0);
+  const [amountPaidDisplay, setAmountPaidDisplay] = useState<string>(
+    initialData?.amount_paid ? (initialData.amount_paid as number).toLocaleString('id-ID') : ''
+  );
+  const [paymentProofUrl, setPaymentProofUrl] = useState<string>(initialData?.payment_proof_url ?? '');
+  const [uploadingProof, setUploadingProof] = useState(false);
 
   const selectedPackage = useMemo(
     () => packages.find((p) => p.id === selectedPackageId) ?? null,
@@ -62,6 +68,28 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialData, onClose, onSuccess }
   );
 
   const form = useOrderForm(initialParticipants, roomOptions);
+
+  const handleAmountPaidChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value.replace(/\./g, '').replace(/\D/g, '');
+    const num = parseInt(raw, 10) || 0;
+    setAmountPaid(num);
+    setAmountPaidDisplay(num > 0 ? num.toLocaleString('id-ID') : '');
+  };
+
+  const handleProofUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingProof(true);
+    const path = `orders/${Date.now()}-${file.name}`;
+    const { data, error } = await supabase.storage.from('payment-proofs').upload(path, file, { upsert: true });
+    if (!error && data) {
+      const { data: urlData } = supabase.storage.from('payment-proofs').getPublicUrl(data.path);
+      setPaymentProofUrl(urlData.publicUrl);
+    } else if (error) {
+      setErrorMsg('Upload bukti gagal: ' + error.message);
+    }
+    setUploadingProof(false);
+  };
 
   useEffect(() => {
     const load = async () => {
@@ -120,6 +148,8 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialData, onClose, onSuccess }
       participant_count: form.totalPax,
       total_price: form.totalPrice,
       payment_status: paymentStatus,
+      amount_paid: amountPaid > 0 ? amountPaid : null,
+      payment_proof_url: paymentProofUrl || null,
       notes,
       branch_id: selectedBranchId || null,
     };
@@ -214,16 +244,16 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialData, onClose, onSuccess }
             )}
 
             <div className="grid grid-cols-2 gap-3">
-              <FormField label="Customer name (rep)" required>
+              <FormField label="Nama customer (rep)" required>
                 <input className={inputClass} value={customerName} onChange={(e) => setCustomerName(e.target.value)} />
               </FormField>
-              <FormField label="WhatsApp / phone" required>
+              <FormField label="WhatsApp / telepon" required>
                 <input className={inputClass} value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} />
               </FormField>
-              <FormField label="Email (optional)">
+              <FormField label="Email (opsional)">
                 <input type="email" className={inputClass} value={customerEmail} onChange={(e) => setCustomerEmail(e.target.value)} />
               </FormField>
-              <FormField label="Payment status">
+              <FormField label="Status pembayaran">
                 <select className={selectClass} value={paymentStatus} onChange={(e) => setPaymentStatus(e.target.value)}>
                   <option value="Down Payment">Down Payment</option>
                   <option value="Payment term 1">Payment term 1</option>
@@ -231,6 +261,34 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialData, onClose, onSuccess }
                   <option value="Payment term 3">Payment term 3</option>
                   <option value="Paid in Full">Paid in Full</option>
                 </select>
+              </FormField>
+              <FormField label="Jumlah dibayar (Rp)">
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  className={inputClass}
+                  placeholder="0"
+                  value={amountPaidDisplay}
+                  onChange={handleAmountPaidChange}
+                />
+              </FormField>
+              <FormField label="Bukti transaksi">
+                <div className="space-y-1.5">
+                  <input
+                    type="file"
+                    accept="image/*,.pdf"
+                    disabled={uploadingProof}
+                    onChange={handleProofUpload}
+                    className="block w-full text-sm text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 disabled:opacity-50"
+                  />
+                  {uploadingProof && <p className="text-xs text-gray-400">Mengunggah…</p>}
+                  {paymentProofUrl && !uploadingProof && (
+                    <a href={paymentProofUrl} target="_blank" rel="noreferrer"
+                      className="text-xs text-blue-600 hover:underline">
+                      Lihat bukti →
+                    </a>
+                  )}
+                </div>
               </FormField>
             </div>
           </div>
