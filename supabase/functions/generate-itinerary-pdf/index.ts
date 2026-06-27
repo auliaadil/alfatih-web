@@ -1,5 +1,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { PDFDocument, StandardFonts, rgb } from 'https://esm.sh/pdf-lib@1.17.1';
+import fontkit from 'https://esm.sh/@pdf-lib/fontkit@1.1.1';
 
 const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -133,6 +134,7 @@ async function buildItineraryPdf(
     logoBase64: string | null,
 ): Promise<Uint8Array> {
     const doc = await PDFDocument.create();
+    doc.registerFontkit(fontkit); // required before embedding custom (non-standard) fonts
 
     // Fonts: Plus Jakarta Sans → WOFF1 from Google Fonts; fall back to Helvetica
     const [regularBytes, boldBytes] = await Promise.all([
