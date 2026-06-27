@@ -173,31 +173,43 @@ The "Download Itinerary PDF" button lives in `PackageDetailPanel.tsx` (`handleDo
 
 ### Photo Picker modal
 
-Triggered by the "Download Itinerary PDF" button in `PackageDetailPanel`. Rendered as a full-screen modal (not SlideOver — needs more horizontal space for the photo grid).
+Triggered by the "Download Itinerary PDF" button in `PackageDetailPanel`. Rendered as a full-screen modal (not SlideOver — needs more horizontal space).
 
-**Contents:**
+Photos are assigned **per day** of the itinerary — **maximum 1 photo per day**. Each day is optional — days without a photo render as text-only, exactly as today. Days with a photo get it embedded inline below that day's activities.
 
-1. **Albums section — linked to this package** (shown first, if any exist)
-   - Albums where `package_id = pkg.id`
-   - Expandable album rows; each expands to a photo grid with checkboxes
+**Layout: two-panel**
 
-2. **Albums section — same category** (shown below, if any exist beyond linked ones)
-   - Albums where `category_id` matches the package's category, excluding already-shown linked albums
-   - Same expandable row + checkbox grid pattern
+- **Left panel (fixed ~280px):** list of itinerary days, e.g. "Day 1 — Keberangkatan", "Day 2 — Madinah", etc. Each day row shows a count badge when photos are assigned (e.g. "3 foto"). Clicking a day selects it and loads the right panel for that day.
+- **Right panel (flex):** album browser for the selected day
+  - Category dropdown filter (cascades into album dropdown)
+  - Album dropdown filter
+  - Photo grid with radio-style single selection — clicking a photo assigns it to this day; clicking again deselects it
+  - The selected photo shows a checkmark overlay; selecting a new photo replaces the previous selection
 
-3. **Footer:**
-   - Selected photo count badge (e.g. "5 foto dipilih")
-   - Skip button — generates PDF without any photos
-   - Generate PDF button (always enabled; 0 photos = no gallery page in PDF)
+**Footer:**
+- Total assigned count (e.g. "12 foto untuk 4 hari")
+- Skip button — generates PDF with no photos
+- Generate PDF button (always enabled)
 
-### Selected photos in the PDF
+### Data shape passed to the edge function
 
-Selected photo URLs are passed as an additional `photoUrls: string[]` field in the POST body to `generate-itinerary-pdf`. The edge function fetches each image and embeds them as a **"Galeri Perjalanan"** page appended at the end of the PDF — a simple grid layout (2 columns) with the album title as a section header.
+```ts
+dayPhotos: { day: number; photoUrls: string[] }[]
+// e.g. [{ day: 2, photoUrls: ["https://..."] }, { day: 7, photoUrls: ["https://..."] }]
+// Days not in the array render as text-only
+// UI enforces max 1 photo per day; array shape kept for future scalability
+```
+
+Passed as an additional field in the POST body alongside the existing `package` and `siteSettings`.
+
+### Photos in the PDF
+
+For each day that has photos in `dayPhotos`, the edge function renders the photos **inline below that day's activity list** — a 2-column image strip (max 4 photos per day to keep page layout manageable). Days with no entry in `dayPhotos` render unchanged.
 
 Changes required:
 - `PackageDetailPanel.tsx` — replace direct `handleDownloadPdf` call with picker modal open
-- `itineraryPdfService.ts` — add optional `photoUrls?: string[]` param to `downloadItineraryPdf`
-- `supabase/functions/generate-itinerary-pdf/index.ts` — add gallery page rendering when `photoUrls` is non-empty
+- `itineraryPdfService.ts` — add optional `dayPhotos?: { day: number; photoUrls: string[] }[]` param to `downloadItineraryPdf`
+- `supabase/functions/generate-itinerary-pdf/index.ts` — after rendering each day's activities, check `dayPhotos` for that day and embed its photo(s) inline (full content width, ~160px tall per photo)
 
 ---
 
