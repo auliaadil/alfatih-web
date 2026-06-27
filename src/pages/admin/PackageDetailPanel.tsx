@@ -4,6 +4,7 @@ import { X, Image, FileDown, Loader2, Users } from 'lucide-react';
 import { supabase } from '@/src/lib/supabase';
 import { useSiteSettings } from '../../contexts/SiteSettingsContext';
 import { downloadItineraryPdf } from '../../../services/itineraryPdfService';
+import PdfPhotoPickerModal from '../../components/admin/PdfPhotoPickerModal';
 
 interface PackageDetailPanelProps {
     pkg: any;
@@ -18,6 +19,7 @@ const PackageDetailPanel: React.FC<PackageDetailPanelProps> = ({ pkg, onClose })
     const [participants, setParticipants] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [isPdfLoading, setIsPdfLoading] = useState(false);
+    const [pickerOpen, setPickerOpen] = useState(false);
 
     useEffect(() => {
         const load = async () => {
@@ -63,18 +65,18 @@ const PackageDetailPanel: React.FC<PackageDetailPanelProps> = ({ pkg, onClose })
     const usedQuota = totalQuota - (pkg.quotas || 0);
     const quotaPct = Math.min(Math.round((usedQuota / totalQuota) * 100), 100);
 
-    const handleDownloadPdf = async () => {
+    const handleDownloadPdf = () => setPickerOpen(true);
+
+    const handleGeneratePdf = async (dayPhotos: { day: number; photoUrls: string[] }[]) => {
+        setPickerOpen(false);
         setIsPdfLoading(true);
         try {
-            const fullPkg = {
-                ...pkg,
-                airlines,
-                hotels,
-            };
-            await downloadItineraryPdf(fullPkg, {
-                whatsapp: settings.whatsapp,
-                phone: settings.phone,
-            });
+            const fullPkg = { ...pkg, airlines, hotels };
+            await downloadItineraryPdf(
+                fullPkg,
+                { whatsapp: settings.whatsapp, phone: settings.phone },
+                dayPhotos,
+            );
         } catch (err) {
             console.error('PDF generation failed:', err);
             alert('Gagal mengunduh itinerary. Silakan coba lagi.');
@@ -252,6 +254,15 @@ const PackageDetailPanel: React.FC<PackageDetailPanelProps> = ({ pkg, onClose })
                     </button>
                 </div>
             </div>
+
+            {pickerOpen && (
+                <PdfPhotoPickerModal
+                    isOpen={pickerOpen}
+                    onClose={() => setPickerOpen(false)}
+                    itinerary={pkg.itinerary || []}
+                    onGenerate={handleGeneratePdf}
+                />
+            )}
         </>
     );
 };
