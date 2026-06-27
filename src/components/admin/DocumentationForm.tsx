@@ -44,7 +44,7 @@ export const DocumentationForm: React.FC<Props> = ({ isOpen, onClose, doc, onSav
       if (data) setCategories(data);
     });
     supabase.from('packages').select('id, title, category, departure_date, arrival_date, description').order('title').then(({ data }) => {
-      if (data) setPackages(data as any);
+      if (data) setPackages(data as { id: string; title: string; category: string; departure_date: string | null; arrival_date: string | null; description: string | null }[]);
     });
     if (doc) {
       setForm({
@@ -203,7 +203,7 @@ export const DocumentationForm: React.FC<Props> = ({ isOpen, onClose, doc, onSav
             className={inputClass + ' resize-none'}
             rows={3}
             value={form.description}
-            onChange={set('description') as any}
+            onChange={set('description') as React.ChangeEventHandler<HTMLTextAreaElement>}
           />
         </FormField>
 

@@ -76,9 +76,12 @@ const Documentations: React.FC = () => {
       (!searchQuery || d.title.toLowerCase().includes(searchQuery.toLowerCase())) &&
       (!categoryFilter || d.category_id === categoryFilter)
     )
-    .sort((a, b) => compareRows(a, b, sort));
+    .sort((a, b) => compareRows(a, b, sort.key, sort.dir));
 
   const paginated = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+
+  const handleSort = (key: string) =>
+    setSort(prev => ({ key, dir: prev.key === key && prev.dir === 'asc' ? 'desc' : 'asc' }));
 
   const photoCount = (doc: Documentation) =>
     doc.documentation_photos?.[0]?.count ?? 0;
@@ -112,13 +115,13 @@ const Documentations: React.FC = () => {
 
       <TableCard>
         <THead>
-          <Th sortKey="title" sort={sort} onSort={setSort}>Album</Th>
+          <Th sortKey="title" currentSort={sort} onSort={handleSort}>Album</Th>
           <Th>Category</Th>
           <Th>Package</Th>
-          <Th sortKey="departure_date" sort={sort} onSort={setSort}>Departure</Th>
+          <Th sortKey="departure_date" currentSort={sort} onSort={handleSort}>Departure</Th>
           <Th>Photos</Th>
           <Th>Status</Th>
-          <Th className="text-right">Actions</Th>
+          <Th>Actions</Th>
         </THead>
         <tbody>
           {loading ? (
@@ -126,7 +129,7 @@ const Documentations: React.FC = () => {
           ) : paginated.length === 0 ? (
             <tr>
               <td colSpan={7}>
-                <EmptyState icon={BookImage} title="No albums yet" subtitle="Create your first trip album" />
+                <EmptyState icon={<BookImage className="w-7 h-7" />} title="No albums yet" description="Create your first trip album" />
               </td>
             </tr>
           ) : paginated.map(doc => (
@@ -188,7 +191,7 @@ const Documentations: React.FC = () => {
       <Pagination
         page={page}
         pageSize={PAGE_SIZE}
-        total={filtered.length}
+        totalItems={filtered.length}
         onPageChange={setPage}
       />
 
@@ -212,12 +215,14 @@ const Documentations: React.FC = () => {
         </div>
       )}
 
-      <DocumentationForm
-        isOpen={formOpen}
-        onClose={() => setFormOpen(false)}
-        doc={editingDoc}
-        onSaved={loadDocs}
-      />
+      {formOpen && (
+        <DocumentationForm
+          isOpen={formOpen}
+          onClose={() => setFormOpen(false)}
+          doc={editingDoc}
+          onSaved={loadDocs}
+        />
+      )}
       {/* DocumentationView wired in Task 4 */}
     </div>
   );
