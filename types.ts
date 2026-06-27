@@ -103,3 +103,28 @@ export interface Testimonial {
   comment: string;
   avatar: string;
 }
+
+export interface Documentation {
+  id: string;
+  title: string;
+  category_id: string;
+  package_id: string | null;
+  departure_date: string | null;
+  arrival_date: string | null;
+  description: string | null;
+  cover_photo_url: string | null;
+  published: boolean;
+  created_at: string;
+  // joined
+  categories?: { id: string; name: string };
+  packages?: { id: string; title: string } | null;
+  documentation_photos?: { count: number }[];
+}
+
+export interface DocumentationPhoto {
+  id: string;
+  documentation_id: string;
+  storage_url: string;
+  sort_order: number;
+  created_at: string;
+}
