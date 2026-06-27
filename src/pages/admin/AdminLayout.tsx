@@ -3,7 +3,7 @@ import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Package, Map, Plane, Building2, ShoppingCart,
   Settings, LogOut, Menu, X, Image as ImageIcon, Layers, ChevronRight,
-  Megaphone, Users, PlaneTakeoff, Tag, Target,
+  Megaphone, Users, PlaneTakeoff, Tag, Target, BookImage,
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { ToastProvider } from '../../components/admin/ui';
@@ -30,6 +30,7 @@ const NAV_GROUPS: NavGroup[] = [
       { path: '/admin', icon: LayoutDashboard, label: 'Dashboard', exact: true },
       { path: '/admin/orders', icon: ShoppingCart, label: 'Orders' },
       { path: '/admin/packages', icon: Package, label: 'Packages' },
+      { path: '/admin/documentations', icon: BookImage, label: 'Documentations' },
       { path: '/admin/private-trips', icon: Map, label: 'Private Trips', allowedRoles: ['admin', 'superadmin'] },
     ],
   },
