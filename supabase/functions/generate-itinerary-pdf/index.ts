@@ -116,7 +116,7 @@ async function fetchPlusJakartaSans(weight: 400 | 700): Promise<ArrayBuffer | nu
 
 async function fetchImageBytes(url: string): Promise<Uint8Array | null> {
     try {
-        const res = await fetch(url);
+        const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
         if (!res.ok) return null;
         const buf = await res.arrayBuffer();
         return new Uint8Array(buf);
