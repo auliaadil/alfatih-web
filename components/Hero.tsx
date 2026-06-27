@@ -25,8 +25,10 @@ const Hero: React.FC = () => {
               <span className="text-secondary font-black text-xs uppercase tracking-widest">Amanah & Profesional Sejak 2012</span>
             </div>
 
-            <h1 className="text-4xl md:text-5xl lg:text-[3.25rem] font-black text-white tracking-tight leading-[1.05] mb-5 font-display">
-              <span className="text-primary">Alfatih Dunia Wisata</span><br />
+            <p className="font-sans font-semibold text-[0.65rem] text-primary tracking-[0.25em] uppercase mb-3">
+              Alfatih Dunia Wisata
+            </p>
+            <h1 className="font-sans font-black text-4xl md:text-5xl lg:text-[3.25rem] text-white leading-[1.05] mb-5 -ml-[0.05em]">
               {t('hero_title')}
             </h1>
 
