@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Search, Image as ImageIcon, QrCode, Loader2, ChevronDown } from 'lucide-react';
+import { Search, Image as ImageIcon, QrCode, Loader2, ChevronDown, BookImage } from 'lucide-react';
+import AlbumsTab from './AlbumsTab';
 
 interface AssetPanelProps {
     onAddImage: (url: string) => void;
@@ -249,7 +250,7 @@ const QrTab: React.FC<{ onAddImage: (url: string) => void }> = ({ onAddImage }) 
 
 // ── Main AssetPanel ───────────────────────────────────────────────────────
 
-type AssetTab = 'images' | 'apps';
+type AssetTab = 'images' | 'apps' | 'albums';
 
 const AssetPanel: React.FC<AssetPanelProps> = ({ onAddImage }) => {
     const [tab, setTab] = useState<AssetTab>('images');
@@ -272,10 +273,18 @@ const AssetPanel: React.FC<AssetPanelProps> = ({ onAddImage }) => {
                     <QrCode className="w-3.5 h-3.5" />
                     Apps
                 </button>
+                <button
+                    onClick={() => setTab('albums')}
+                    className={`flex-1 py-1.5 text-xs font-medium flex items-center justify-center gap-1 transition ${tab === 'albums' ? 'bg-primary text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+                >
+                    <BookImage className="w-3.5 h-3.5" />
+                    Albums
+                </button>
             </div>
 
             {tab === 'images' && <ImagesTab onAddImage={onAddImage} />}
             {tab === 'apps' && <QrTab onAddImage={onAddImage} />}
+            {tab === 'albums' && <AlbumsTab onAddImage={onAddImage} />}
         </div>
     );
 };
