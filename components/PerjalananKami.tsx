@@ -44,9 +44,9 @@ const PerjalananKami: React.FC = () => {
       if (e.key === 'Escape') {
         closeLightbox();
       } else if (e.key === 'ArrowRight') {
-        setLightboxIdx(i => Math.min(i + 1, lightboxPhotos.length - 1));
+        setLightboxIdx(i => (i + 1) % lightboxPhotos.length);
       } else if (e.key === 'ArrowLeft') {
-        setLightboxIdx(i => Math.max(i - 1, 0));
+        setLightboxIdx(i => (i - 1 + lightboxPhotos.length) % lightboxPhotos.length);
       }
     };
     window.addEventListener('keydown', onKey);
@@ -116,7 +116,7 @@ const PerjalananKami: React.FC = () => {
       {/* Lightbox portal */}
       {lightboxAlbum &&
         ReactDOM.createPortal(
-          <div className="fixed inset-0 z-50 bg-black/90 flex flex-col">
+          <div className="fixed inset-0 z-[200] bg-black/90 flex flex-col">
             {/* Backdrop click to close */}
             <div
               className="absolute inset-0"
@@ -160,32 +160,28 @@ const PerjalananKami: React.FC = () => {
               )}
 
               {/* Left arrow */}
-              {lightboxIdx > 0 && (
-                <button
-                  onClick={e => {
-                    e.stopPropagation();
-                    setLightboxIdx(i => i - 1);
-                  }}
-                  className="absolute left-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition"
-                  aria-label="Previous photo"
-                >
-                  <ChevronLeft className="w-6 h-6" />
-                </button>
-              )}
+              <button
+                onClick={e => {
+                  e.stopPropagation();
+                  setLightboxIdx(i => (i - 1 + lightboxPhotos.length) % lightboxPhotos.length);
+                }}
+                className="absolute left-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition"
+                aria-label="Previous photo"
+              >
+                <ChevronLeft className="w-6 h-6" />
+              </button>
 
               {/* Right arrow */}
-              {lightboxIdx < lightboxPhotos.length - 1 && (
-                <button
-                  onClick={e => {
-                    e.stopPropagation();
-                    setLightboxIdx(i => i + 1);
-                  }}
-                  className="absolute right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition"
-                  aria-label="Next photo"
-                >
-                  <ChevronRight className="w-6 h-6" />
-                </button>
-              )}
+              <button
+                onClick={e => {
+                  e.stopPropagation();
+                  setLightboxIdx(i => (i + 1) % lightboxPhotos.length);
+                }}
+                className="absolute right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition"
+                aria-label="Next photo"
+              >
+                <ChevronRight className="w-6 h-6" />
+              </button>
             </div>
           </div>,
           document.body,
