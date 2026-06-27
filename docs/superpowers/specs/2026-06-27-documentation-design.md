@@ -165,9 +165,44 @@ Filter logic: `documentation_photos` joined to `documentations` filtered by `cat
 
 ---
 
+## Itinerary PDF Integration
+
+### Where it plugs in
+
+The "Download Itinerary PDF" button lives in `PackageDetailPanel.tsx` (`handleDownloadPdf`). Currently it calls `downloadItineraryPdf(pkg, siteSettings)` immediately. With this feature, clicking the button first opens a **Photo Picker modal** — the PDF only generates after the admin confirms their selection (or skips it).
+
+### Photo Picker modal
+
+Triggered by the "Download Itinerary PDF" button in `PackageDetailPanel`. Rendered as a full-screen modal (not SlideOver — needs more horizontal space for the photo grid).
+
+**Contents:**
+
+1. **Albums section — linked to this package** (shown first, if any exist)
+   - Albums where `package_id = pkg.id`
+   - Expandable album rows; each expands to a photo grid with checkboxes
+
+2. **Albums section — same category** (shown below, if any exist beyond linked ones)
+   - Albums where `category_id` matches the package's category, excluding already-shown linked albums
+   - Same expandable row + checkbox grid pattern
+
+3. **Footer:**
+   - Selected photo count badge (e.g. "5 foto dipilih")
+   - Skip button — generates PDF without any photos
+   - Generate PDF button (always enabled; 0 photos = no gallery page in PDF)
+
+### Selected photos in the PDF
+
+Selected photo URLs are passed as an additional `photoUrls: string[]` field in the POST body to `generate-itinerary-pdf`. The edge function fetches each image and embeds them as a **"Galeri Perjalanan"** page appended at the end of the PDF — a simple grid layout (2 columns) with the album title as a section header.
+
+Changes required:
+- `PackageDetailPanel.tsx` — replace direct `handleDownloadPdf` call with picker modal open
+- `itineraryPdfService.ts` — add optional `photoUrls?: string[]` param to `downloadItineraryPdf`
+- `supabase/functions/generate-itinerary-pdf/index.ts` — add gallery page rendering when `photoUrls` is non-empty
+
+---
+
 ## Out of Scope (this iteration)
 
 - Per-photo captions
 - Tags / manual tagging (filtering uses category, album, and date from the album record)
-- Automatic PDF integration (flagged as future use; the data model supports it via `package_id` and `category_id`)
 - Public album detail page (only the homepage section + admin view panel)
