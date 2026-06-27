@@ -6,6 +6,7 @@ import TourDetail from '../../components/TourDetail';
 import AIPlanner from '../../components/AIPlanner';
 import CompanyProfile from '../../components/CompanyProfile';
 import Footer from '../../components/Footer';
+import PerjalananKami from '../../components/PerjalananKami';
 import { TESTIMONIALS } from '../../constants';
 import { TourCategory, TourPackage } from '../../types';
 import { Quote, ShieldCheck, Users, Star } from 'lucide-react';
@@ -214,6 +215,7 @@ const Home: React.FC = () => {
                     </div>
                 </div>
             </section>
+            <PerjalananKami />
             <section className="py-10 md:py-12 bg-gray-50">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-7">
