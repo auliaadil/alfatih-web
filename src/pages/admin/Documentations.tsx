@@ -8,6 +8,7 @@ import {
 } from '../../components/admin/ui';
 import { Documentation } from '../../../types';
 import { DocumentationForm } from '../../components/admin/DocumentationForm';
+import { DocumentationView } from '../../components/admin/DocumentationView';
 
 const PAGE_SIZE = 10;
 
@@ -223,7 +224,14 @@ const Documentations: React.FC = () => {
           onSaved={loadDocs}
         />
       )}
-      {/* DocumentationView wired in Task 4 */}
+      {viewOpen && (
+        <DocumentationView
+          isOpen={viewOpen}
+          onClose={() => setViewOpen(false)}
+          doc={viewingDoc}
+          onEdit={() => { setViewOpen(false); setEditingDoc(viewingDoc); setFormOpen(true); }}
+        />
+      )}
     </div>
   );
 };
