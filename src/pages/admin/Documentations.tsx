@@ -7,6 +7,7 @@ import {
   btnPrimary, btnGhost,
 } from '../../components/admin/ui';
 import { Documentation } from '../../../types';
+import { DocumentationForm } from '../../components/admin/DocumentationForm';
 
 const PAGE_SIZE = 10;
 
@@ -211,7 +212,13 @@ const Documentations: React.FC = () => {
         </div>
       )}
 
-      {/* DocumentationForm and DocumentationView are wired in Tasks 3 & 4 */}
+      <DocumentationForm
+        isOpen={formOpen}
+        onClose={() => setFormOpen(false)}
+        doc={editingDoc}
+        onSaved={loadDocs}
+      />
+      {/* DocumentationView wired in Task 4 */}
     </div>
   );
 };
