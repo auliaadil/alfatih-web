@@ -80,7 +80,8 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialData, onClose, onSuccess }
     const file = e.target.files?.[0];
     if (!file) return;
     setUploadingProof(true);
-    const path = `orders/${Date.now()}-${file.name}`;
+    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+    const path = `orders/${Date.now()}-${safeName}`;
     const { data, error } = await supabase.storage.from('payment-proofs').upload(path, file, { upsert: true });
     if (!error && data) {
       const { data: urlData } = supabase.storage.from('payment-proofs').getPublicUrl(data.path);
