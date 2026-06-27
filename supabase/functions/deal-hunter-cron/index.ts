@@ -1,7 +1,6 @@
-// supabase/functions/deal-hunter-cron/index.ts
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-const AMADEUS_BASE = 'https://api.amadeus.com'
+const SERPAPI_BASE = 'https://serpapi.com/search.json'
 const RESEND_BASE = 'https://api.resend.com'
 const MAX_WATCHLISTS = parseInt(Deno.env.get('MAX_WATCHLISTS_PER_RUN') ?? '15')
 
@@ -28,41 +27,6 @@ interface PendingAlert extends NewAlert {
   id: string
   created_at: string
   watchlist: WatchlistRow
-}
-
-async function getAmadeusToken(supabase: ReturnType<typeof createClient>): Promise<string> {
-  const { data: cached } = await supabase
-    .from('system_tokens')
-    .select('access_token, expires_at')
-    .eq('service', 'amadeus')
-    .single()
-
-  const bufferMs = 5 * 60 * 1000
-  if (cached && new Date(cached.expires_at).getTime() > Date.now() + bufferMs) {
-    return cached.access_token as string
-  }
-
-  const res = await fetch(`${AMADEUS_BASE}/v1/security/oauth2/token`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({
-      grant_type: 'client_credentials',
-      client_id: Deno.env.get('AMADEUS_CLIENT_ID')!,
-      client_secret: Deno.env.get('AMADEUS_CLIENT_SECRET')!,
-    }),
-  })
-
-  if (!res.ok) throw new Error(`Amadeus auth failed: ${res.status}`)
-  const json = await res.json()
-  const expiresAt = new Date(Date.now() + (json.expires_in as number) * 1000).toISOString()
-
-  await supabase.from('system_tokens').upsert({
-    service: 'amadeus',
-    access_token: json.access_token as string,
-    expires_at: expiresAt,
-  })
-
-  return json.access_token as string
 }
 
 async function pickDate(
@@ -93,42 +57,53 @@ async function pickDate(
 }
 
 async function searchFlight(
-  token: string,
   origin: string,
   destination: string,
   date: string,
   adults: number
 ): Promise<{ price: number; airline: string; details: unknown } | null> {
   const params = new URLSearchParams({
-    originLocationCode: origin,
-    destinationLocationCode: destination,
-    departureDate: date,
+    engine: 'google_flights',
+    departure_id: origin,
+    arrival_id: destination,
+    outbound_date: date,
     adults: String(adults),
-    max: '1',
-    currencyCode: 'IDR',
+    currency: 'IDR',
+    hl: 'id',
+    type: '2', // one-way
+    api_key: Deno.env.get('SERPAPI_KEY')!,
   })
 
-  const res = await fetch(`${AMADEUS_BASE}/v2/shopping/flight-offers?${params}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  })
+  const res = await fetch(`${SERPAPI_BASE}?${params}`)
 
   if (res.status === 429) throw new Error('RATE_LIMIT')
-  if (res.status === 401) throw new Error('UNAUTHORIZED')
+  if (res.status === 401 || res.status === 403) throw new Error('INVALID_KEY')
   if (!res.ok) return null
 
   const data = await res.json()
-  if (!data.data || (data.data as unknown[]).length === 0) return null
 
-  const offer = (data.data as Record<string, unknown>[])[0]
-  const price = parseFloat((offer.price as Record<string, string>).grandTotal)
-  const codes = offer.validatingAirlineCodes as string[] | undefined
-  const carrierCode = codes?.[0] ??
-    ((offer.itineraries as Record<string, unknown>[])?.[0]?.segments as Record<string, unknown>[])?.[0]?.carrierCode as string ??
-    'Unknown'
-  const carriers = (data.dictionaries as Record<string, Record<string, string>>)?.carriers
-  const airline = carriers?.[carrierCode] ?? carrierCode
+  // SerpApi returns {"error": "..."} with 200 when key is invalid or quota exceeded
+  if (data.error) {
+    if ((data.error as string).toLowerCase().includes('quota')) throw new Error('RATE_LIMIT')
+    throw new Error(`SERPAPI_ERROR: ${data.error}`)
+  }
 
-  return { price, airline, details: offer }
+  const flights = [
+    ...((data.best_flights as unknown[]) ?? []),
+    ...((data.other_flights as unknown[]) ?? []),
+  ] as Record<string, unknown>[]
+
+  if (flights.length === 0) return null
+
+  const cheapest = flights.reduce((a, b) =>
+    (a.price as number) <= (b.price as number) ? a : b
+  )
+
+  const price = cheapest.price as number
+  const segments = cheapest.flights as Record<string, unknown>[] | undefined
+  const airline = (segments?.[0]?.airline as string) ?? 'Unknown'
+
+  return { price, airline, details: cheapest }
 }
 
 async function sendAlertEmail(alert: PendingAlert, watchlist: WatchlistRow): Promise<void> {
@@ -194,19 +169,9 @@ Deno.serve(async (req) => {
     })
   }
 
-  // 2. Get Amadeus token
-  let token: string
-  try {
-    token = await getAmadeusToken(supabase)
-  } catch (err) {
-    return new Response(JSON.stringify({ error: 'Amadeus auth failed', detail: String(err) }), {
-      status: 500, headers: { 'Content-Type': 'application/json' },
-    })
-  }
-
   const log: string[] = []
 
-  // 3. Process each watchlist sequentially
+  // 2. Process each watchlist sequentially
   for (const watchlist of watchlists as WatchlistRow[]) {
     try {
       const date = await pickDate(supabase, watchlist)
@@ -217,21 +182,21 @@ Deno.serve(async (req) => {
 
       let result: { price: number; airline: string; details: unknown } | null = null
       try {
-        result = await searchFlight(token, watchlist.origin, watchlist.destination, date, watchlist.adults)
+        result = await searchFlight(watchlist.origin, watchlist.destination, date, watchlist.adults)
       } catch (err) {
         const msg = String(err)
         if (msg.includes('RATE_LIMIT')) {
           log.push('Rate limit hit — aborting')
           break
         }
-        if (msg.includes('UNAUTHORIZED')) {
-          token = await getAmadeusToken(supabase)
-          result = await searchFlight(token, watchlist.origin, watchlist.destination, date, watchlist.adults)
-        } else {
-          log.push(`${watchlist.id}: search error — ${msg}`)
-          await supabase.from('watchlists').update({ last_checked_at: new Date().toISOString() }).eq('id', watchlist.id)
-          continue
+        if (msg.includes('INVALID_KEY')) {
+          return new Response(JSON.stringify({ error: 'Invalid SerpApi key', log }), {
+            status: 500, headers: { 'Content-Type': 'application/json' },
+          })
         }
+        log.push(`${watchlist.id}: search error — ${msg}`)
+        await supabase.from('watchlists').update({ last_checked_at: new Date().toISOString() }).eq('id', watchlist.id)
+        continue
       }
 
       if (result && result.price <= watchlist.target_price_max) {
@@ -260,7 +225,7 @@ Deno.serve(async (req) => {
     }
   }
 
-  // 4. Email unnotified alerts
+  // 3. Email unnotified alerts
   const { data: pending } = await supabase
     .from('deal_alerts')
     .select('*, watchlist:watchlists(*)')

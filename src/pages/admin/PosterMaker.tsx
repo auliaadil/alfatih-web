@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
-import { Loader2, Sparkles, LayoutTemplate, Save, X, Plus, Clock } from 'lucide-react';
+import { Loader2, Sparkles, LayoutTemplate, Save, X, Plus, Clock, Eye } from 'lucide-react';
 import { applyTemplateContent, TemplateInputs, TemplateType } from '../../../services/posterAutofillService';
 import { fetchTemplate, fetchTemplates, saveTemplate, updateTemplate, SavedTemplate } from '../../services/posterTemplates';
 import { supabase } from '../../lib/supabase';
@@ -192,12 +192,17 @@ interface NewDesignModalProps {
 
 const POSTER_TYPE_PILLS: Array<PosterTemplateType | 'All'> = ['All', 'Conversion', 'Tour Promotion', 'Documentation', 'Content'];
 
+type PreviewTarget =
+    | { kind: 'starter'; t: PosterTemplate; override: SavedTemplate | undefined }
+    | { kind: 'custom'; t: SavedTemplate };
+
 const NewDesignModal: React.FC<NewDesignModalProps> = ({
     canDismiss, starterOverrides, customTemplates, drafts, starterTemplates,
     onPickBlank, onPickStarter, onPickCustom, onPickDraft, onDeleteDraft, onClose,
 }) => {
     const [size, setSize] = useState<CanvasSize>('post');
     const [typeFilter, setTypeFilter] = useState<PosterTemplateType | 'All'>('All');
+    const [preview, setPreview] = useState<PreviewTarget | null>(null);
     const visibleStarters = starterTemplates.filter(t =>
         t.aspectRatio === size &&
         (typeFilter === 'All' || t.type === typeFilter) &&
@@ -205,7 +210,25 @@ const NewDesignModal: React.FC<NewDesignModalProps> = ({
     );
     const visibleCustom = customTemplates.filter(t => t.aspect_ratio === size);
 
+    const previewAspectRatio = preview
+        ? (preview.kind === 'starter'
+            ? (preview.t.aspectRatio === 'post' ? '4/5' : '9/16')
+            : (preview.t.aspect_ratio === 'post' ? '4/5' : '9/16'))
+        : '4/5';
+    const previewName = preview ? preview.t.name : '';
+    const previewType = preview
+        ? (preview.kind === 'starter' ? preview.t.type : preview.t.template_type)
+        : '';
+
+    const handleUsePreview = () => {
+        if (!preview) return;
+        if (preview.kind === 'starter') onPickStarter(preview.t);
+        else onPickCustom(preview.t);
+        setPreview(null);
+    };
+
     return (
+        <>
         <div
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4"
             role="dialog"
@@ -293,56 +316,78 @@ const NewDesignModal: React.FC<NewDesignModalProps> = ({
                             </button>
                         ))}
                     </div>
-                    <div className="grid grid-cols-4 gap-3">
+                    <div className="grid grid-cols-4 gap-x-3 gap-y-4">
                         {/* Blank canvas */}
-                        <button
-                            onClick={() => onPickBlank(size)}
-                            className="border-2 border-dashed border-primary rounded-xl bg-emerald-50 hover:bg-emerald-100 transition-all group flex flex-col items-center justify-center"
-                            style={{ aspectRatio: size === 'post' ? '4/5' : '9/16' }}
-                        >
-                            <Plus className="w-6 h-6 text-primary group-hover:scale-110 transition-transform" />
-                            <span className="text-[10px] font-bold text-primary mt-1 text-center leading-tight">
-                                Kanvas<br/>Kosong
-                            </span>
-                        </button>
+                        <div className="flex flex-col gap-1">
+                            <button
+                                onClick={() => onPickBlank(size)}
+                                className="border-2 border-dashed border-primary rounded-xl bg-emerald-50 hover:bg-emerald-100 transition-all group flex flex-col items-center justify-center w-full"
+                                style={{ aspectRatio: size === 'post' ? '4/5' : '9/16' }}
+                            >
+                                <Plus className="w-6 h-6 text-primary group-hover:scale-110 transition-transform" />
+                            </button>
+                            <p className="text-[9px] text-gray-400 text-center truncate leading-tight">Kanvas Kosong</p>
+                        </div>
 
                         {/* Custom templates */}
                         {visibleCustom.map(t => (
-                            <button
-                                key={t.id}
-                                onClick={() => onPickCustom(t)}
-                                className="rounded-xl border border-blue-200 hover:border-primary hover:shadow-md transition-all overflow-hidden bg-white"
-                                style={{ aspectRatio: size === 'post' ? '4/5' : '9/16' }}
-                                title={t.name}
-                            >
-                                {t.thumbnail_data_url
-                                    ? <img src={t.thumbnail_data_url} alt={t.name} className="w-full h-full object-cover" />
-                                    : <div className="w-full h-full bg-gray-100 flex items-center justify-center"><LayoutTemplate className="w-5 h-5 text-gray-300" /></div>
-                                }
-                            </button>
+                            <div key={t.id} className="flex flex-col gap-1">
+                                <div className="relative group">
+                                    <button
+                                        onClick={() => onPickCustom(t)}
+                                        className="w-full rounded-xl border border-blue-200 hover:border-primary hover:shadow-md transition-all overflow-hidden bg-white block"
+                                        style={{ aspectRatio: size === 'post' ? '4/5' : '9/16' }}
+                                        title={t.name}
+                                    >
+                                        {t.thumbnail_data_url
+                                            ? <img src={t.thumbnail_data_url} alt={t.name} className="w-full h-full object-cover" />
+                                            : <div className="w-full h-full bg-gray-100 flex items-center justify-center"><LayoutTemplate className="w-5 h-5 text-gray-300" /></div>
+                                        }
+                                    </button>
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); setPreview({ kind: 'custom', t }); }}
+                                        className="absolute top-1 left-1 w-6 h-6 bg-black/60 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                                        title="Lihat Preview"
+                                    >
+                                        <Eye className="w-3 h-3" />
+                                    </button>
+                                </div>
+                                <p className="text-[9px] text-gray-500 text-center truncate leading-tight">{t.name}</p>
+                            </div>
                         ))}
 
                         {/* Starter templates */}
                         {visibleStarters.map(t => {
                             const override = starterOverrides.get(t.id);
                             return (
-                                <button
-                                    key={t.id}
-                                    onClick={() => onPickStarter(t)}
-                                    className="rounded-xl border border-gray-200 hover:border-primary hover:shadow-md transition-all overflow-hidden bg-white relative"
-                                    style={{ aspectRatio: size === 'post' ? '4/5' : '9/16' }}
-                                    title={t.name}
-                                >
-                                    {override?.thumbnail_data_url
-                                        ? <img src={override.thumbnail_data_url} alt={t.name} className="w-full h-full object-cover" />
-                                        : <TemplateThumbnail t={t} />
-                                    }
-                                    {override && (
-                                        <span className="absolute top-1 right-1 text-[8px] font-bold bg-primary text-white px-1.5 py-0.5 rounded-full leading-none">
-                                            Modified
-                                        </span>
-                                    )}
-                                </button>
+                                <div key={t.id} className="flex flex-col gap-1">
+                                    <div className="relative group">
+                                        <button
+                                            onClick={() => onPickStarter(t)}
+                                            className="w-full rounded-xl border border-gray-200 hover:border-primary hover:shadow-md transition-all overflow-hidden bg-white relative block"
+                                            style={{ aspectRatio: size === 'post' ? '4/5' : '9/16' }}
+                                            title={t.name}
+                                        >
+                                            {override?.thumbnail_data_url
+                                                ? <img src={override.thumbnail_data_url} alt={t.name} className="w-full h-full object-cover" />
+                                                : <TemplateThumbnail t={t} />
+                                            }
+                                            {override && (
+                                                <span className="absolute top-1 right-1 text-[8px] font-bold bg-primary text-white px-1.5 py-0.5 rounded-full leading-none">
+                                                    Modified
+                                                </span>
+                                            )}
+                                        </button>
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); setPreview({ kind: 'starter', t, override }); }}
+                                            className="absolute top-1 left-1 w-6 h-6 bg-black/60 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                                            title="Lihat Preview"
+                                        >
+                                            <Eye className="w-3 h-3" />
+                                        </button>
+                                    </div>
+                                    <p className="text-[9px] text-gray-500 text-center truncate leading-tight">{t.name}</p>
+                                </div>
                             );
                         })}
                     </div>
@@ -356,12 +401,65 @@ const NewDesignModal: React.FC<NewDesignModalProps> = ({
                 </button>
             </div>
         </div>
+
+        {/* Template preview overlay */}
+        {preview && (
+            <div
+                className="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 px-4"
+                onClick={() => setPreview(null)}
+            >
+                <div
+                    className="flex flex-col items-center gap-4 max-h-full py-6"
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <button
+                        onClick={() => setPreview(null)}
+                        className="self-end p-1 text-white/50 hover:text-white transition"
+                    >
+                        <X className="w-5 h-5" />
+                    </button>
+                    <div
+                        style={{ height: '60vh', aspectRatio: previewAspectRatio }}
+                        className="rounded-xl overflow-hidden shadow-2xl flex-shrink-0"
+                    >
+                        {preview.kind === 'starter'
+                            ? (preview.override?.thumbnail_data_url
+                                ? <img src={preview.override.thumbnail_data_url} alt={previewName} className="w-full h-full object-cover" />
+                                : <TemplateThumbnail t={preview.t} />)
+                            : (preview.t.thumbnail_data_url
+                                ? <img src={preview.t.thumbnail_data_url} alt={previewName} className="w-full h-full object-cover" />
+                                : <div className="w-full h-full bg-gray-200 flex items-center justify-center"><LayoutTemplate className="w-8 h-8 text-gray-400" /></div>)
+                        }
+                    </div>
+                    <div className="text-center">
+                        <p className="text-white font-semibold text-sm">{previewName}</p>
+                        <p className="text-white/50 text-xs mt-0.5">{previewType}</p>
+                    </div>
+                    <div className="flex gap-3">
+                        <button
+                            onClick={() => setPreview(null)}
+                            className="px-4 py-2 border border-white/20 text-white/80 text-sm rounded-lg hover:bg-white/10 transition"
+                        >
+                            Tutup
+                        </button>
+                        <button
+                            onClick={handleUsePreview}
+                            className="px-4 py-2.5 bg-primary text-white text-sm font-bold rounded-lg hover:bg-emerald-700 transition"
+                        >
+                            Gunakan Template →
+                        </button>
+                    </div>
+                </div>
+            </div>
+        )}
+        </>
     );
 };
 
 // ── Main Component ────────────────────────────────────────────────────────────
 const PosterMaker: React.FC = () => {
     const canvasRef = useRef<FabricCanvasRef>(null);
+    const pendingBrochureAutofill = useRef(false);
     const location = useLocation();
     const toast = useToast();
     const siteSettings = useSiteSettings();
@@ -744,7 +842,14 @@ const PosterMaker: React.FC = () => {
         setTimeout(() => canvasRef.current?.loadTemplate(template.json), 200);
         const type = getTemplateType(template);
         if (type !== 'blank') setRightTab('ai');
+        if (isBrochureMode && type !== 'blank') pendingBrochureAutofill.current = true;
         setIsNewDesignModalOpen(false);
+    };
+
+    const handleTemplateLoaded = () => {
+        if (!pendingBrochureAutofill.current) return;
+        pendingBrochureAutofill.current = false;
+        handleGenerateAndApply();
     };
 
     const handlePickCustomTemplate = (t: SavedTemplate) => {
@@ -1262,8 +1367,7 @@ const PosterMaker: React.FC = () => {
             {isBrochureMode && isBrochureBannerVisible && (
                 <div className="flex items-center justify-between gap-3 px-4 py-2 bg-blue-50 border-b border-blue-200 text-sm flex-shrink-0">
                     <p className="text-blue-800">
-                        <span className="font-semibold">Mode Brosur aktif</span> — pilih template lalu klik{' '}
-                        <span className="font-semibold">AI Autofill</span> untuk mengisi otomatis dari paket ini.
+                        <span className="font-semibold">Mode Brosur aktif</span> — pilih template dan AI Autofill akan berjalan otomatis dari paket ini.
                     </p>
                     <button
                         onClick={() => setIsBrochureBannerVisible(false)}
@@ -1329,6 +1433,7 @@ const PosterMaker: React.FC = () => {
                             onHistoryChange={handleHistoryChange}
                             onZoomChange={setZoom}
                             onObjectTransforming={handleObjectTransforming}
+                            onTemplateLoaded={handleTemplateLoaded}
                             onDrawModeChange={(mode) => {
                                 setActiveDrawTool(mode);
                                 if (mode !== null) {

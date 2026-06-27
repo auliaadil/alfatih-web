@@ -4,6 +4,8 @@ import { FormField, SectionCard, inputClass, selectClass, textareaClass, btnPrim
 import { supabase } from '../../../lib/supabase';
 import { Airport } from '../../../../types';
 import { WizardDraft } from '../../../pages/admin/PackageWizard';
+import AirportSelect, { AirportRow } from '../AirportSelect';
+import CountrySelect from '../CountrySelect';
 import {
   generateDescription,
   generateFeatures,
@@ -81,7 +83,7 @@ const Step2FlightHotels: React.FC<Props> = ({ draft, updateDraft, onNext, onBack
   };
 
   const [airportSlideOpen, setAirportSlideOpen] = useState(false);
-  const [newAirportForm, setNewAirportForm] = useState({ iata_code: '', name: '', city: '', country: '' });
+  const [newAirportForm, setNewAirportForm] = useState({ iata_code: '', name: '', city: '', country_id: '' });
   const [savingAirport, setSavingAirport] = useState(false);
 
   const handleCreateAirport = async (e: React.FormEvent) => {
@@ -92,28 +94,28 @@ const Step2FlightHotels: React.FC<Props> = ({ draft, updateDraft, onNext, onBack
       .insert([{
         iata_code: newAirportForm.iata_code.trim().toUpperCase(),
         name: newAirportForm.name.trim(),
-        city: newAirportForm.city.trim() || null,
-        country: newAirportForm.country.trim() || null,
+        city: newAirportForm.city.trim(),
+        country_id: newAirportForm.country_id,
       }]);
     setSavingAirport(false);
     if (error) {
       toast('error', error.code === '23505' ? 'Airport code already exists.' : 'Failed to create airport.');
       return;
     }
-    const { data: fresh, error: refreshError } = await supabase.from('airports').select('*').order('iata_code');
+    const { data: fresh, error: refreshError } = await supabase
+      .from('airports').select('*, countries(name)').order('iata_code');
     if (refreshError) { toast('error', 'Airport created but failed to refresh list. Please reload.'); return; }
-    if (fresh) setAirports(fresh);
+    if (fresh) setAirports(fresh as Airport[]);
     toast('success', 'Airport created. Select it in a route leg below.');
     setAirportSlideOpen(false);
-    setNewAirportForm({ iata_code: '', name: '', city: '', country: '' });
-    // No auto-select: airport appears in all leg dropdowns; user places it in the correct leg/direction.
+    setNewAirportForm({ iata_code: '', name: '', city: '', country_id: '' });
   };
 
   useEffect(() => {
     Promise.all([
       supabase.from('airlines').select('*').order('name'),
       supabase.from('hotels').select('*').order('name'),
-      supabase.from('airports').select('*').order('iata_code'),
+      supabase.from('airports').select('*, countries(name)').order('iata_code'),
     ]).then(([a, h, ap]) => {
       if (a.data) setAirlines(a.data);
       if (h.data) setHotels(h.data);
@@ -289,39 +291,29 @@ const Step2FlightHotels: React.FC<Props> = ({ draft, updateDraft, onNext, onBack
                         </div>
                         {route.legs.map((leg, i) => (
                           <div key={leg.id ?? i} className="flex items-center gap-2 mb-2">
-                            <select
-                              className={selectClass + ' flex-1'}
-                              value={leg.from_airport_id}
-                              onChange={(e) =>
-                                updateLeg(airline.id, i, 'from_airport_id', e.target.value)
-                              }
-                            >
-                              <option value="">From...</option>
-                              {airports.map((a) => (
-                                <option key={a.id} value={a.id}>
-                                  {a.iata_code} — {a.name}
-                                </option>
-                              ))}
-                            </select>
-                            <span className="text-gray-400">→</span>
-                            <select
-                              className={selectClass + ' flex-1'}
-                              value={leg.to_airport_id}
-                              onChange={(e) =>
-                                updateLeg(airline.id, i, 'to_airport_id', e.target.value)
-                              }
-                            >
-                              <option value="">To...</option>
-                              {airports.map((a) => (
-                                <option key={a.id} value={a.id}>
-                                  {a.iata_code} — {a.name}
-                                </option>
-                              ))}
-                            </select>
+                            <div className="flex-1">
+                              <AirportSelect
+                                valueKey="id"
+                                airports={airports as AirportRow[]}
+                                value={leg.from_airport_id}
+                                onChange={v => updateLeg(airline.id, i, 'from_airport_id', v)}
+                                placeholder="Dari..."
+                              />
+                            </div>
+                            <span className="text-gray-400 shrink-0">→</span>
+                            <div className="flex-1">
+                              <AirportSelect
+                                valueKey="id"
+                                airports={airports as AirportRow[]}
+                                value={leg.to_airport_id}
+                                onChange={v => updateLeg(airline.id, i, 'to_airport_id', v)}
+                                placeholder="Ke..."
+                              />
+                            </div>
                             <button
                               type="button"
                               onClick={() => removeLeg(airline.id, i)}
-                              className="text-red-400 hover:text-red-600"
+                              className="text-red-400 hover:text-red-600 shrink-0"
                             >
                               <X className="w-4 h-4" />
                             </button>
@@ -576,22 +568,21 @@ const Step2FlightHotels: React.FC<Props> = ({ draft, updateDraft, onNext, onBack
               onChange={(e) => setNewAirportForm({ ...newAirportForm, name: e.target.value })}
             />
           </FormField>
-          <FormField label="City">
+          <FormField label="City" required>
             <input
               type="text"
+              required
               className={inputClass}
               placeholder="e.g., Tangerang"
               value={newAirportForm.city}
               onChange={(e) => setNewAirportForm({ ...newAirportForm, city: e.target.value })}
             />
           </FormField>
-          <FormField label="Country">
-            <input
-              type="text"
-              className={inputClass}
-              placeholder="e.g., Indonesia"
-              value={newAirportForm.country}
-              onChange={(e) => setNewAirportForm({ ...newAirportForm, country: e.target.value })}
+          <FormField label="Country" required>
+            <CountrySelect
+              value={newAirportForm.country_id}
+              onChange={(id) => setNewAirportForm(f => ({ ...f, country_id: id }))}
+              required
             />
           </FormField>
         </form>

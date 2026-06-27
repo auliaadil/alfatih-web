@@ -101,28 +101,14 @@ function drawSectionHeader(ctx: DrawContext, label: string): void {
     ctx.y -= 30;
 }
 
-// Fetch Plus Jakarta Sans WOFF1 from Google Fonts using IE10 UA.
-// pdf-lib/fontkit supports WOFF1 but not WOFF2.
+// Fetch Plus Jakarta Sans TTF from fontsource CDN (jsDelivr).
+// fontkit supports TTF/OTF natively; avoids the brittle WOFF1/WOFF2 Google Fonts UA hack.
 async function fetchPlusJakartaSans(weight: 400 | 700): Promise<ArrayBuffer | null> {
+    const file = weight === 700 ? 'latin-700-normal.ttf' : 'latin-400-normal.ttf';
+    const url = `https://cdn.jsdelivr.net/fontsource/fonts/plus-jakarta-sans@latest/${file}`;
     try {
-        const cssRes = await fetch(
-            `https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@${weight}`,
-            {
-                headers: {
-                    // IE10 UA → Google Fonts serves WOFF1 (not WOFF2)
-                    'User-Agent': 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; Trident/6.0)',
-                },
-                signal: AbortSignal.timeout(8000),
-            },
-        );
-        if (!cssRes.ok) return null;
-        const css = await cssRes.text();
-        // The last url() in the CSS response is the latin subset
-        const matches = [...css.matchAll(/url\(([^)]+)\)/g)];
-        if (!matches.length) return null;
-        const fontUrl = matches[matches.length - 1][1].replace(/['"]/g, '').trim();
-        const fontRes = await fetch(fontUrl, { signal: AbortSignal.timeout(10000) });
-        return fontRes.ok ? fontRes.arrayBuffer() : null;
+        const res = await fetch(url, { signal: AbortSignal.timeout(12000) });
+        return res.ok ? res.arrayBuffer() : null;
     } catch {
         return null;
     }

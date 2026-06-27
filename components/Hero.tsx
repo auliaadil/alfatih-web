@@ -26,7 +26,7 @@ const Hero: React.FC = () => {
             </div>
 
             <h1 className="text-4xl md:text-5xl lg:text-[3.25rem] font-black text-white tracking-tight leading-[1.05] mb-5 font-display">
-              <span className="text-primary">AlFatih</span><br />
+              <span className="text-primary">Alfatih Dunia Wisata</span><br />
               {t('hero_title')}
             </h1>
 

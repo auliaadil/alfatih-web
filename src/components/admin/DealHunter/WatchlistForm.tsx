@@ -4,6 +4,7 @@ import {
   SlideOver, FormField, inputClass, btnPrimary, btnSecondary, useToast,
 } from '../ui';
 import { Watchlist, WatchlistFormData, EMPTY_WATCHLIST_FORM } from './types';
+import AirportSelect from '../AirportSelect';
 
 interface Props {
   isOpen: boolean;
@@ -44,6 +45,8 @@ const WatchlistForm: React.FC<Props> = ({ isOpen, editing, onClose, onSaved }) =
     const price = parseFloat(form.target_price_max);
     const adults = parseInt(form.adults, 10);
 
+    if (!origin) { toast('error', 'Bandara asal wajib dipilih.'); return; }
+    if (!destination) { toast('error', 'Bandara tujuan wajib dipilih.'); return; }
     if (origin === destination) { toast('error', 'Origin dan destination tidak boleh sama.'); return; }
     if (!form.date_range_start || !form.date_range_end) { toast('error', 'Tanggal wajib diisi.'); return; }
     if (form.date_range_end < form.date_range_start) { toast('error', 'Tanggal akhir harus setelah tanggal awal.'); return; }
@@ -87,24 +90,22 @@ const WatchlistForm: React.FC<Props> = ({ isOpen, editing, onClose, onSaved }) =
       }
     >
       <form id="watchlist-form" onSubmit={handleSubmit} className="space-y-5">
-        <div className="grid grid-cols-2 gap-4">
-          <FormField label="Origin (IATA)" required>
-            <input
-              type="text" maxLength={3} placeholder="CGK"
-              value={form.origin}
-              onChange={e => setForm(f => ({ ...f, origin: e.target.value.toUpperCase() }))}
-              className={inputClass} required
-            />
-          </FormField>
-          <FormField label="Destination (IATA)" required>
-            <input
-              type="text" maxLength={3} placeholder="JED"
-              value={form.destination}
-              onChange={e => setForm(f => ({ ...f, destination: e.target.value.toUpperCase() }))}
-              className={inputClass} required
-            />
-          </FormField>
-        </div>
+        <FormField label="Asal (Origin)" required>
+          <AirportSelect
+            value={form.origin}
+            onChange={iata => setForm(f => ({ ...f, origin: iata }))}
+            placeholder="Cari bandara asal..."
+            exclude={form.destination}
+          />
+        </FormField>
+        <FormField label="Tujuan (Destination)" required>
+          <AirportSelect
+            value={form.destination}
+            onChange={iata => setForm(f => ({ ...f, destination: iata }))}
+            placeholder="Cari bandara tujuan..."
+            exclude={form.origin}
+          />
+        </FormField>
         <div className="grid grid-cols-2 gap-4">
           <FormField label="Tanggal Mulai" required>
             <input type="date" value={form.date_range_start} onChange={field('date_range_start')}
@@ -115,9 +116,13 @@ const WatchlistForm: React.FC<Props> = ({ isOpen, editing, onClose, onSaved }) =
               onChange={field('date_range_end')} className={inputClass} required />
           </FormField>
         </div>
-        <FormField label="Harga Maks (IDR)" required hint="Contoh: 5000000">
+        <FormField
+          label="Harga Maks Total (IDR)"
+          required
+          hint={`Harga total untuk semua penumpang${form.adults && parseInt(form.adults) > 1 ? ` (${form.adults} dewasa)` : ''}. Contoh: 10000000`}
+        >
           <input
-            type="number" min={0} step={100000} placeholder="5000000"
+            type="number" min={1} step={100000} placeholder="10000000"
             value={form.target_price_max} onChange={field('target_price_max')}
             className={inputClass} required
           />

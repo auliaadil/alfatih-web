@@ -15,7 +15,7 @@ async function getLogoBase64(): Promise<string | null> {
         await new Promise<void>((resolve, reject) => {
             img.onload = () => resolve();
             img.onerror = reject;
-            img.src = '/assets/alfatih_logo_only.webp';
+            img.src = '/assets/alfatih_logo_circle.webp';
         });
         const canvas = document.createElement('canvas');
         canvas.width = img.naturalWidth;

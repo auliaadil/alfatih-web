@@ -139,7 +139,7 @@ const CompanyProfile: React.FC = () => {
       <section className="py-10 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8">
-            <h2 className="text-2xl md:text-3xl font-black text-gray-900 mb-2 uppercase tracking-tight font-display">{t('advantages_title')}</h2>
+            <h2 className="text-2xl md:text-3xl font-black text-gray-900 mb-2 tracking-tight font-display">{t('advantages_title')}</h2>
             <p className="text-gray-500 text-sm">{t('advantages_subtitle')}</p>
           </div>
           <div className="grid md:grid-cols-3 gap-5">

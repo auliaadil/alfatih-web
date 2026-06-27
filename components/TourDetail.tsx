@@ -233,7 +233,7 @@ const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
                         {day.day}
                       </div>
                       <div>
-                        <h3 className="text-base md:text-lg font-bold text-gray-900 mb-3 group-hover:text-primary transition-colors font-display">
+                        <h3 className="text-base md:text-lg font-bold text-gray-900 mb-3 group-hover:text-primary transition-colors font-jakarta">
                           {day.title}
                         </h3>
                         <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 space-y-3">

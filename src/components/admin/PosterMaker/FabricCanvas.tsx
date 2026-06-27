@@ -71,13 +71,14 @@ interface FabricCanvasProps {
     onZoomChange?: (zoom: number) => void;
     onObjectTransforming?: (obj: FabricObject) => void;
     onDrawModeChange?: (mode: 'rect' | 'circle' | 'line' | 'arrow' | 'divider' | null) => void;
+    onTemplateLoaded?: () => void;
 }
 
 // Module-level clipboard so copy/paste works across renders
 let clipboard: FabricObject | null = null;
 
 const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
-    ({ canvasSize, onSelectionChange, onCanvasModified, onHistoryChange, onZoomChange, onObjectTransforming, onDrawModeChange }, ref) => {
+    ({ canvasSize, onSelectionChange, onCanvasModified, onHistoryChange, onZoomChange, onObjectTransforming, onDrawModeChange, onTemplateLoaded }, ref) => {
         const canvasEl = useRef<HTMLCanvasElement>(null);
         const wrapperRef = useRef<HTMLDivElement>(null);
         const fabricRef = useRef<Canvas | null>(null);
@@ -961,6 +962,7 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
                         c.requestRenderAll();
                         onCanvasModified?.();
                         saveHistory(c);
+                        onTemplateLoaded?.();
                     });
                 });
             },

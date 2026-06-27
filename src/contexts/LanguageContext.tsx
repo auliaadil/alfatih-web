@@ -38,12 +38,12 @@ export const translations: Translations = {
     pihk_desc_2: { id: 'Target ini dicanangkan agar jamaah yang ingin beribadah haji dapat dilayani sepenuhnya secara eksklusif oleh manajemen Alfatih, memberikan kepastian dan kenyamanan ibadah yang lebih personal.', en: 'This target is set so that pilgrims wishing to perform Hajj can be fully and exclusively served by Alfatih management, providing certainty and a more personalized worship comfort.' },
     pihk_current: { id: 'Izin Saat Ini', en: 'Current License' },
     pihk_target: { id: 'Target 2026', en: '2026 Target' },
-    vision_mission_title: { id: 'VISI & MISI', en: 'VISION & MISSION' },
+    vision_mission_title: { id: 'Visi & Misi', en: 'Vision & Mission' },
     vision_title: { id: 'Visi', en: 'Vision' },
     vision_desc: { id: '"Menjadi perusahaan perjalanan Umroh dan wisata halal terdepan yang menginspirasi umat Muslim untuk meraih pengalaman spiritual, edukatif, dan berkelas dunia, dengan layanan yang amanah, profesional, dan sesuai nilai-nilai Islam."', en: '"To be the leading Umrah and halal tourism company that inspires Muslims to achieve spiritual, educational, and world-class experiences, with trustworthy, professional services in accordance with Islamic values."' },
     mission_title: { id: 'Misi', en: 'Mission' },
     mission_desc: { id: '"Memberikan layanan profesional, amanah, dan sesuai syariah, serta menghadirkan solusi perjalanan halal yang mudah dan berkualitas untuk semua kalangan."', en: '"To provide professional, trustworthy, and sharia-compliant services, and to present easy and quality halal travel solutions for all."' },
-    advantages_title: { id: 'KEUNGGULAN ALFATIH', en: 'ALFATIH ADVANTAGES' },
+    advantages_title: { id: 'Keunggulan Alfatih Dunia Wisata', en: 'Alfatih Dunia Wisata Advantages' },
     advantages_subtitle: { id: 'Nilai yang kami bawa dalam setiap perjalanan Anda.', en: 'The values we bring to every journey of yours.' },
 
     // Why Choose Us
