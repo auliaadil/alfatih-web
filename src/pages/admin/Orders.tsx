@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
-import { Plus, Edit2, Trash2, ShoppingCart } from 'lucide-react';
+import { Plus, Edit2, Trash2, ShoppingCart, ExternalLink } from 'lucide-react';
 import {
     PageHeader, TableCard, THead, Th, Td, SkeletonRows, EmptyState,
     ConfirmDialog, StatusBadge, btnPrimary, btnGhost, useToast,
@@ -183,9 +183,27 @@ const Orders: React.FC = () => {
                                         <p className="font-semibold text-gray-900">
                                             Rp {order.total_price?.toLocaleString('id-ID') ?? '—'}
                                         </p>
+                                        {order.amount_paid != null && order.amount_paid > 0 && (
+                                            <p className="text-xs text-emerald-600 mt-0.5">
+                                                Dibayar: Rp {(order.amount_paid as number).toLocaleString('id-ID')}
+                                            </p>
+                                        )}
                                     </Td>
                                     <Td>
-                                        <StatusBadge status={order.payment_status || 'Unknown'} />
+                                        <div className="flex items-center gap-1.5">
+                                            <StatusBadge status={order.payment_status || 'Unknown'} />
+                                            {order.payment_proof_url && (
+                                                <a
+                                                    href={order.payment_proof_url}
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                    title="Lihat bukti transaksi"
+                                                    className="text-gray-400 hover:text-blue-600 transition-colors"
+                                                >
+                                                    <ExternalLink className="w-3.5 h-3.5" />
+                                                </a>
+                                            )}
+                                        </div>
                                     </Td>
                                     <Td className="text-right">
                                         <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
