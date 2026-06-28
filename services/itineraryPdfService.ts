@@ -33,6 +33,7 @@ async function getLogoBase64(): Promise<string | null> {
 export async function downloadItineraryPdf(
     pkg: any,
     siteSettings: ItinerarySiteSettings,
+    dayPhotos?: { day: number; photoUrls: string[] }[],
 ): Promise<void> {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) throw new Error('Not authenticated');
@@ -45,7 +46,7 @@ export async function downloadItineraryPdf(
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${session.access_token}`,
         },
-        body: JSON.stringify({ package: pkg, siteSettings, logoBase64 }),
+        body: JSON.stringify({ package: pkg, siteSettings, logoBase64, dayPhotos: dayPhotos ?? [] }),
     });
 
     if (!res.ok) {

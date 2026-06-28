@@ -1,5 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { PDFDocument, StandardFonts, rgb } from 'https://esm.sh/pdf-lib@1.17.1';
+import { PDFDocument, PDFImage, StandardFonts, rgb } from 'https://esm.sh/pdf-lib@1.17.1';
 import fontkit from 'https://esm.sh/@pdf-lib/fontkit@1.1.1';
 
 const corsHeaders = {
@@ -114,10 +114,34 @@ async function fetchPlusJakartaSans(weight: 400 | 700): Promise<ArrayBuffer | nu
     }
 }
 
+async function fetchImageBytes(url: string): Promise<Uint8Array | null> {
+    try {
+        const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
+        if (!res.ok) return null;
+        const buf = await res.arrayBuffer();
+        return new Uint8Array(buf);
+    } catch {
+        return null;
+    }
+}
+
+async function embedImage(doc: PDFDocument, url: string): Promise<PDFImage | null> {
+    const bytes = await fetchImageBytes(url);
+    if (!bytes) return null;
+    try {
+        const lower = url.toLowerCase().split('?')[0];
+        if (lower.endsWith('.png')) return await doc.embedPng(bytes);
+        return await doc.embedJpg(bytes);
+    } catch {
+        try { return await doc.embedPng(bytes); } catch { return null; }
+    }
+}
+
 async function buildItineraryPdf(
     pkg: any,
     siteSettings: { whatsapp?: string; phone?: string },
     logoBase64: string | null,
+    dayPhotos: { day: number; photoUrls: string[] }[] = [],
 ): Promise<Uint8Array> {
     const doc = await PDFDocument.create();
     doc.registerFontkit(fontkit); // required before embedding custom (non-standard) fonts
@@ -196,6 +220,10 @@ async function buildItineraryPdf(
 
     // ── Day-by-day itinerary ──────────────────────────────────────────────────
     const itinerary: any[] = pkg.itinerary || [];
+    const dayPhotoMap = new Map<number, string[]>(
+        dayPhotos.map((dp: { day: number; photoUrls: string[] }) => [dp.day, dp.photoUrls])
+    );
+
     if (itinerary.length > 0) {
         drawSectionHeader(ctx, 'Program Perjalanan');
         ctx.y -= 4;
@@ -214,6 +242,35 @@ async function buildItineraryPdf(
                 drawText(ctx, `• ${act}`, { fontSize: 9, color: COLOR_DARK, indent: 8 });
             }
             ctx.y -= 8;
+
+            // Embed day photo if provided (max 1 per day)
+            const dayUrls = dayPhotoMap.get(day.day) ?? [];
+            for (const photoUrl of dayUrls.slice(0, 1)) {
+                try {
+                    const img = await embedImage(doc, photoUrl);
+                    if (img) {
+                        const maxW = CONTENT_W;
+                        const maxH = 160;
+                        const scale = Math.min(maxW / img.width, maxH / img.height);
+                        const w = img.width * scale;
+                        const h = img.height * scale;
+                        if (ctx.y - h - 12 < MARGIN) {
+                            ctx.page = ctx.doc.addPage([PAGE_W, PAGE_H]);
+                            ctx.y = PAGE_H - MARGIN;
+                        }
+                        ctx.y -= 8;
+                        ctx.page.drawImage(img, {
+                            x: MARGIN + (CONTENT_W - w) / 2,
+                            y: ctx.y - h,
+                            width: w,
+                            height: h,
+                        });
+                        ctx.y -= h + 12;
+                    }
+                } catch (e) {
+                    console.error('Failed to embed day photo:', e);
+                }
+            }
         }
         ctx.y -= 8;
     }
@@ -328,13 +385,13 @@ Deno.serve(async (req) => {
     if (authError || !user) return new Response('Unauthorized', { status: 401, headers: corsHeaders });
 
     try {
-        const { package: pkg, siteSettings, logoBase64 } = await req.json();
+        const { package: pkg, siteSettings, logoBase64, dayPhotos = [] } = await req.json();
         if (!pkg) return new Response(
             JSON.stringify({ error: 'Missing package' }),
             { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
         );
 
-        const pdfBytes = await buildItineraryPdf(pkg, siteSettings ?? {}, logoBase64 ?? null);
+        const pdfBytes = await buildItineraryPdf(pkg, siteSettings ?? {}, logoBase64 ?? null, dayPhotos);
 
         return new Response(pdfBytes, {
             headers: {
