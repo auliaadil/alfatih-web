@@ -141,7 +141,12 @@ const PdfPhotoPickerModal: React.FC<Props> = ({ isOpen, onClose, itinerary, onGe
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex flex-col bg-white">
+        <div className="fixed inset-0 z-50 flex">
+            {/* Backdrop */}
+            <div className="flex-1 bg-black/40" onClick={onClose} />
+
+            {/* Slide-over panel */}
+            <div className="w-full max-w-4xl bg-white flex flex-col h-full shadow-2xl">
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 flex-shrink-0">
                 <div>
@@ -325,6 +330,7 @@ const PdfPhotoPickerModal: React.FC<Props> = ({ isOpen, onClose, itinerary, onGe
                         Generate PDF
                     </button>
                 </div>
+            </div>
             </div>
         </div>
     );
