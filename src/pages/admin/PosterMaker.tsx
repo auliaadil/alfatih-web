@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import { Loader2, Sparkles, LayoutTemplate, Save, X, Plus, Clock, Eye } from 'lucide-react';
 import { applyTemplateContent, TemplateInputs, TemplateType } from '../../../services/posterAutofillService';
-import { fetchTemplate, fetchTemplates, saveTemplate, updateTemplate, SavedTemplate } from '../../services/posterTemplates';
+import { fetchTemplate, fetchTemplates, fetchTemplateByStarterId, saveTemplate, updateTemplate, SavedTemplate } from '../../services/posterTemplates';
 import { supabase } from '../../lib/supabase';
 import { TourPackage } from '../../../types';
 import { PosterSlide } from '../../../types/poster';
@@ -817,10 +817,15 @@ const PosterMaker: React.FC = () => {
         if (canvas?.freeDrawingBrush) (canvas.freeDrawingBrush as any).width = width;
     };
 
-    const handlePickTemplate = (template: PosterTemplate) => {
+    const handlePickTemplate = async (template: PosterTemplate) => {
         setLoadedStarterId(template.id);
 
-        const override = starterOverrides.get(template.id);
+        // Authoritative lookup against the DB rather than the locally-cached
+        // customTemplates list, which may not have loaded yet (e.g. right after
+        // navigating here from Template Manager) and would otherwise cause an
+        // existing override to go undetected — saving would then insert a
+        // duplicate row instead of updating it.
+        const override = await fetchTemplateByStarterId(template.id);
         if (override) {
             setLoadedTemplate(template);
             setCanvasSize(override.aspect_ratio);
@@ -858,6 +863,7 @@ const PosterMaker: React.FC = () => {
         setCanvasSize(t.aspect_ratio);
         setEditingTemplateId(t.id);
         setEditingTemplateName(t.name);
+        setLoadedStarterId(t.starter_id);
         setSlides([{ id: `${Date.now()}`, json: t.canvas_json, thumbnail: '' }]);
         setActiveSlideIndex(0);
         setTimeout(() => canvasRef.current?.loadTemplate(t.canvas_json), 200);

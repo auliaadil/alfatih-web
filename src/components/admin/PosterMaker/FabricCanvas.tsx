@@ -3,6 +3,7 @@ import { Canvas, Rect, Textbox, Circle, Line, Path, PencilBrush, FabricImage, Fa
 import { installSceneSnap } from './fabricSnap';
 import { createBulletListTextbox, normalizeBulletList } from './fabricBulletList';
 import { preloadTemplateFonts } from './fontLoader';
+import { toggleCropMode, exitActiveCropMode, isInCropMode } from './fabricImageCrop';
 
 export type CanvasSize = 'post' | 'story';
 
@@ -89,6 +90,7 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
         const history = useRef<object[]>([]);
         const historyIndex = useRef<number>(-1);
         const isHistoryProcessing = useRef(false);
+        const isCropModeActive = useRef(false);
         const freehandRef = useRef(false);
         const textPlacementRef = useRef(false);
         const drawModeRef    = useRef<'rect' | 'circle' | 'line' | 'arrow' | 'divider' | null>(null);
@@ -119,6 +121,13 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
             updateHistoryState();
         };
 
+        const commitCropExitIfActive = (c: Canvas) => {
+            if (!exitActiveCropMode(c)) return;
+            isCropModeActive.current = false;
+            onCanvasModified?.();
+            saveHistory(c);
+        };
+
         const calcFitScale = () => {
             const dims = CANVAS_DIMENSIONS[canvasSize];
             const maxH = window.innerHeight - 200;
@@ -145,10 +154,30 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
 
             setTimeout(() => saveHistory(canvas), 100);
 
-            canvas.on('selection:created', (e) => onSelectionChange?.(e.selected?.[0] || null));
-            canvas.on('selection:updated', (e) => onSelectionChange?.(e.selected?.[0] || null));
-            canvas.on('selection:cleared', () => onSelectionChange?.(null));
-            canvas.on('object:modified', () => { onCanvasModified?.(); saveHistory(canvas); });
+            const onSelectionChanged = (next: FabricObject | null) => {
+                const cropImg = canvas.getObjects().find(isInCropMode);
+                if (cropImg && cropImg !== next) commitCropExitIfActive(canvas);
+                onSelectionChange?.(next);
+            };
+            canvas.on('selection:created', (e) => onSelectionChanged(e.selected?.[0] || null));
+            canvas.on('selection:updated', (e) => onSelectionChanged(e.selected?.[0] || null));
+            canvas.on('selection:cleared', () => onSelectionChanged(null));
+            canvas.on('mouse:dblclick', (e) => {
+                if (!e.target || e.target.type !== 'image') return;
+                const entered = toggleCropMode(e.target as FabricImage);
+                isCropModeActive.current = entered;
+                if (!entered) {
+                    // toggleCropMode already performed the exit; commit it as one history step here.
+                    onCanvasModified?.();
+                    saveHistory(canvas);
+                }
+                canvas.requestRenderAll();
+            });
+            canvas.on('object:modified', () => {
+                if (isCropModeActive.current) return; // committed as one step on crop exit instead
+                onCanvasModified?.();
+                saveHistory(canvas);
+            });
             canvas.on('object:added', (e) => {
                 if ((e.target as any).isPreview) return;
                 onCanvasModified?.();
@@ -156,6 +185,7 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
             });
             canvas.on('object:removed', (e) => {
                 if ((e.target as any).isPreview) return;
+                if (isInCropMode(e.target)) isCropModeActive.current = false;
                 onCanvasModified?.();
                 saveHistory(canvas);
             });
@@ -477,6 +507,8 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
                 }
 
                 if (ev.key === 'Escape') {
+                    // Exit image crop mode
+                    commitCropExitIfActive(c);
                     // Cancel text placement
                     if (textPlacementRef.current) {
                         textPlacementRef.current = false;
@@ -959,6 +991,7 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
                 }
                 preloadTemplateFonts(safeJson).then(() => {
                     c.loadFromJSON(safeJson).then(() => {
+                        isCropModeActive.current = false;
                         c.requestRenderAll();
                         onCanvasModified?.();
                         saveHistory(c);
@@ -993,6 +1026,7 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
                     const c = fabricRef.current;
                     if (c) {
                         c.loadFromJSON(history.current[historyIndex.current]).then(() => {
+                            isCropModeActive.current = false;
                             c.requestRenderAll();
                             onCanvasModified?.();
                             isHistoryProcessing.current = false;
@@ -1009,6 +1043,7 @@ const FabricCanvas = forwardRef<FabricCanvasRef, FabricCanvasProps>(
                     const c = fabricRef.current;
                     if (c) {
                         c.loadFromJSON(history.current[historyIndex.current]).then(() => {
+                            isCropModeActive.current = false;
                             c.requestRenderAll();
                             onCanvasModified?.();
                             isHistoryProcessing.current = false;
