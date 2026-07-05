@@ -86,7 +86,6 @@ const Airports: React.FC = () => {
         title="Airports"
         badge={airports.length}
         subtitle="Manage airports used in flight route legs"
-        breadcrumbs={[{ label: 'Resources' }, { label: 'Airports' }]}
         action={<button onClick={openCreate} className={btnPrimary}><Plus className="w-4 h-4" /> Add Airport</button>}
       />
       <div className="mb-4 flex items-center justify-between gap-3">
@@ -126,9 +125,9 @@ const Airports: React.FC = () => {
                 <Td><span className="text-gray-600">{a.city}</span></Td>
                 <Td><span className="text-gray-600">{a.countries?.name ?? ''}</span></Td>
                 <Td className="text-right">
-                  <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onClick={() => openEdit(a)} className={btnGhost}><Edit2 className="w-4 h-4" /></button>
-                    <button onClick={() => setDeleteId(a.id)} className="inline-flex items-center px-3 py-2 text-sm font-medium text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"><Trash2 className="w-4 h-4" /></button>
+                  <div className="flex justify-end gap-2">
+                    <button onClick={() => openEdit(a)} className={`${btnGhost} text-xs px-2 py-1`}>Edit</button>
+                    <button onClick={() => setDeleteId(a.id)} className={`${btnGhost} text-red-500 hover:bg-red-50 text-xs px-2 py-1`}>Delete</button>
                   </div>
                 </Td>
               </tr>

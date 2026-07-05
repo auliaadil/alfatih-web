@@ -127,7 +127,6 @@ const SiteSettings: React.FC = () => {
             <PageHeader
                 title="Site Settings"
                 subtitle="Configure contact info, social links, and AI planner options"
-                breadcrumbs={[{ label: 'System' }, { label: 'Settings' }]}
             />
 
             <form onSubmit={handleSave} className="space-y-6 max-w-3xl">

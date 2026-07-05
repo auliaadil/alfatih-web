@@ -102,7 +102,6 @@ const PrivateTrips: React.FC = () => {
                 title="Private Trip Requests"
                 badge={requests.length}
                 subtitle={pendingCount > 0 ? `${pendingCount} pending follow-up` : 'All caught up!'}
-                breadcrumbs={[{ label: 'Operations' }, { label: 'Private Trips' }]}
             />
 
             <div className="mb-4">
@@ -163,23 +162,21 @@ const PrivateTrips: React.FC = () => {
                                         <StatusBadge status={req.status === 'pending' ? 'Pending' : 'Handled'} />
                                     </Td>
                                     <Td className="text-right">
-                                        <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
+                                        <div className="flex justify-end gap-2" onClick={(e) => e.stopPropagation()}>
                                             <button
                                                 onClick={() => markAsHandled(req.id, req.status)}
-                                                className={`inline-flex items-center px-3 py-2 text-sm rounded-lg transition-colors ${req.status === 'pending'
+                                                className={`${btnGhost} ${req.status === 'pending'
                                                     ? 'text-emerald-600 hover:bg-emerald-50'
                                                     : 'text-gray-400 hover:bg-gray-100'
-                                                }`}
-                                                title={req.status === 'pending' ? 'Mark handled' : 'Unmark'}
+                                                } text-xs px-2 py-1`}
                                             >
-                                                <CheckCircle className="w-4 h-4" />
+                                                {req.status === 'pending' ? 'Mark Handled' : 'Unmark'}
                                             </button>
                                             <button
                                                 onClick={() => setDeleteId(req.id)}
-                                                className="inline-flex items-center px-3 py-2 text-sm text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
-                                                title="Delete"
+                                                className={`${btnGhost} text-red-500 hover:bg-red-50 text-xs px-2 py-1`}
                                             >
-                                                <Trash2 className="w-4 h-4" />
+                                                Delete
                                             </button>
                                         </div>
                                     </Td>

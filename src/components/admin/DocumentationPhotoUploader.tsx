@@ -34,12 +34,14 @@ export const DocumentationPhotoUploader: React.FC<Props> = ({
         .from('documentation-photos')
         .getPublicUrl(data.path);
       const nextOrder = photos.length + newPhotos.length;
-      const { data: row, error: dbErr } = await supabase
-        .from('documentation_photos')
-        .insert({ documentation_id: docId, storage_url: urlData.publicUrl, sort_order: nextOrder })
-        .select()
-        .single();
-      if (!dbErr && row) newPhotos.push(row as DocumentationPhoto);
+      const tempPhoto: DocumentationPhoto = {
+        id: `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        documentation_id: docId,
+        storage_url: urlData.publicUrl,
+        sort_order: nextOrder,
+        created_at: new Date().toISOString()
+      };
+      newPhotos.push(tempPhoto);
     }
     const updated = [...photos, ...newPhotos];
     onPhotosChange(updated);
@@ -60,7 +62,9 @@ export const DocumentationPhotoUploader: React.FC<Props> = ({
     const url = new URL(photo.storage_url);
     const storagePath = url.pathname.split('/object/public/documentation-photos/')[1];
     await supabase.storage.from('documentation-photos').remove([storagePath]);
-    await supabase.from('documentation_photos').delete().eq('id', photo.id);
+    if (!photo.id.startsWith('temp-')) {
+      await supabase.from('documentation_photos').delete().eq('id', photo.id);
+    }
     const updated = photos.filter(p => p.id !== photo.id);
     onPhotosChange(updated);
     if (coverUrl === photo.storage_url) onCoverChange(updated[0]?.storage_url ?? null);
@@ -86,10 +90,10 @@ export const DocumentationPhotoUploader: React.FC<Props> = ({
   };
 
   const handleDragEnd = async () => {
-    // persist new sort_order to DB
+    // persist new sort_order to DB for non-temp photos
     await Promise.all(
       photos.map(p =>
-        supabase.from('documentation_photos').update({ sort_order: p.sort_order }).eq('id', p.id)
+        p.id.startsWith('temp-') ? Promise.resolve() : supabase.from('documentation_photos').update({ sort_order: p.sort_order }).eq('id', p.id)
       )
     );
     dragOverRef.current = null;

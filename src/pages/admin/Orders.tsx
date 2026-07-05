@@ -95,7 +95,6 @@ const Orders: React.FC = () => {
                 title="Orders"
                 badge={orders.length}
                 subtitle="Track and manage customer bookings"
-                breadcrumbs={[{ label: 'Operations' }, { label: 'Orders' }]}
                 action={
                     <button
                         onClick={() => { setEditingOrder(null); setIsFormOpen(true); }}
@@ -206,20 +205,18 @@ const Orders: React.FC = () => {
                                         </div>
                                     </Td>
                                     <Td className="text-right">
-                                        <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <div className="flex justify-end gap-2">
                                             <button
                                                 onClick={() => { setEditingOrder(order); setIsFormOpen(true); }}
-                                                className={btnGhost}
-                                                title="Edit"
+                                                className={`${btnGhost} text-xs px-2 py-1`}
                                             >
-                                                <Edit2 className="w-4 h-4" />
+                                                Edit
                                             </button>
                                             <button
                                                 onClick={() => setDeleteId(order.id)}
-                                                className="inline-flex items-center px-3 py-2 text-sm font-medium text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
-                                                title="Delete"
+                                                className={`${btnGhost} text-red-500 hover:bg-red-50 text-xs px-2 py-1`}
                                             >
-                                                <Trash2 className="w-4 h-4" />
+                                                Delete
                                             </button>
                                         </div>
                                     </Td>

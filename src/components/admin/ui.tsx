@@ -345,9 +345,11 @@ interface ThProps {
     sortKey?: string;
     currentSort?: SortState;
     onSort?: (key: string) => void;
+    width?: string;
+    className?: string;
 }
 
-export const Th: React.FC<ThProps> = ({ children, align = 'left', sortKey, currentSort, onSort }) => {
+export const Th: React.FC<ThProps> = ({ children, align = 'left', sortKey, currentSort, onSort, width, className = '' }) => {
     const isSortable = !!sortKey && !!onSort;
     const isActive = isSortable && currentSort?.key === sortKey;
 
@@ -360,7 +362,7 @@ export const Th: React.FC<ThProps> = ({ children, align = 'left', sortKey, curre
         : <ChevronsUpDown className="w-3 h-3 shrink-0 text-gray-300" />;
 
     return (
-        <th className={`px-6 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wide text-${align}`}>
+        <th style={width ? { width } : undefined} className={`px-6 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wide text-${align} ${className}`}>
             {isSortable ? (
                 <button
                     type="button"

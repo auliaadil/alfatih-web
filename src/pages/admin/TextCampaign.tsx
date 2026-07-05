@@ -171,7 +171,6 @@ const TextCampaign: React.FC = () => {
             <PageHeader
                 title="Text Campaign"
                 subtitle="Buat pesan broadcast berbasis AI untuk berbagai channel"
-                breadcrumbs={[{ label: 'Marketing' }, { label: 'Text Campaign' }]}
                 action={
                     <button
                         onClick={() => setIsHistoryOpen(true)}

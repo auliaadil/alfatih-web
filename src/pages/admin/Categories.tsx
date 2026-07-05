@@ -86,7 +86,6 @@ const Categories: React.FC = () => {
         title="Categories"
         badge={categories.length}
         subtitle="Manage package categories shown in the wizard"
-        breadcrumbs={[{ label: 'Resources' }, { label: 'Categories' }]}
         action={<button onClick={openCreate} className={btnPrimary}><Plus className="w-4 h-4" /> Add Category</button>}
       />
       <div className="mb-4">
@@ -118,9 +117,9 @@ const Categories: React.FC = () => {
                   <Td><span className="font-medium text-gray-900">{c.name}</span></Td>
                   <Td><span className="font-mono text-sm text-gray-500">{c.slug}</span></Td>
                   <Td className="text-right">
-                    <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button onClick={() => openEdit(c)} className={btnGhost}><Edit2 className="w-4 h-4" /></button>
-                      <button onClick={() => setDeleteId(c.id)} className="inline-flex items-center px-3 py-2 text-sm font-medium text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"><Trash2 className="w-4 h-4" /></button>
+                    <div className="flex justify-end gap-2">
+                      <button onClick={() => openEdit(c)} className={`${btnGhost} text-xs px-2 py-1`}>Edit</button>
+                      <button onClick={() => setDeleteId(c.id)} className={`${btnGhost} text-red-500 hover:bg-red-50 text-xs px-2 py-1`}>Delete</button>
                     </div>
                   </Td>
                 </tr>

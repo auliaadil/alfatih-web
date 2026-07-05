@@ -80,7 +80,6 @@ const Dashboard: React.FC = () => {
       <PageHeader
         title="Dashboard"
         subtitle={isBranchAdmin ? 'Your branch orders and bookings' : "Welcome back — here's what's happening."}
-        breadcrumbs={[{ label: 'Admin' }, { label: 'Dashboard' }]}
       />
 
       {/* Role + branch chips */}

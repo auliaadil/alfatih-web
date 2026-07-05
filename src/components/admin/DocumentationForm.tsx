@@ -109,8 +109,33 @@ export const DocumentationForm: React.FC<Props> = ({ isOpen, onClose, doc, onSav
     const { error } = doc
       ? await supabase.from('documentations').update(payload).eq('id', doc.id)
       : await supabase.from('documentations').upsert(payload);
-    if (error) { toast('error', 'Gagal menyimpan: ' + error.message); }
-    else { toast('success', doc ? 'Dokumentasi diperbarui.' : 'Dokumentasi dibuat.'); onSaved(); onClose(); }
+      
+    if (error) { 
+      toast('error', 'Gagal menyimpan: ' + error.message); 
+    } else { 
+      const tempPhotos = photos.filter(p => p.id.startsWith('temp-'));
+      if (tempPhotos.length > 0) {
+         const photosToInsert = tempPhotos.map(p => ({
+           documentation_id: docId,
+           storage_url: p.storage_url,
+           sort_order: p.sort_order
+         }));
+         const { error: photoErr } = await supabase.from('documentation_photos').insert(photosToInsert);
+         if (photoErr) {
+           console.error('Error saving photos:', photoErr);
+           toast('warning', 'Album disimpan, tetapi beberapa foto gagal disimpan ke database.');
+         }
+         
+         await Promise.all(
+            photos.filter(p => !p.id.startsWith('temp-')).map(p =>
+              supabase.from('documentation_photos').update({ sort_order: p.sort_order }).eq('id', p.id)
+            )
+         );
+      }
+      toast('success', doc ? 'Dokumentasi diperbarui.' : 'Dokumentasi dibuat.'); 
+      onSaved(); 
+      onClose(); 
+    }
     setSaving(false);
   };
 
@@ -122,9 +147,9 @@ export const DocumentationForm: React.FC<Props> = ({ isOpen, onClose, doc, onSav
           role="switch"
           aria-checked={form.published}
           onClick={() => setForm(prev => ({ ...prev, published: !prev.published }))}
-          className={`w-9 h-5 rounded-full transition-colors relative ${form.published ? 'bg-primary' : 'bg-gray-300'}`}
+          className={`w-9 h-5 rounded-full transition-colors flex items-center px-0.5 ${form.published ? 'bg-primary justify-end' : 'bg-gray-300 justify-start'}`}
         >
-          <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${form.published ? 'translate-x-4' : 'translate-x-0.5'}`} />
+          <span className="w-4 h-4 bg-white rounded-full shadow" />
         </button>
         <span className="text-sm text-gray-600">Publish</span>
       </label>
@@ -158,9 +183,9 @@ export const DocumentationForm: React.FC<Props> = ({ isOpen, onClose, doc, onSav
                 setLinkPackage(!linkPackage);
                 if (linkPackage) setForm(prev => ({ ...prev, package_id: '' }));
               }}
-              className={`w-9 h-5 rounded-full transition-colors relative flex-shrink-0 ${linkPackage ? 'bg-primary' : 'bg-gray-300'}`}
+              className={`w-9 h-5 rounded-full transition-colors flex items-center px-0.5 flex-shrink-0 ${linkPackage ? 'bg-primary justify-end' : 'bg-gray-300 justify-start'}`}
             >
-              <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${linkPackage ? 'translate-x-4' : 'translate-x-0.5'}`} />
+              <span className="w-4 h-4 bg-white rounded-full shadow" />
             </button>
             <div className="min-w-0">
               <p className="text-sm font-semibold text-blue-800">Hubungkan ke paket</p>

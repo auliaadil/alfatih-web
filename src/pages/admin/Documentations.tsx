@@ -88,19 +88,20 @@ const Documentations: React.FC = () => {
     doc.documentation_photos?.[0]?.count ?? 0;
 
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title="Documentations"
-        subtitle="Manage trip albums and photo collections"
-        action={
-          <button
-            className={btnPrimary}
-            onClick={() => { setEditingDoc(null); setFormOpen(true); }}
-          >
-            + New Album
-          </button>
-        }
-      />
+    <>
+      <div className="space-y-6">
+        <PageHeader
+          title="Documentations"
+          subtitle="Manage trip albums and photo collections"
+          action={
+            <button
+              className={btnPrimary}
+              onClick={() => { setEditingDoc(null); setFormOpen(true); }}
+            >
+              + New Album
+            </button>
+          }
+        />
 
       <div className="flex gap-3">
         <SearchInput value={searchQuery} onChange={setSearchQuery} placeholder="Search by title…" />
@@ -116,13 +117,13 @@ const Documentations: React.FC = () => {
 
       <TableCard>
         <THead>
-          <Th sortKey="title" currentSort={sort} onSort={handleSort}>Album</Th>
-          <Th>Category</Th>
-          <Th>Package</Th>
-          <Th sortKey="departure_date" currentSort={sort} onSort={handleSort}>Departure</Th>
-          <Th>Photos</Th>
-          <Th>Status</Th>
-          <Th>Actions</Th>
+          <Th sortKey="title" currentSort={sort} onSort={handleSort} width="30%">Album</Th>
+          <Th width="15%">Category</Th>
+          <Th width="20%">Package</Th>
+          <Th sortKey="departure_date" currentSort={sort} onSort={handleSort} width="10%">Departure</Th>
+          <Th align="center" width="5%">Photos</Th>
+          <Th align="center" width="10%">Status</Th>
+          <Th align="right" width="10%">Actions</Th>
         </THead>
         <tbody>
           {loading ? (
@@ -195,6 +196,7 @@ const Documentations: React.FC = () => {
         totalItems={filtered.length}
         onPageChange={setPage}
       />
+      </div>
 
       {/* Delete confirm — inline for now */}
       {deleteId && (
@@ -232,7 +234,7 @@ const Documentations: React.FC = () => {
           onEdit={() => { setViewOpen(false); setEditingDoc(viewingDoc); setFormOpen(true); }}
         />
       )}
-    </div>
+    </>
   );
 };
 

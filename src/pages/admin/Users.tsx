@@ -257,19 +257,18 @@ const UsersTab: React.FC<{ currentUserId: string; allBranches: BranchRow[] }> = 
                       {isMe ? null : (
                         <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                           {u.invite_pending && (
-                            <button onClick={() => handleResend(u.email)} className={btnGhost} title="Resend invite">
-                              <RefreshCw className="w-4 h-4" />
+                            <button onClick={() => handleResend(u.email)} className={`${btnGhost} text-xs px-2 py-1`}>
+                              Resend
                             </button>
                           )}
-                          <button onClick={() => handleEditOpen(u)} className={btnGhost} title="Edit">
-                            <Edit2 className="w-4 h-4" />
+                          <button onClick={() => handleEditOpen(u)} className={`${btnGhost} text-xs px-2 py-1`}>
+                            Edit
                           </button>
                           <button
                             onClick={() => setRemoveUserId(u.id)}
-                            className="inline-flex items-center px-3 py-2 text-sm font-medium text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
-                            title="Remove"
+                            className={`${btnGhost} text-red-500 hover:bg-red-50 text-xs px-2 py-1`}
                           >
-                            <Trash2 className="w-4 h-4" />
+                            Delete
                           </button>
                         </div>
                       )}
@@ -466,14 +465,13 @@ const BranchesTab: React.FC<{ branches: BranchRow[]; onRefresh: () => void }> = 
                   </Td>
                   <Td><p className="text-gray-700">{b.user_branches.length} user{b.user_branches.length !== 1 ? 's' : ''}</p></Td>
                   <Td className="text-right">
-                    <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button onClick={() => openEdit(b)} className={btnGhost} title="Edit"><Edit2 className="w-4 h-4" /></button>
+                    <div className="flex justify-end gap-2">
+                      <button onClick={() => openEdit(b)} className={`${btnGhost} text-xs px-2 py-1`}>Edit</button>
                       <button
                         onClick={() => setDeleteId(b.id)}
-                        className="inline-flex items-center px-3 py-2 text-sm font-medium text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
-                        title="Delete"
+                        className={`${btnGhost} text-red-500 hover:bg-red-50 text-xs px-2 py-1`}
                       >
-                        <Trash2 className="w-4 h-4" />
+                        Delete
                       </button>
                     </div>
                   </Td>
@@ -542,7 +540,6 @@ const Users: React.FC = () => {
       <PageHeader
         title="Users & Roles"
         subtitle="Manage admin access, roles, and branch assignments"
-        breadcrumbs={[{ label: 'System' }, { label: 'Users & Roles' }]}
       />
 
       <div className="flex gap-1 mb-6 border-b border-gray-200">

@@ -144,7 +144,6 @@ const Hotels: React.FC = () => {
                 title="Hotels"
                 badge={hotels.length}
                 subtitle="Manage hotel accommodations used in packages"
-                breadcrumbs={[{ label: 'Resources' }, { label: 'Hotels' }]}
                 action={
                     <button onClick={openCreate} className={btnPrimary}>
                         <Plus className="w-4 h-4" /> Add Hotel
@@ -212,16 +211,15 @@ const Hotels: React.FC = () => {
                                         <StarRating count={hotel.stars} />
                                     </Td>
                                     <Td className="text-right">
-                                        <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <button onClick={() => openEdit(hotel)} className={btnGhost} title="Edit">
-                                                <Edit2 className="w-4 h-4" />
+                                        <div className="flex justify-end gap-2">
+                                            <button onClick={() => openEdit(hotel)} className={`${btnGhost} text-xs px-2 py-1`}>
+                                                Edit
                                             </button>
                                             <button
                                                 onClick={() => setDeleteId(hotel.id)}
-                                                className="inline-flex items-center px-3 py-2 text-sm font-medium text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
-                                                title="Delete"
+                                                className={`${btnGhost} text-red-500 hover:bg-red-50 text-xs px-2 py-1`}
                                             >
-                                                <Trash2 className="w-4 h-4" />
+                                                Delete
                                             </button>
                                         </div>
                                     </Td>
