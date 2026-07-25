@@ -76,10 +76,10 @@ const Footer: React.FC<FooterProps> = () => {
               {t('footer_quick_links')}
             </h3>
             <ul className="space-y-3 text-sm text-gray-400">
-              <li><button onClick={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="hover:text-primary transition-colors font-medium">Home</button></li>
-              <li><a href="#tours" className="hover:text-primary transition-colors font-medium">Tour Packages</a></li>
-              <li><a href="#private-trip" className="hover:text-primary transition-colors font-medium">Private Trip</a></li>
-              <li><a href="#about" className="hover:text-primary transition-colors font-medium">About Us</a></li>
+              <li><button onClick={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="hover:text-primary transition-colors font-medium">{t('footer_nav_home')}</button></li>
+              <li><a href="#tours" className="hover:text-primary transition-colors font-medium">{t('footer_nav_tours')}</a></li>
+              <li><a href="#private-trip" className="hover:text-primary transition-colors font-medium">{t('footer_nav_private')}</a></li>
+              <li><a href="#about" className="hover:text-primary transition-colors font-medium">{t('footer_nav_about')}</a></li>
             </ul>
           </div>
 
@@ -99,7 +99,7 @@ const Footer: React.FC<FooterProps> = () => {
                   </li>
                 ))
               ) : (
-                <li className="text-gray-500 italic">No packages available.</li>
+                <li className="text-gray-500 italic">{t('footer_no_packages')}</li>
               )}
             </ul>
           </div>
@@ -134,10 +134,10 @@ const Footer: React.FC<FooterProps> = () => {
         </div>
 
         <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-500">
-          <p className="font-medium">&copy; {new Date().getFullYear()} Alfatih Dunia Wisata. All rights reserved.</p>
+          <p className="font-medium">&copy; {new Date().getFullYear()} Alfatih Dunia Wisata. {t('footer_rights')}</p>
           <div className="flex gap-6">
-            <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
+            <a href="#" className="hover:text-white transition-colors">{t('footer_privacy')}</a>
+            <a href="#" className="hover:text-white transition-colors">{t('footer_terms')}</a>
           </div>
         </div>
         <p className="text-center text-xs text-gray-600 mt-4">

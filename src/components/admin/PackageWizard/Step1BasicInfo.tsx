@@ -117,6 +117,16 @@ const Step1BasicInfo: React.FC<Props> = ({ draft, updateDraft, onNext, categorie
             </select>
           </div>
 
+          <FormField label="Destination Country" hint="e.g., Arab Saudi, Turki, Jepang. Digunakan untuk filter di halaman paket.">
+            <input
+              type="text"
+              className={inputClass}
+              placeholder="e.g., Arab Saudi"
+              value={draft.destination_country}
+              onChange={(e) => updateDraft({ destination_country: e.target.value })}
+            />
+          </FormField>
+
           <div className="grid grid-cols-2 gap-4">
             <FormField label="Departure Date" required>
               <input
@@ -239,6 +249,26 @@ const Step1BasicInfo: React.FC<Props> = ({ draft, updateDraft, onNext, categorie
               <span className="text-sm text-gray-700">Show as popular package on homepage</span>
             </label>
           </FormField>
+
+          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
+            <div>
+              <p className="text-sm font-medium text-gray-700">Published</p>
+              <p className="text-xs text-gray-400 mt-0.5">Tampilkan paket ini di halaman publik</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => updateDraft({ is_published: !draft.is_published })}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
+                draft.is_published ? 'bg-primary' : 'bg-gray-200'
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+                  draft.is_published ? 'translate-x-6' : 'translate-x-1'
+                }`}
+              />
+            </button>
+          </div>
         </div>
       </SectionCard>
 

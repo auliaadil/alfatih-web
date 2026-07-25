@@ -18,6 +18,7 @@ export interface Category {
   id: string;
   name: string;
   slug: string;
+  terms_conditions?: string;
 }
 
 export interface FlightLeg {
@@ -86,7 +87,10 @@ export interface TourPackage {
   included?: string[];
   not_included?: string[];
   brochure_url?: string;
+  is_published?: boolean;
+  itinerary_pdf_url?: string;
   gallery?: string[];
+  destination_country?: string;
 }
 
 export interface AIPlannerInput {
@@ -97,11 +101,15 @@ export interface AIPlannerInput {
 }
 
 export interface Testimonial {
-  id: number;
+  id: string | number;
   name: string;
   role: string;
   comment: string;
-  avatar: string;
+  avatar?: string;
+  avatar_url?: string;
+  sort_order?: number;
+  is_active?: boolean;
+  created_at?: string;
 }
 
 export interface Documentation {
@@ -126,5 +134,69 @@ export interface DocumentationPhoto {
   documentation_id: string;
   storage_url: string;
   sort_order: number;
+  created_at: string;
+}
+
+export type AgentType = 'Person' | 'OTA' | 'Direct';
+export type BookingStatus = 'Planned' | 'Quoted' | 'Booked' | 'Paid' | 'Cancelled';
+export type Currency = 'IDR' | 'USD';
+
+export interface Agent {
+  id: string;
+  name: string;
+  company?: string;
+  contact_info?: string;
+  agent_type: AgentType;
+  created_at: string;
+}
+
+export interface HotelBooking {
+  id: string;
+  hotel_id: string;
+  agent_id?: string;
+  check_in_date?: string;
+  check_out_date?: string;
+  rooms: { room_type: string; paxes: number }[];
+  price?: number;
+  currency: Currency;
+  status: BookingStatus;
+  created_at: string;
+  // joined
+  hotels?: { name: string; location: string };
+  agents?: { name: string; company?: string };
+}
+
+export interface FlightBooking {
+  id: string;
+  airline_id: string;
+  agent_id?: string;
+  departure_date?: string;
+  return_date?: string;
+  flight_route?: string;
+  paxes?: number;
+  price?: number;
+  currency: Currency;
+  status: BookingStatus;
+  created_at: string;
+  // joined
+  airlines?: { name: string; logo_url?: string };
+  agents?: { name: string; company?: string };
+}
+
+export interface BookingAttachment {
+  id: string;
+  hotel_booking_id?: string;
+  flight_booking_id?: string;
+  file_url: string;
+  file_name: string;
+  created_at: string;
+}
+
+export interface OrderAttachment {
+  id: string;
+  order_id: string;
+  file_url: string;
+  file_name: string;
+  file_type?: string;
   created_at: string;
 }

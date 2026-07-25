@@ -3,7 +3,7 @@ import { supabase } from '../../lib/supabase';
 import { Plus, Edit2, Trash2, Tag } from 'lucide-react';
 import {
   PageHeader, TableCard, THead, Th, Td, SkeletonRows, EmptyState, SlideOver,
-  ConfirmDialog, FormField, inputClass, btnPrimary, btnSecondary, btnGhost, useToast,
+  ConfirmDialog, FormField, inputClass, textareaClass, btnPrimary, btnSecondary, btnGhost, useToast,
   SearchInput, Pagination, SortState, compareRows,
 } from '../../components/admin/ui';
 import { Category } from '../../../types';
@@ -11,7 +11,7 @@ import { Category } from '../../../types';
 const toSlug = (name: string) =>
   name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
 
-const EMPTY_FORM = { name: '', slug: '' };
+const EMPTY_FORM = { name: '', slug: '', terms_conditions: '' };
 
 const PAGE_SIZE = 10;
 
@@ -45,12 +45,12 @@ const Categories: React.FC = () => {
   };
 
   const openCreate = () => { setEditingId(null); setForm(EMPTY_FORM); setIsFormOpen(true); };
-  const openEdit = (c: Category) => { setEditingId(c.id); setForm({ name: c.name, slug: c.slug }); setIsFormOpen(true); };
+  const openEdit = (c: Category) => { setEditingId(c.id); setForm({ name: c.name, slug: c.slug, terms_conditions: c.terms_conditions || '' }); setIsFormOpen(true); };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
-    const payload = { name: form.name, slug: form.slug || toSlug(form.name) };
+    const payload = { name: form.name, slug: form.slug || toSlug(form.name), terms_conditions: form.terms_conditions || null };
     const { error } = editingId
       ? await supabase.from('categories').update(payload).eq('id', editingId)
       : await supabase.from('categories').insert([payload]);
@@ -137,11 +137,20 @@ const Categories: React.FC = () => {
         <form id="category-form" onSubmit={handleSave} className="space-y-5">
           <FormField label="Category Name" required>
             <input type="text" required className={inputClass} placeholder="e.g., Umrah Plus" value={form.name}
-              onChange={(e) => setForm({ name: e.target.value, slug: toSlug(e.target.value) })} />
+              onChange={(e) => setForm({ ...form, name: e.target.value, slug: toSlug(e.target.value) })} />
           </FormField>
           <FormField label="Slug" hint="Auto-generated. Edit if needed.">
             <input type="text" className={inputClass} placeholder="e.g., umrah-plus" value={form.slug}
               onChange={(e) => setForm({ ...form, slug: e.target.value })} />
+          </FormField>
+          <FormField label="Syarat & Ketentuan" hint="Akan ditampilkan di halaman akhir itinerary PDF. Kosongkan jika tidak ada.">
+            <textarea
+              rows={8}
+              className={textareaClass}
+              placeholder="Tulis syarat & ketentuan paket tour..."
+              value={form.terms_conditions}
+              onChange={(e) => setForm({ ...form, terms_conditions: e.target.value })}
+            />
           </FormField>
         </form>
       </SlideOver>

@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
-import { Plus, Edit2, Trash2, Building2, Star, X } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Plus, Building2, Star } from 'lucide-react';
 import {
     PageHeader, TableCard, THead, Th, Td, SkeletonRows, EmptyState, SlideOver,
-    ConfirmDialog, FormField, inputClass, selectClass, btnPrimary, btnSecondary, btnGhost,
+    ConfirmDialog, btnPrimary, btnGhost,
     useToast, SearchInput, Pagination, SortState, compareRows,
 } from '../../components/admin/ui';
-import CountrySelect from '../../components/admin/CountrySelect';
+import HotelForm from '../../components/admin/HotelForm';
 
 // Catalogue-level room type (no price — pricing is set per-package in the wizard)
 interface RoomTypeRow { name: string; capacity: number; }
@@ -22,15 +23,6 @@ interface Hotel {
   countries: { name: string } | null;
 }
 
-// New hotels default to the standard room type config (mirrors the DB column default).
-const DEFAULT_ROOM_TYPES: RoomTypeRow[] = [
-    { name: 'Quad', capacity: 4 },
-    { name: 'Triple', capacity: 3 },
-    { name: 'Double', capacity: 2 },
-];
-
-const EMPTY_FORM = { name: '', location: '', stars: 3, room_types: DEFAULT_ROOM_TYPES, maps_url: '', country_id: '' };
-
 const PAGE_SIZE = 10;
 
 const StarRating: React.FC<{ count: number }> = ({ count }) => (
@@ -45,11 +37,9 @@ const Hotels: React.FC = () => {
     const toast = useToast();
     const [hotels, setHotels] = useState<Hotel[]>([]);
     const [loading, setLoading] = useState(true);
-    const [saving, setSaving] = useState(false);
 
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
-    const [form, setForm] = useState(EMPTY_FORM);
 
     const [deleteId, setDeleteId] = useState<string | null>(null);
     const [deleting, setDeleting] = useState(false);
@@ -73,33 +63,12 @@ const Hotels: React.FC = () => {
 
     const openCreate = () => {
         setEditingId(null);
-        setForm(EMPTY_FORM);
         setIsFormOpen(true);
     };
 
     const openEdit = (hotel: Hotel) => {
         setEditingId(hotel.id);
-        setForm({ name: hotel.name, location: hotel.location, stars: hotel.stars, room_types: hotel.room_types ?? [], maps_url: hotel.maps_url || '', country_id: hotel.country_id || '' });
         setIsFormOpen(true);
-    };
-
-    const handleSave = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setSaving(true);
-        const payload = { name: form.name, location: form.location, stars: form.stars, room_types: form.room_types, maps_url: form.maps_url || null, country_id: form.country_id || null };
-        const { error } = editingId
-            ? await supabase.from('hotels').update(payload).eq('id', editingId)
-            : await supabase.from('hotels').insert([payload]);
-
-        setSaving(false);
-        if (error) {
-            toast('error', 'Failed to save hotel.');
-        } else {
-            toast('success', editingId ? 'Hotel updated.' : 'Hotel added.');
-            setIsFormOpen(false);
-            setPage(0);
-            fetchHotels();
-        }
     };
 
     const handleDelete = async () => {
@@ -116,19 +85,6 @@ const Hotels: React.FC = () => {
             fetchHotels();
         }
     };
-
-    const addRoomType = () =>
-        setForm((f) => ({ ...f, room_types: [...f.room_types, { name: '', capacity: 2 }] }));
-
-    const updateRoomType = (i: number, field: keyof RoomTypeRow, value: string | number) =>
-        setForm((f) => {
-            const rt = [...f.room_types];
-            rt[i] = { ...rt[i], [field]: value };
-            return { ...f, room_types: rt };
-        });
-
-    const removeRoomType = (i: number) =>
-        setForm((f) => ({ ...f, room_types: f.room_types.filter((_, idx) => idx !== i) }));
 
     const filtered = hotels.filter((h) =>
         [h.name, h.location, h.countries?.name].some((f) =>
@@ -212,6 +168,12 @@ const Hotels: React.FC = () => {
                                     </Td>
                                     <Td className="text-right">
                                         <div className="flex justify-end gap-2">
+                                            <Link 
+                                                to={`/admin/hotel-bookings?hotel_id=${hotel.id}`}
+                                                className={`${btnGhost} text-blue-600 hover:bg-blue-50 text-xs px-2 py-1`}
+                                            >
+                                                Bookings
+                                            </Link>
                                             <button onClick={() => openEdit(hotel)} className={`${btnGhost} text-xs px-2 py-1`}>
                                                 Edit
                                             </button>
@@ -240,108 +202,16 @@ const Hotels: React.FC = () => {
                 onClose={() => setIsFormOpen(false)}
                 title={editingId ? 'Edit Hotel' : 'Add Hotel'}
                 subtitle={editingId ? 'Update hotel details below.' : 'Fill in the details to add a new hotel.'}
-                footer={
-                    <div className="flex gap-3">
-                        <button type="button" onClick={() => setIsFormOpen(false)} className={btnSecondary}>
-                            Cancel
-                        </button>
-                        <button form="hotel-form" type="submit" disabled={saving} className={btnPrimary}>
-                            {saving ? 'Saving...' : (editingId ? 'Update Hotel' : 'Add Hotel')}
-                        </button>
-                    </div>
-                }
             >
-                <form id="hotel-form" onSubmit={handleSave} className="space-y-5">
-                    <FormField label="Hotel Name" required>
-                        <input
-                            type="text"
-                            required
-                            className={inputClass}
-                            placeholder="e.g., Anjum Hotel Makkah"
-                            value={form.name}
-                            onChange={(e) => setForm({ ...form, name: e.target.value })}
-                        />
-                    </FormField>
-                    <FormField label="Location" required>
-                        <input
-                            type="text"
-                            required
-                            className={inputClass}
-                            placeholder="e.g., Makkah"
-                            value={form.location}
-                            onChange={(e) => setForm({ ...form, location: e.target.value })}
-                        />
-                    </FormField>
-                    <FormField label="Country">
-                        <CountrySelect
-                            value={form.country_id}
-                            onChange={(id) => setForm((f) => ({ ...f, country_id: id }))}
-                        />
-                    </FormField>
-                    <FormField label="Google Maps Link" hint="Paste the share link from Google Maps. Shown as a clickable link on the public page.">
-                        <input
-                            type="url"
-                            className={inputClass}
-                            placeholder="https://maps.app.goo.gl/..."
-                            value={form.maps_url}
-                            onChange={(e) => setForm({ ...form, maps_url: e.target.value })}
-                        />
-                    </FormField>
-                    <FormField label="Star Rating" required>
-                        <select
-                            className={selectClass}
-                            value={form.stars}
-                            onChange={(e) => setForm({ ...form, stars: parseInt(e.target.value) })}
-                        >
-                            {[1, 2, 3, 4, 5].map((n) => (
-                                <option key={n} value={n}>{n} Star{n > 1 ? 's' : ''}</option>
-                            ))}
-                        </select>
-                        <div className="mt-2">
-                            <StarRating count={form.stars} />
-                        </div>
-                    </FormField>
-                    {/* Room Types */}
-                    <div>
-                        <div className="flex items-center justify-between mb-3">
-                            <label className="block text-sm font-medium text-gray-700">Room Types</label>
-                            <button type="button" onClick={addRoomType} className="text-xs text-primary font-medium hover:underline flex items-center gap-1">
-                                <Plus className="w-3 h-3" /> Add room type
-                            </button>
-                        </div>
-                        {form.room_types.length === 0 && (
-                            <p className="text-xs text-gray-400">No room types defined. Click "Add room type" to begin.</p>
-                        )}
-                        <div className="space-y-2">
-                            {form.room_types.map((rt, i) => (
-                                <div key={i} className="flex items-center gap-2">
-                                    <input
-                                        type="text"
-                                        required
-                                        placeholder="e.g., Quad"
-                                        className={inputClass + ' flex-1'}
-                                        value={rt.name}
-                                        onChange={(e) => updateRoomType(i, 'name', e.target.value)}
-                                    />
-                                    <input
-                                        type="number"
-                                        required
-                                        min={1}
-                                        max={10}
-                                        placeholder="Pax"
-                                        className={inputClass + ' w-20'}
-                                        value={rt.capacity}
-                                        onChange={(e) => updateRoomType(i, 'capacity', parseInt(e.target.value) || 1)}
-                                    />
-                                    <button type="button" onClick={() => removeRoomType(i)} className="text-red-400 hover:text-red-600 p-1">
-                                        <X className="w-4 h-4" />
-                                    </button>
-                                </div>
-                            ))}
-                        </div>
-                        <p className="text-xs text-gray-400 mt-2">These room types will be available when creating packages.</p>
-                    </div>
-                </form>
+                <HotelForm
+                    editingId={editingId}
+                    initialData={editingId ? (() => {
+                        const h = hotels.find(x => x.id === editingId);
+                        return h ? { name: h.name, location: h.location, stars: h.stars, room_types: h.room_types ?? [], maps_url: h.maps_url || '', country_id: h.country_id || '' } : undefined;
+                    })() : undefined}
+                    onSaved={() => { fetchHotels(); setIsFormOpen(false); }}
+                    onCancel={() => setIsFormOpen(false)}
+                />
             </SlideOver>
 
             {/* Delete Confirm */}

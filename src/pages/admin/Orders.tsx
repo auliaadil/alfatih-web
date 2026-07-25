@@ -7,6 +7,7 @@ import {
     SearchInput, Pagination, SortState, compareRows,
 } from '../../components/admin/ui';
 import OrderForm from './OrderForm';
+import OrderView from '../../components/admin/OrderView';
 import { useAuth } from '../../contexts/AuthContext';
 
 const BranchBanner: React.FC<{ branchIds: string[] }> = ({ branchIds }) => {
@@ -33,6 +34,7 @@ const Orders: React.FC = () => {
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [editingOrder, setEditingOrder] = useState<any | null>(null);
 
+    const [viewingOrder, setViewingOrder] = useState<any | null>(null);
     const [deleteId, setDeleteId] = useState<string | null>(null);
     const [deleting, setDeleting] = useState(false);
 
@@ -207,6 +209,12 @@ const Orders: React.FC = () => {
                                     <Td className="text-right">
                                         <div className="flex justify-end gap-2">
                                             <button
+                                                onClick={() => setViewingOrder(order)}
+                                                className={`${btnGhost} text-blue-600 hover:bg-blue-50 text-xs px-2 py-1`}
+                                            >
+                                                View
+                                            </button>
+                                            <button
                                                 onClick={() => { setEditingOrder(order); setIsFormOpen(true); }}
                                                 className={`${btnGhost} text-xs px-2 py-1`}
                                             >
@@ -237,6 +245,10 @@ const Orders: React.FC = () => {
                     onClose={() => { setIsFormOpen(false); setEditingOrder(null); }}
                     onSuccess={() => { setIsFormOpen(false); setEditingOrder(null); setPage(0); fetchOrders(); toast('success', editingOrder ? 'Order updated.' : 'Order created.'); }}
                 />
+            )}
+
+            {viewingOrder && (
+                <OrderView order={viewingOrder} onClose={() => setViewingOrder(null)} />
             )}
 
             <ConfirmDialog

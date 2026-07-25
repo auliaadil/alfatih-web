@@ -22,12 +22,6 @@ export interface FooterData {
     izin_ppiu: string;
 }
 
-const DEFAULT_FOOTER: FooterData = {
-    instagram: 'https://instagram.com/alfatihduniawisata',
-    phone: '0811-1234-5678',
-    email: 'info@alfatihduniawisata.com',
-    izin_ppiu: '1234/2024',
-};
 
 const extractInstagramHandle = (url: string): string => {
     if (!url) return '';
@@ -2205,8 +2199,8 @@ const BASE_TEMPLATES: PosterTemplate[] = [
     },
 ];
 
-// Backward-compat export: uses default footer for display/listing in non-component contexts
-export const STARTER_TEMPLATES: PosterTemplate[] = buildStarterTemplates(DEFAULT_FOOTER);
+// Backward-compat export: uses blank footer for display/listing in non-component contexts
+export const STARTER_TEMPLATES: PosterTemplate[] = buildStarterTemplates({ instagram: '', phone: '', email: '', izin_ppiu: '' });
 
 // ── Visual thumbnail ──────────────────────────────────────────────────────────
 export const TemplateThumbnail: React.FC<{ t: PosterTemplate }> = ({ t }) => {
@@ -2250,7 +2244,13 @@ const FILTER_PILLS: Array<TemplateType | 'All'> = ['All', 'Conversion', 'Tour Pr
 
 const TemplatePanel: React.FC<TemplatePanelProps> = ({ onLoadTemplate }) => {
     const siteSettings = useSiteSettings();
-    const liveTemplates = useMemo(() => buildStarterTemplates(siteSettings), [siteSettings]);
+    const footerFromSettings: FooterData = {
+        instagram: siteSettings.instagram || '',
+        phone: siteSettings.phone || '',
+        email: siteSettings.email || '',
+        izin_ppiu: siteSettings.izin_ppiu || '',
+    };
+    const liveTemplates = useMemo(() => buildStarterTemplates(footerFromSettings), [siteSettings]);
     const [typeFilter, setTypeFilter] = useState<TemplateType | 'All'>('All');
 
     const filteredTemplates = typeFilter === 'All'

@@ -13,6 +13,7 @@ export interface WizardDraft {
   // Step 1
   title: string;
   category: string;
+  destination_country: string;
   departure_date: string;
   departure_date_hijri: string;
   arrival_date: string;
@@ -20,6 +21,7 @@ export interface WizardDraft {
   image_credit: string;
   gallery: string[];
   is_popular: boolean;
+  is_published: boolean;
 
   // Step 2
   airline_ids: string[];
@@ -39,8 +41,8 @@ export interface WizardDraft {
 }
 
 const EMPTY_DRAFT: WizardDraft = {
-  title: '', category: '', departure_date: '', departure_date_hijri: '', arrival_date: '',
-  image_url: '', image_credit: '', gallery: [], is_popular: false,
+  title: '', category: '', destination_country: '', departure_date: '', departure_date_hijri: '', arrival_date: '',
+  image_url: '', image_credit: '', gallery: [], is_popular: false, is_published: true,
   airline_ids: [], hotel_ids: [], flight_routes: [],
   description: '', features: [],
   quotas: 0, room_options: [],
@@ -89,6 +91,7 @@ const PackageWizard: React.FC = () => {
         setDraft({
           title: data.title ?? '',
           category: data.category ?? '',
+          destination_country: data.destination_country ?? '',
           departure_date: data.departure_date ?? '',
           departure_date_hijri: data.departure_date_hijri ?? '',
           arrival_date: data.arrival_date ?? '',
@@ -96,6 +99,7 @@ const PackageWizard: React.FC = () => {
           image_credit: data.image_credit ?? '',
           gallery: data.gallery ?? [],
           is_popular: data.is_popular ?? false,
+          is_published: data.is_published ?? true,
           airline_ids: data.airline_ids ?? [],
           hotel_ids: data.hotel_ids ?? [],
           flight_routes: data.flight_routes ?? [],
@@ -127,6 +131,7 @@ const PackageWizard: React.FC = () => {
     const payload = {
       title: draft.title,
       category: draft.category,
+      destination_country: draft.destination_country || null,
       departure_date: draft.departure_date,
       departure_date_hijri: draft.departure_date_hijri || null,
       arrival_date: draft.arrival_date,
@@ -135,6 +140,7 @@ const PackageWizard: React.FC = () => {
       image_credit: draft.image_credit || null,
       gallery: draft.gallery,
       is_popular: draft.is_popular,
+      is_published: draft.is_published,
       airline_ids: draft.airline_ids,
       hotel_ids: draft.hotel_ids,
       flight_routes: draft.flight_routes,

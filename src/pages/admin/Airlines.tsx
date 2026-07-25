@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
-import { Plus, Edit2, Trash2, Plane, Upload, Link } from 'lucide-react';
+import { Link as RouterLink } from 'react-router-dom';
+import { Plus, Plane } from 'lucide-react';
 import {
     PageHeader, TableCard, THead, Th, Td, SkeletonRows, EmptyState, SlideOver,
-    ConfirmDialog, FormField, inputClass, btnPrimary, btnSecondary, btnGhost,
+    ConfirmDialog, btnPrimary, btnGhost,
     useToast, SearchInput, Pagination, SortState, compareRows,
 } from '../../components/admin/ui';
-import CountrySelect from '../../components/admin/CountrySelect';
+import AirlineForm from '../../components/admin/AirlineForm';
 
 interface Airline {
   id: string;
@@ -16,27 +17,21 @@ interface Airline {
   countries: { name: string } | null;
 }
 
-const EMPTY_FORM = { name: '', logo_url: '', country_id: '' };
-
 const PAGE_SIZE = 10;
 
 const Airlines: React.FC = () => {
     const toast = useToast();
     const [airlines, setAirlines] = useState<Airline[]>([]);
     const [loading, setLoading] = useState(true);
-    const [saving, setSaving] = useState(false);
 
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
-    const [form, setForm] = useState(EMPTY_FORM);
 
     const [deleteId, setDeleteId] = useState<string | null>(null);
     const [deleting, setDeleting] = useState(false);
 
     const [searchQuery, setSearchQuery] = useState('');
     const [page, setPage] = useState(0);
-    const [logoTab, setLogoTab] = useState<'upload' | 'url'>('upload');
-    const [uploading, setUploading] = useState(false);
     const [sort, setSort] = useState<SortState>({ key: 'name', dir: 'asc' });
     const handleSort = (key: string) =>
         setSort(prev => ({ key, dir: prev.key === key && prev.dir === 'asc' ? 'desc' : 'asc' }));
@@ -44,34 +39,6 @@ const Airlines: React.FC = () => {
     useEffect(() => { fetchAirlines(); }, []);
     useEffect(() => { setPage(0); }, [searchQuery]);
     useEffect(() => { setPage(0); }, [sort]);
-
-    const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-        const MAX_MB = 2;
-        if (file.size > MAX_MB * 1024 * 1024) {
-            toast('error', `File terlalu besar. Maksimum ${MAX_MB} MB.`);
-            e.target.value = '';
-            return;
-        }
-        setUploading(true);
-        const raw = file.name.split('.').pop() ?? 'png';
-        const ext = raw.toLowerCase().slice(0, 5);
-        const path = `${crypto.randomUUID()}.${ext}`;
-        const { data, error } = await supabase.storage
-            .from('airline-logos')
-            .upload(path, file, { upsert: true, contentType: file.type || 'image/png' });
-        if (error) {
-            toast('error', 'Logo upload failed.');
-            setUploading(false);
-            return;
-        }
-        const { data: urlData } = supabase.storage.from('airline-logos').getPublicUrl(data.path);
-        setForm((f) => ({ ...f, logo_url: urlData.publicUrl }));
-        setUploading(false);
-        toast('success', 'Logo uploaded.');
-        e.target.value = '';
-    };
 
     const fetchAirlines = async () => {
         setLoading(true);
@@ -82,35 +49,12 @@ const Airlines: React.FC = () => {
 
     const openCreate = () => {
         setEditingId(null);
-        setForm(EMPTY_FORM);
-        setLogoTab('upload');
         setIsFormOpen(true);
     };
 
     const openEdit = (airline: Airline) => {
         setEditingId(airline.id);
-        setForm({ name: airline.name, logo_url: airline.logo_url || '', country_id: airline.country_id || '' });
-        setLogoTab(airline.logo_url ? 'url' : 'upload');
         setIsFormOpen(true);
-    };
-
-    const handleSave = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setSaving(true);
-        const payload = { name: form.name, logo_url: form.logo_url || null, country_id: form.country_id || null };
-        const { error } = editingId
-            ? await supabase.from('airlines').update(payload).eq('id', editingId)
-            : await supabase.from('airlines').insert([payload]);
-
-        setSaving(false);
-        if (error) {
-            toast('error', 'Failed to save airline.');
-        } else {
-            toast('success', editingId ? 'Airline updated.' : 'Airline added.');
-            setIsFormOpen(false);
-            setPage(0);
-            fetchAirlines();
-        }
     };
 
     const handleDelete = async () => {
@@ -215,6 +159,12 @@ const Airlines: React.FC = () => {
                                     </Td>
                                     <Td className="text-right">
                                         <div className="flex justify-end gap-2">
+                                            <RouterLink 
+                                                to={`/admin/flight-bookings?airline_id=${airline.id}`}
+                                                className={`${btnGhost} text-blue-600 hover:bg-blue-50 text-xs px-2 py-1`}
+                                            >
+                                                Bookings
+                                            </RouterLink>
                                             <button onClick={() => openEdit(airline)} className={`${btnGhost} text-xs px-2 py-1`}>
                                                 Edit
                                             </button>
@@ -243,92 +193,16 @@ const Airlines: React.FC = () => {
                 onClose={() => setIsFormOpen(false)}
                 title={editingId ? 'Edit Airline' : 'Add Airline'}
                 subtitle={editingId ? 'Update the airline details below.' : 'Fill in the details to add a new airline.'}
-                footer={
-                    <div className="flex gap-3">
-                        <button type="button" onClick={() => setIsFormOpen(false)} className={btnSecondary}>
-                            Cancel
-                        </button>
-                        <button
-                            form="airline-form"
-                            type="submit"
-                            disabled={saving || uploading}
-                            className={btnPrimary}
-                        >
-                            {saving ? 'Saving...' : (editingId ? 'Update Airline' : 'Add Airline')}
-                        </button>
-                    </div>
-                }
             >
-                <form id="airline-form" onSubmit={handleSave} className="space-y-5">
-                    <FormField label="Airline Name" required>
-                        <input
-                            type="text"
-                            required
-                            className={inputClass}
-                            placeholder="e.g., Garuda Indonesia"
-                            value={form.name}
-                            onChange={(e) => setForm({ ...form, name: e.target.value })}
-                        />
-                    </FormField>
-                    <FormField label="Country">
-                        <CountrySelect
-                            value={form.country_id}
-                            onChange={(id) => setForm((f) => ({ ...f, country_id: id }))}
-                        />
-                    </FormField>
-                    <FormField label="Logo">
-                        {/* Tab switcher */}
-                        <div className="flex rounded-lg border border-gray-200 overflow-hidden mb-3 w-fit">
-                            {(['upload', 'url'] as const).map((tab) => (
-                                <button
-                                    key={tab}
-                                    type="button"
-                                    onClick={() => setLogoTab(tab)}
-                                    className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-colors ${
-                                        logoTab === tab
-                                            ? 'bg-primary text-white'
-                                            : 'bg-white text-gray-500 hover:bg-gray-50'
-                                    }`}
-                                >
-                                    {tab === 'upload' ? <Upload className="w-3 h-3" /> : <Link className="w-3 h-3" />}
-                                    {tab === 'upload' ? 'Upload' : 'URL'}
-                                </button>
-                            ))}
-                        </div>
-
-                        {logoTab === 'upload' ? (
-                            <label className={`flex items-center justify-center gap-2 cursor-pointer rounded-lg border-2 border-dashed border-gray-200 p-4 hover:border-primary/40 transition-colors ${uploading ? 'opacity-50 pointer-events-none' : ''}`}>
-                                <Upload className="w-4 h-4 text-gray-400" />
-                                <span className="text-sm text-gray-500">
-                                    {uploading ? 'Uploading...' : 'Click to upload JPG / PNG / WebP / SVG'}
-                                </span>
-                                <input
-                                    type="file"
-                                    accept="image/jpeg,image/png,image/webp,image/svg+xml"
-                                    className="sr-only"
-                                    onChange={handleLogoUpload}
-                                    disabled={uploading}
-                                />
-                            </label>
-                        ) : (
-                            <input
-                                type="url"
-                                className={inputClass}
-                                placeholder="https://..."
-                                value={form.logo_url}
-                                onChange={(e) => setForm({ ...form, logo_url: e.target.value })}
-                            />
-                        )}
-
-                        {/* Shared preview */}
-                        {form.logo_url && (
-                            <div className="rounded-xl border border-gray-200 p-4 bg-gray-50 mt-3">
-                                <p className="text-xs text-gray-500 mb-2">Preview</p>
-                                <img src={form.logo_url} alt="Logo preview" className="h-10 max-w-[180px] object-contain" />
-                            </div>
-                        )}
-                    </FormField>
-                </form>
+                <AirlineForm
+                    editingId={editingId}
+                    initialData={editingId ? (() => {
+                        const a = airlines.find(x => x.id === editingId);
+                        return a ? { name: a.name, logo_url: a.logo_url || '', country_id: a.country_id || '' } : undefined;
+                    })() : undefined}
+                    onSaved={() => { fetchAirlines(); setIsFormOpen(false); }}
+                    onCancel={() => setIsFormOpen(false)}
+                />
             </SlideOver>
 
             {/* Delete Confirm */}

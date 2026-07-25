@@ -5,12 +5,13 @@ import { TourPackage } from '../types';
 import { useLanguage } from '../src/contexts/LanguageContext';
 import { formatDate } from '../src/lib/formatDate';
 
+
 interface TourCardProps {
   tour: TourPackage;
 }
 
 const TourCard: React.FC<TourCardProps> = ({ tour }) => {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const cheapestRoom = tour.room_options?.length > 0
     ? tour.room_options.reduce((min, curr) => curr.price < min.price ? curr : min)
     : null;
@@ -36,7 +37,7 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
         {tour.is_popular && (
           <div className="absolute top-4 left-4 bg-secondary text-white px-3 py-1 rounded-full text-xs font-bold shadow-sm flex items-center gap-1">
             <Star className="w-3 h-3 fill-white" />
-            Popular
+            {t('card_popular')}
           </div>
         )}
       </div>
@@ -75,7 +76,7 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
 
         <div className="mt-auto pt-4 border-t border-gray-100">
           <div>
-            <span className="text-xs text-gray-500 uppercase font-semibold">Start from {cheapestRoom ? `(${cheapestRoom.name})` : ''}</span>
+            <span className="text-xs text-gray-500 uppercase font-semibold">{t('card_start_from')} {cheapestRoom ? `(${cheapestRoom.name})` : ''}</span>
             <div className="flex items-end gap-2">
               <div className="text-xl font-bold text-primary">
                 {cheapestRoom ? `Rp ${(cheapestRoom.price / 1000000).toLocaleString('id-ID', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} JT` : 'TBA'}

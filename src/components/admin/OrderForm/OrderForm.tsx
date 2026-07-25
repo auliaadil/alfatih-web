@@ -8,6 +8,7 @@ import type { ParticipantDraft } from './types';
 import { useOrderForm } from './useOrderForm';
 import ParticipantList from './ParticipantList';
 import OrderSummaryFooter from './OrderSummaryFooter';
+import OrderAttachmentUploader from '../OrderAttachmentUploader';
 
 interface PackageRow {
   id: string;
@@ -44,8 +45,6 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialData, onClose, onSuccess }
   const [amountPaidDisplay, setAmountPaidDisplay] = useState<string>(
     initialData?.amount_paid ? (initialData.amount_paid as number).toLocaleString('id-ID') : ''
   );
-  const [paymentProofUrl, setPaymentProofUrl] = useState<string>(initialData?.payment_proof_url ?? '');
-  const [uploadingProof, setUploadingProof] = useState(false);
 
   const selectedPackage = useMemo(
     () => packages.find((p) => p.id === selectedPackageId) ?? null,
@@ -74,22 +73,6 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialData, onClose, onSuccess }
     const num = parseInt(raw, 10) || 0;
     setAmountPaid(num);
     setAmountPaidDisplay(num > 0 ? num.toLocaleString('id-ID') : '');
-  };
-
-  const handleProofUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setUploadingProof(true);
-    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-    const path = `orders/${Date.now()}-${safeName}`;
-    const { data, error } = await supabase.storage.from('payment-proofs').upload(path, file, { upsert: true });
-    if (!error && data) {
-      const { data: urlData } = supabase.storage.from('payment-proofs').getPublicUrl(data.path);
-      setPaymentProofUrl(urlData.publicUrl);
-    } else if (error) {
-      setErrorMsg('Upload bukti gagal: ' + error.message);
-    }
-    setUploadingProof(false);
   };
 
   useEffect(() => {
@@ -150,7 +133,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialData, onClose, onSuccess }
       total_price: form.totalPrice,
       payment_status: paymentStatus,
       amount_paid: amountPaid > 0 ? amountPaid : null,
-      payment_proof_url: paymentProofUrl || null,
+      payment_proof_url: null,
       notes,
       branch_id: selectedBranchId || null,
     };
@@ -273,24 +256,9 @@ const OrderForm: React.FC<OrderFormProps> = ({ initialData, onClose, onSuccess }
                   onChange={handleAmountPaidChange}
                 />
               </FormField>
-              <FormField label="Bukti transaksi">
-                <div className="space-y-1.5">
-                  <input
-                    type="file"
-                    accept="image/*,.pdf"
-                    disabled={uploadingProof}
-                    onChange={handleProofUpload}
-                    className="block w-full text-sm text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 disabled:opacity-50"
-                  />
-                  {uploadingProof && <p className="text-xs text-gray-400">Mengunggah…</p>}
-                  {paymentProofUrl && !uploadingProof && (
-                    <a href={paymentProofUrl} target="_blank" rel="noreferrer"
-                      className="text-xs text-blue-600 hover:underline">
-                      Lihat bukti →
-                    </a>
-                  )}
-                </div>
-              </FormField>
+            </div>
+            <div className="pt-1">
+              <OrderAttachmentUploader orderId={initialData?.id ?? null} />
             </div>
           </div>
 

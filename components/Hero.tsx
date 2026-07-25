@@ -22,7 +22,7 @@ const Hero: React.FC = () => {
           <div>
             <div className="inline-flex items-center px-3 py-1.5 rounded-full bg-secondary/10 border border-secondary/30 backdrop-blur-md mb-5">
               <Star className="w-3.5 h-3.5 text-secondary mr-2 fill-secondary" />
-              <span className="text-secondary font-black text-xs uppercase tracking-widest">Amanah & Profesional Sejak 2012</span>
+              <span className="text-secondary font-black text-xs uppercase tracking-widest">{t('hero_badge')}</span>
             </div>
 
             <p className="font-sans font-semibold text-[0.65rem] text-primary tracking-[0.25em] uppercase mb-3">
@@ -64,9 +64,9 @@ const Hero: React.FC = () => {
               <div className="absolute inset-0 bg-gradient-to-t from-dark/80 via-dark/20 to-transparent"></div>
               <div className="absolute bottom-4 left-4 right-4 grid grid-cols-3 gap-2">
                 {[
-                  { value: '10K+', label: 'Jamaah' },
-                  { value: '12+', label: 'Tahun' },
-                  { value: '99%', label: 'Kepuasan' },
+                  { value: '10K+', label: t('hero_stat_pilgrims') },
+                  { value: '12+', label: t('hero_stat_years') },
+                  { value: '99%', label: t('hero_stat_satisfaction') },
                 ].map((stat) => (
                   <div key={stat.label} className="bg-white/10 backdrop-blur-md rounded-xl px-3 py-2.5 border border-white/10 text-center">
                     <div className="text-xl font-black text-white">{stat.value}</div>

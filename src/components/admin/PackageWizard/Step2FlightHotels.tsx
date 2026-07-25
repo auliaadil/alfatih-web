@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Plus, X, Loader2 } from 'lucide-react';
-import { FormField, SectionCard, inputClass, selectClass, textareaClass, btnPrimary, btnSecondary, SlideOver, useToast } from '../ui';
+import { FormField, SectionCard, inputClass, textareaClass, btnPrimary, btnSecondary, SlideOver, useToast } from '../ui';
 import { supabase } from '../../../lib/supabase';
 import { Airport } from '../../../../types';
 import { WizardDraft } from '../../../pages/admin/PackageWizard';
 import AirportSelect, { AirportRow } from '../AirportSelect';
 import CountrySelect from '../CountrySelect';
+import AirlineForm from '../AirlineForm';
+import HotelForm from '../HotelForm';
 import {
   generateDescription,
   generateFeatures,
@@ -33,54 +35,7 @@ const Step2FlightHotels: React.FC<Props> = ({ draft, updateDraft, onNext, onBack
 
   const toast = useToast();
   const [airlineSlideOpen, setAirlineSlideOpen] = useState(false);
-  const [newAirlineForm, setNewAirlineForm] = useState({ name: '', iata_code: '', logo_url: '' });
-  const [savingAirline, setSavingAirline] = useState(false);
-
-  const handleCreateAirline = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSavingAirline(true);
-    const { data, error } = await supabase
-      .from('airlines')
-      .insert([{
-        name: newAirlineForm.name.trim(),
-        iata_code: newAirlineForm.iata_code.trim().toUpperCase() || null,
-        logo_url: newAirlineForm.logo_url || null,
-      }])
-      .select()
-      .single();
-    setSavingAirline(false);
-    if (error) { toast('error', 'Failed to create airline.'); return; }
-    const { data: fresh, error: refreshError } = await supabase.from('airlines').select('*').order('name');
-    if (refreshError) { toast('error', 'Airline created but failed to refresh list. Please reload.'); return; }
-    if (fresh) setAirlines(fresh);
-    toast('success', 'Airline created.');
-    setAirlineSlideOpen(false);
-    setNewAirlineForm({ name: '', iata_code: '', logo_url: '' });
-    if (data) toggleAirline(data.id);
-  };
-
   const [hotelSlideOpen, setHotelSlideOpen] = useState(false);
-  const [newHotelForm, setNewHotelForm] = useState({ name: '', location: '', stars: 4 });
-  const [savingHotel, setSavingHotel] = useState(false);
-
-  const handleCreateHotel = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSavingHotel(true);
-    const { data, error } = await supabase
-      .from('hotels')
-      .insert([{ name: newHotelForm.name.trim(), location: newHotelForm.location.trim(), stars: newHotelForm.stars }])
-      .select()
-      .single();
-    setSavingHotel(false);
-    if (error) { toast('error', 'Failed to create hotel.'); return; }
-    const { data: fresh, error: refreshError } = await supabase.from('hotels').select('*').order('name');
-    if (refreshError) { toast('error', 'Hotel created but failed to refresh list. Please reload.'); return; }
-    if (fresh) setHotels(fresh);
-    toast('success', 'Hotel created.');
-    setHotelSlideOpen(false);
-    setNewHotelForm({ name: '', location: '', stars: 4 });
-    if (data) toggleHotel(data.id);
-  };
 
   const [airportSlideOpen, setAirportSlideOpen] = useState(false);
   const [newAirportForm, setNewAirportForm] = useState({ iata_code: '', name: '', city: '', country_id: '' });
@@ -434,48 +389,15 @@ const Step2FlightHotels: React.FC<Props> = ({ draft, updateDraft, onNext, onBack
         onClose={() => setAirlineSlideOpen(false)}
         title="New Airline"
         width="sm"
-        footer={
-          <div className="flex gap-3">
-            <button type="button" onClick={() => setAirlineSlideOpen(false)} className={btnSecondary}>
-              Cancel
-            </button>
-            <button form="airline-create-form" type="submit" disabled={savingAirline} className={btnPrimary}>
-              {savingAirline ? 'Saving...' : 'Add Airline'}
-            </button>
-          </div>
-        }
       >
-        <form id="airline-create-form" onSubmit={handleCreateAirline} className="space-y-5">
-          <FormField label="Airline Name" required>
-            <input
-              type="text"
-              required
-              className={inputClass}
-              placeholder="e.g., Garuda Indonesia"
-              value={newAirlineForm.name}
-              onChange={(e) => setNewAirlineForm({ ...newAirlineForm, name: e.target.value })}
-            />
-          </FormField>
-          <FormField label="IATA Code" hint="2–3 letter code, e.g. GA">
-            <input
-              type="text"
-              maxLength={3}
-              className={inputClass}
-              placeholder="e.g., GA"
-              value={newAirlineForm.iata_code}
-              onChange={(e) => setNewAirlineForm({ ...newAirlineForm, iata_code: e.target.value })}
-            />
-          </FormField>
-          <FormField label="Logo URL" hint="Optional. Paste a direct image URL.">
-            <input
-              type="url"
-              className={inputClass}
-              placeholder="https://..."
-              value={newAirlineForm.logo_url}
-              onChange={(e) => setNewAirlineForm({ ...newAirlineForm, logo_url: e.target.value })}
-            />
-          </FormField>
-        </form>
+        <AirlineForm
+          onSaved={(airline) => {
+            setAirlines(prev => [...prev, { id: airline.id, name: airline.name, logo_url: airline.logo_url ?? undefined, iata_code: undefined }]);
+            toggleAirline(airline.id);
+            setAirlineSlideOpen(false);
+          }}
+          onCancel={() => setAirlineSlideOpen(false)}
+        />
       </SlideOver>
 
       <SlideOver
@@ -483,50 +405,15 @@ const Step2FlightHotels: React.FC<Props> = ({ draft, updateDraft, onNext, onBack
         onClose={() => setHotelSlideOpen(false)}
         title="New Hotel"
         width="sm"
-        footer={
-          <div className="flex gap-3">
-            <button type="button" onClick={() => setHotelSlideOpen(false)} className={btnSecondary}>
-              Cancel
-            </button>
-            <button form="hotel-create-form" type="submit" disabled={savingHotel} className={btnPrimary}>
-              {savingHotel ? 'Saving...' : 'Add Hotel'}
-            </button>
-          </div>
-        }
       >
-        <form id="hotel-create-form" onSubmit={handleCreateHotel} className="space-y-5">
-          <FormField label="Hotel Name" required>
-            <input
-              type="text"
-              required
-              className={inputClass}
-              placeholder="e.g., Hilton Makkah Convention"
-              value={newHotelForm.name}
-              onChange={(e) => setNewHotelForm({ ...newHotelForm, name: e.target.value })}
-            />
-          </FormField>
-          <FormField label="Location" required>
-            <input
-              type="text"
-              required
-              className={inputClass}
-              placeholder="e.g., Makkah"
-              value={newHotelForm.location}
-              onChange={(e) => setNewHotelForm({ ...newHotelForm, location: e.target.value })}
-            />
-          </FormField>
-          <FormField label="Stars">
-            <select
-              className={selectClass}
-              value={newHotelForm.stars}
-              onChange={(e) => setNewHotelForm({ ...newHotelForm, stars: Number(e.target.value) })}
-            >
-              {[1, 2, 3, 4, 5].map((n) => (
-                <option key={n} value={n}>{n} Star{n > 1 ? 's' : ''}</option>
-              ))}
-            </select>
-          </FormField>
-        </form>
+        <HotelForm
+          onSaved={(hotel) => {
+            setHotels(prev => [...prev, { id: hotel.id, name: hotel.name, location: hotel.location, stars: hotel.stars }]);
+            toggleHotel(hotel.id);
+            setHotelSlideOpen(false);
+          }}
+          onCancel={() => setHotelSlideOpen(false)}
+        />
       </SlideOver>
 
       <SlideOver

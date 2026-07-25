@@ -104,13 +104,11 @@ Deno.serve(async (req) => {
 - Nada: hangat, profesional, Islami`
       } else {
         instructionBlock = `Tulis caption Instagram promosi paket wisata dengan ketentuan:
-- Baris pertama: hook yang menarik perhatian (bisa pertanyaan atau pernyataan impactful) + emoji
-- Paragraf utama: deskripsi paket yang menginspirasi, 3-4 keunggulan key
-- Call-to-action: arahkan ke link di bio atau link paket
-- Tutup dengan 8-12 hashtag relevan (#WisataHalal #UmrohMurah #AlfatihDuniaWisata dll)
-- Sertakan link publik paket sebelum hashtag
-- Panjang: 100-180 kata (belum termasuk hashtag)
-- Nada: inspiratif, aspirasional, Islami`
+- Maksimal 2 paragraf, tidak lebih.
+- Baris pertama: hook yang menarik perhatian (bisa pertanyaan atau pernyataan impactful) + emoji relevan.
+- Wajib gunakan emoji yang menarik di setiap baris penting (harga, fitur utama, CTA).
+- Tulis singkat, padat, dan penuh semangat — hindari kalimat panjang formal.
+- Akhiri dengan 1 baris hashtag populer (maks 5 hashtag).`
       }
     } else if (type === 'konten-edukasi') {
       if (!topic) {
@@ -150,14 +148,12 @@ Teks: ...
 - Nada: santai, personal, inspiratif`
       } else {
         instructionBlock = `Tulis caption Instagram untuk paket wisata ini dengan ketentuan:
-- Hook kuat di baris pertama (pertanyaan retoris, pernyataan bold, atau kutipan pendek)
-${theme ? `- Fokus angle: ${theme}` : ''}
-- Ceritakan pengalaman/nilai paket, bukan hanya spesifikasi teknis
-- Call-to-action yang soft: "link di bio", "DM kami", atau link langsung
-- Sertakan link publik paket
-- Tutup dengan 10-15 hashtag relevan (campur antara niche dan populer)
-- Panjang: 120-200 kata (belum termasuk hashtag)
-- Nada: autentik, inspiratif, aspirasional`
+- Maksimal 2 paragraf, tidak lebih.
+- Paragraf pertama: hook emosional yang kuat + destinasi utama + emoji.
+- Paragraf kedua: 2-3 keunggulan paket + harga terbaik + CTA singkat + emoji.
+- Wajib gunakan emoji yang relevan dan menarik di setiap baris penting.
+- Hindari kalimat panjang dan formal — gaya kasual, energik, inspiratif.
+- Akhiri dengan 1 baris hashtag populer (maks 5 hashtag).`
       }
     }
 

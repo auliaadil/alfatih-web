@@ -3,7 +3,7 @@ import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Package, Map, Plane, Building2, ShoppingCart,
   Settings, LogOut, Menu, X, Image as ImageIcon, Layers, ChevronRight,
-  Megaphone, Users, PlaneTakeoff, Tag, Target, BookImage,
+  Megaphone, Users, PlaneTakeoff, Tag, Target, BookImage, MessageSquare,
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { ToastProvider } from '../../components/admin/ui';
@@ -31,6 +31,8 @@ const NAV_GROUPS: NavGroup[] = [
       { path: '/admin/orders', icon: ShoppingCart, label: 'Orders' },
       { path: '/admin/packages', icon: Package, label: 'Packages' },
       { path: '/admin/documentations', icon: BookImage, label: 'Documentations' },
+      { path: '/admin/hotel-bookings', icon: Building2, label: 'Hotel Bookings' },
+      { path: '/admin/flight-bookings', icon: PlaneTakeoff, label: 'Flight Bookings' },
       { path: '/admin/private-trips', icon: Map, label: 'Private Trips', allowedRoles: ['admin', 'superadmin'] },
     ],
   },
@@ -42,12 +44,14 @@ const NAV_GROUPS: NavGroup[] = [
       { path: '/admin/hotels', icon: Building2, label: 'Hotels' },
       { path: '/admin/airports', icon: PlaneTakeoff, label: 'Airports' },
       { path: '/admin/categories', icon: Tag, label: 'Categories' },
+      { path: '/admin/agents', icon: Users, label: 'Agents & Vendors' },
     ],
   },
   {
     label: 'Marketing',
     allowedRoles: ['admin', 'superadmin'],
     items: [
+      { path: '/admin/testimonials', icon: MessageSquare, label: 'Testimonials' },
       { path: '/admin/poster-maker', icon: ImageIcon, label: 'Poster Maker' },
       { path: '/admin/poster-templates', icon: Layers, label: 'Templates' },
       { path: '/admin/text-campaign', icon: Megaphone, label: 'Text Campaign' },
