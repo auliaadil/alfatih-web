@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
-import { Save, X, Plus, Phone, Globe, MessageSquare, FileText } from 'lucide-react';
+import { Save, X, Plus, Phone, Globe, MessageSquare, FileText, Upload, Loader2 } from 'lucide-react';
 import {
     PageHeader, SectionCard, FormField, inputClass, textareaClass, btnPrimary, useToast,
 } from '../../components/admin/ui';
@@ -61,6 +61,9 @@ const SiteSettings: React.FC = () => {
     const [settings, setSettings] = useState<SiteSettingsData | null>(null);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [siskoTab, setSiskoTab] = useState<'upload' | 'url'>('url');
+    const [pastiTab, setPastiTab] = useState<'upload' | 'url'>('url');
+    const [uploadingLogo, setUploadingLogo] = useState<'sisko' | 'pasti' | null>(null);
 
     useEffect(() => { fetchSettings(); }, []);
 
@@ -106,6 +109,22 @@ const SiteSettings: React.FC = () => {
 
     const set = (field: keyof SiteSettingsData, value: any) =>
         setSettings(s => s ? { ...s, [field]: value } : null);
+
+    const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: 'siskopatuh_logo_url' | 'pasti_umrah_logo_url') => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        if (file.size > 2 * 1024 * 1024) { toast('error', 'File terlalu besar. Maksimum 2 MB.'); e.target.value = ''; return; }
+        setUploadingLogo(field === 'siskopatuh_logo_url' ? 'sisko' : 'pasti');
+        const ext = (file.name.split('.').pop() ?? 'png').toLowerCase().slice(0, 5);
+        const name = `${field === 'siskopatuh_logo_url' ? 'siskopatuh' : 'pasti-umrah'}-${Date.now()}.${ext}`;
+        const { data, error } = await supabase.storage.from('site-assets').upload(`logos/${name}`, file, { upsert: true, contentType: file.type || 'image/png' });
+        setUploadingLogo(null);
+        if (error) { toast('error', 'Upload logo gagal.'); e.target.value = ''; return; }
+        const { data: urlData } = supabase.storage.from('site-assets').getPublicUrl(data.path);
+        set(field, urlData.publicUrl);
+        toast('success', 'Logo berhasil diunggah.');
+        e.target.value = '';
+    };
 
     const updateTravelerType = (i: number, field: keyof TravelerType, value: string) => {
         if (!settings) return;
@@ -194,17 +213,49 @@ const SiteSettings: React.FC = () => {
                             </FormField>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                            <FormField label="URL Logo Siskopatuh" hint="URL gambar logo Siskopatuh">
-                                <div className="space-y-2">
-                                    <input type="url" className={inputClass} value={settings?.siskopatuh_logo_url || ''} onChange={e => set('siskopatuh_logo_url', e.target.value)} placeholder="https://..." />
+                            <FormField label="Logo Siskopatuh">
+                                <div className="space-y-3">
+                                    <div className="flex gap-2">
+                                        {(['upload', 'url'] as const).map(tab => (
+                                            <button key={tab} type="button" onClick={() => setSiskoTab(tab)}
+                                                className={`px-3 py-1.5 text-sm rounded-lg font-medium transition-colors ${siskoTab === tab ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
+                                                {tab === 'upload' ? 'Upload' : 'URL'}
+                                            </button>
+                                        ))}
+                                    </div>
+                                    {siskoTab === 'upload' ? (
+                                        <label className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-dashed border-gray-300 cursor-pointer hover:border-primary hover:bg-blue-50/30 transition-colors">
+                                            {uploadingLogo === 'sisko' ? <Loader2 className="w-4 h-4 animate-spin text-primary" /> : <Upload className="w-4 h-4 text-gray-400" />}
+                                            <span className="text-sm text-gray-500">{uploadingLogo === 'sisko' ? 'Uploading...' : 'Klik untuk upload logo'}</span>
+                                            <input type="file" className="hidden" accept="image/*" onChange={e => handleLogoUpload(e, 'siskopatuh_logo_url')} disabled={uploadingLogo !== null} />
+                                        </label>
+                                    ) : (
+                                        <input type="url" className={inputClass} placeholder="https://..." value={settings?.siskopatuh_logo_url || ''} onChange={e => set('siskopatuh_logo_url', e.target.value)} />
+                                    )}
                                     {settings?.siskopatuh_logo_url && (
                                         <img src={settings.siskopatuh_logo_url} alt="Siskopatuh" className="h-10 object-contain rounded border border-gray-100 bg-gray-50 p-1" />
                                     )}
                                 </div>
                             </FormField>
-                            <FormField label="URL Logo 5 Pasti Umrah" hint="URL gambar logo 5 Pasti Umrah">
-                                <div className="space-y-2">
-                                    <input type="url" className={inputClass} value={settings?.pasti_umrah_logo_url || ''} onChange={e => set('pasti_umrah_logo_url', e.target.value)} placeholder="https://..." />
+                            <FormField label="Logo 5 Pasti Umrah">
+                                <div className="space-y-3">
+                                    <div className="flex gap-2">
+                                        {(['upload', 'url'] as const).map(tab => (
+                                            <button key={tab} type="button" onClick={() => setPastiTab(tab)}
+                                                className={`px-3 py-1.5 text-sm rounded-lg font-medium transition-colors ${pastiTab === tab ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
+                                                {tab === 'upload' ? 'Upload' : 'URL'}
+                                            </button>
+                                        ))}
+                                    </div>
+                                    {pastiTab === 'upload' ? (
+                                        <label className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-dashed border-gray-300 cursor-pointer hover:border-primary hover:bg-blue-50/30 transition-colors">
+                                            {uploadingLogo === 'pasti' ? <Loader2 className="w-4 h-4 animate-spin text-primary" /> : <Upload className="w-4 h-4 text-gray-400" />}
+                                            <span className="text-sm text-gray-500">{uploadingLogo === 'pasti' ? 'Uploading...' : 'Klik untuk upload logo'}</span>
+                                            <input type="file" className="hidden" accept="image/*" onChange={e => handleLogoUpload(e, 'pasti_umrah_logo_url')} disabled={uploadingLogo !== null} />
+                                        </label>
+                                    ) : (
+                                        <input type="url" className={inputClass} placeholder="https://..." value={settings?.pasti_umrah_logo_url || ''} onChange={e => set('pasti_umrah_logo_url', e.target.value)} />
+                                    )}
                                     {settings?.pasti_umrah_logo_url && (
                                         <img src={settings.pasti_umrah_logo_url} alt="5 Pasti Umrah" className="h-10 object-contain rounded border border-gray-100 bg-gray-50 p-1" />
                                     )}
