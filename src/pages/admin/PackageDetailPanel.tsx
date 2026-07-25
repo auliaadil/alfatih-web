@@ -71,11 +71,21 @@ const PackageDetailPanel: React.FC<PackageDetailPanelProps> = ({ pkg, onClose })
         setPickerOpen(false);
         setIsPdfLoading(true);
         try {
+            let termsConditions = '';
+            if (pkg.category) {
+                const { data: catData } = await supabase
+                    .from('categories')
+                    .select('terms_conditions')
+                    .eq('name', pkg.category)
+                    .maybeSingle();
+                termsConditions = catData?.terms_conditions || '';
+            }
             const fullPkg = { ...pkg, airlines, hotels };
             await downloadItineraryPdf(
                 fullPkg,
                 { whatsapp: settings.whatsapp, phone: settings.phone },
                 dayPhotos,
+                termsConditions,
             );
         } catch (err) {
             console.error('PDF generation failed:', err);

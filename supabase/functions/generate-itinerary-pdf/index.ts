@@ -142,6 +142,7 @@ async function buildItineraryPdf(
     siteSettings: { whatsapp?: string; phone?: string },
     logoBase64: string | null,
     dayPhotos: { day: number; photoUrls: string[] }[] = [],
+    termsConditions = '',
 ): Promise<Uint8Array> {
     const doc = await PDFDocument.create();
     doc.registerFontkit(fontkit); // required before embedding custom (non-standard) fonts
@@ -351,6 +352,17 @@ async function buildItineraryPdf(
         ctx.y -= 8;
     }
 
+    // ── Syarat & Ketentuan ────────────────────────────────────────────────────
+    if (termsConditions && termsConditions.trim()) {
+        drawSectionHeader(ctx, 'Syarat & Ketentuan');
+        ctx.y -= 4;
+        const tncLines = termsConditions.split('\n').filter((l: string) => l.trim());
+        for (const line of tncLines) {
+            drawText(ctx, line.trim(), { fontSize: 8, color: COLOR_GRAY, indent: 4, maxWidth: CONTENT_W - 8 });
+        }
+        ctx.y -= 8;
+    }
+
     // ── Closing footer ────────────────────────────────────────────────────────
     if (ctx.y < MARGIN + 80) {
         ctx.page = ctx.doc.addPage([PAGE_W, PAGE_H]);
@@ -385,13 +397,13 @@ Deno.serve(async (req) => {
     if (authError || !user) return new Response('Unauthorized', { status: 401, headers: corsHeaders });
 
     try {
-        const { package: pkg, siteSettings, logoBase64, dayPhotos = [] } = await req.json();
+        const { package: pkg, siteSettings, logoBase64, dayPhotos = [], termsConditions = '' } = await req.json();
         if (!pkg) return new Response(
             JSON.stringify({ error: 'Missing package' }),
             { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
         );
 
-        const pdfBytes = await buildItineraryPdf(pkg, siteSettings ?? {}, logoBase64 ?? null, dayPhotos);
+        const pdfBytes = await buildItineraryPdf(pkg, siteSettings ?? {}, logoBase64 ?? null, dayPhotos, termsConditions ?? '');
 
         return new Response(pdfBytes, {
             headers: {
