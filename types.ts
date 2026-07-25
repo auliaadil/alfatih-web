@@ -18,6 +18,7 @@ export interface Category {
   id: string;
   name: string;
   slug: string;
+  terms_conditions?: string;
 }
 
 export interface FlightLeg {
@@ -86,6 +87,8 @@ export interface TourPackage {
   included?: string[];
   not_included?: string[];
   brochure_url?: string;
+  is_published?: boolean;
+  itinerary_pdf_url?: string;
   gallery?: string[];
 }
 
@@ -181,5 +184,14 @@ export interface BookingAttachment {
   flight_booking_id?: string;
   file_url: string;
   file_name: string;
+  created_at: string;
+}
+
+export interface OrderAttachment {
+  id: string;
+  order_id: string;
+  file_url: string;
+  file_name: string;
+  file_type?: string;
   created_at: string;
 }
