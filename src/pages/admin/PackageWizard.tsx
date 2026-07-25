@@ -13,6 +13,7 @@ export interface WizardDraft {
   // Step 1
   title: string;
   category: string;
+  destination_country: string;
   departure_date: string;
   departure_date_hijri: string;
   arrival_date: string;
@@ -40,7 +41,7 @@ export interface WizardDraft {
 }
 
 const EMPTY_DRAFT: WizardDraft = {
-  title: '', category: '', departure_date: '', departure_date_hijri: '', arrival_date: '',
+  title: '', category: '', destination_country: '', departure_date: '', departure_date_hijri: '', arrival_date: '',
   image_url: '', image_credit: '', gallery: [], is_popular: false, is_published: true,
   airline_ids: [], hotel_ids: [], flight_routes: [],
   description: '', features: [],
@@ -90,6 +91,7 @@ const PackageWizard: React.FC = () => {
         setDraft({
           title: data.title ?? '',
           category: data.category ?? '',
+          destination_country: data.destination_country ?? '',
           departure_date: data.departure_date ?? '',
           departure_date_hijri: data.departure_date_hijri ?? '',
           arrival_date: data.arrival_date ?? '',
@@ -129,6 +131,7 @@ const PackageWizard: React.FC = () => {
     const payload = {
       title: draft.title,
       category: draft.category,
+      destination_country: draft.destination_country || null,
       departure_date: draft.departure_date,
       departure_date_hijri: draft.departure_date_hijri || null,
       arrival_date: draft.arrival_date,

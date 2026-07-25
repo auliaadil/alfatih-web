@@ -4,6 +4,7 @@ import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import Home from './src/pages/Home';
 import PackageDetailPage from './src/pages/PackageDetailPage';
+import PackagesPage from './src/pages/PackagesPage';
 import { AuthGuard } from './src/components/AuthGuard';
 import { RoleGuard } from './src/components/admin/RoleGuard';
 import Login from './src/pages/admin/Login';
@@ -24,6 +25,7 @@ import Airports from './src/pages/admin/Airports';
 import Categories from './src/pages/admin/Categories';
 import Users from './src/pages/admin/Users';
 import Documentations from './src/pages/admin/Documentations';
+import Testimonials from './src/pages/admin/Testimonials';
 import Agents from './src/pages/admin/Agents';
 import HotelBookings from './src/pages/admin/HotelBookings';
 import FlightBookings from './src/pages/admin/FlightBookings';
@@ -40,6 +42,7 @@ const App: React.FC = () => {
                     <BrowserRouter>
                         <Routes>
                             <Route path="/" element={<Home />} />
+                            <Route path="/packages" element={<PackagesPage />} />
                             <Route path="/package/:slug" element={<PackageDetailPage />} />
 
                             {/* Admin Auth */}
@@ -54,6 +57,7 @@ const App: React.FC = () => {
                                     <Route path="packages/new" element={<PackageWizard />} />
                                     <Route path="packages/:id/edit" element={<PackageWizard />} />
                                     <Route path="documentations" element={<Documentations />} />
+                                    <Route path="testimonials" element={<Testimonials />} />
                                     <Route path="airports" element={<Airports />} />
                                     <Route path="categories" element={<Categories />} />
                                     <Route path="private-trips" element={<PrivateTrips />} />

@@ -117,6 +117,16 @@ const Step1BasicInfo: React.FC<Props> = ({ draft, updateDraft, onNext, categorie
             </select>
           </div>
 
+          <FormField label="Destination Country" hint="e.g., Arab Saudi, Turki, Jepang. Digunakan untuk filter di halaman paket.">
+            <input
+              type="text"
+              className={inputClass}
+              placeholder="e.g., Arab Saudi"
+              value={draft.destination_country}
+              onChange={(e) => updateDraft({ destination_country: e.target.value })}
+            />
+          </FormField>
+
           <div className="grid grid-cols-2 gap-4">
             <FormField label="Departure Date" required>
               <input

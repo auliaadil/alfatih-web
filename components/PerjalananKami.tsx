@@ -3,8 +3,10 @@ import ReactDOM from 'react-dom';
 import { supabase } from '../src/lib/supabase';
 import { Documentation, DocumentationPhoto } from '../types';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useLanguage } from '../src/contexts/LanguageContext';
 
 const PerjalananKami: React.FC = () => {
+  const { t } = useLanguage();
   const [albums, setAlbums] = useState<Documentation[]>([]);
   const [lightboxAlbum, setLightboxAlbum] = useState<Documentation | null>(null);
   const [lightboxPhotos, setLightboxPhotos] = useState<DocumentationPhoto[]>([]);
@@ -63,10 +65,10 @@ const PerjalananKami: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-10">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 font-display">
-            Perjalanan Kami
+            {t('gallery_title')}
           </h2>
           <p className="text-gray-500 mt-2 text-sm md:text-base">
-            Potret perjalanan nyata jamaah kami
+            {t('gallery_subtitle')}
           </p>
         </div>
 
@@ -97,7 +99,7 @@ const PerjalananKami: React.FC = () => {
               {/* Photo count badge */}
               {photoCount(doc) > 0 && (
                 <div className="absolute top-3 right-3 bg-black/50 text-white text-xs font-medium px-2 py-0.5 rounded-full">
-                  {photoCount(doc)} foto
+                  {photoCount(doc)} {t('gallery_photo_suffix')}
                 </div>
               )}
 
@@ -149,7 +151,7 @@ const PerjalananKami: React.FC = () => {
             {/* Photo area */}
             <div className="relative z-10 flex-1 flex items-center justify-center px-16 py-4">
               {lightboxPhotos.length === 0 ? (
-                <p className="text-white/50 text-sm">Memuat foto...</p>
+                <p className="text-white/50 text-sm">{t('gallery_loading')}</p>
               ) : (
                 <img
                   src={lightboxPhotos[lightboxIdx]?.storage_url}

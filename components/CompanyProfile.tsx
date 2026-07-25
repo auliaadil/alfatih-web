@@ -21,28 +21,16 @@ import { useLanguage } from '../src/contexts/LanguageContext';
 const CompanyProfile: React.FC = () => {
   const { t } = useLanguage();
   const stats = [
-    { label: 'Jamaah Terlayani', value: '10.000+', icon: <Users className="w-6 h-6" /> },
-    { label: 'Tahun Pengalaman', value: '12+', icon: <Award className="w-6 h-6" /> },
-    { label: 'Tingkat Kepuasan', value: '99%', icon: <Star className="w-6 h-6" /> },
-    { label: 'Mitra Hotel', value: '50+', icon: <MapPin className="w-6 h-6" /> },
+    { label: t('stat_pilgrims_served'), value: '10.000+', icon: <Users className="w-6 h-6" /> },
+    { label: t('stat_years_exp'), value: '12+', icon: <Award className="w-6 h-6" /> },
+    { label: t('stat_satisfaction'), value: '99%', icon: <Star className="w-6 h-6" /> },
+    { label: t('stat_hotel_partners'), value: '50+', icon: <MapPin className="w-6 h-6" /> },
   ];
 
   const values = [
-    {
-      title: 'Amanah',
-      desc: 'Menjaga kepercayaan jamaah dengan pelayanan jujur dan transparan sesuai nilai-nilai Islam.',
-      icon: <ShieldCheck className="w-8 h-8" />
-    },
-    {
-      title: 'Profesional',
-      desc: 'Memberikan layanan berkualitas tinggi melalui tim ahli yang berpengalaman di bidangnya.',
-      icon: <Target className="w-8 h-8" />
-    },
-    {
-      title: 'Halal Berkelas',
-      desc: 'Menghadirkan pengalaman spiritual dan edukatif berkelas dunia untuk semua kalangan.',
-      icon: <TrendingUp className="w-8 h-8" />
-    }
+    { title: t('value_amanah_title'), desc: t('value_amanah_desc'), icon: <ShieldCheck className="w-8 h-8" /> },
+    { title: t('value_profesional_title'), desc: t('value_profesional_desc'), icon: <Target className="w-8 h-8" /> },
+    { title: t('value_halal_title'), desc: t('value_halal_desc'), icon: <TrendingUp className="w-8 h-8" /> },
   ];
 
   return (
@@ -170,7 +158,7 @@ const CompanyProfile: React.FC = () => {
           </div>
 
           <div className="mt-10 pt-10 border-t border-white/5 text-center">
-            <h3 className="text-lg font-black mb-7 font-display">Penyelenggara Perjalanan Ibadah Terpercaya</h3>
+            <h3 className="text-lg font-black mb-7 font-display">{t('company_endorser_title')}</h3>
             <div className="flex flex-wrap justify-center gap-8 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
               {/* Placeholders for partner logos */}
               <div className="h-12 w-32 bg-white/10 rounded flex items-center justify-center font-bold">KEMENAG</div>

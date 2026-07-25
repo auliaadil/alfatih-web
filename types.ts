@@ -90,6 +90,7 @@ export interface TourPackage {
   is_published?: boolean;
   itinerary_pdf_url?: string;
   gallery?: string[];
+  destination_country?: string;
 }
 
 export interface AIPlannerInput {
@@ -100,11 +101,15 @@ export interface AIPlannerInput {
 }
 
 export interface Testimonial {
-  id: number;
+  id: string | number;
   name: string;
   role: string;
   comment: string;
-  avatar: string;
+  avatar?: string;
+  avatar_url?: string;
+  sort_order?: number;
+  is_active?: boolean;
+  created_at?: string;
 }
 
 export interface Documentation {

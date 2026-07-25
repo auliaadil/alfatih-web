@@ -46,17 +46,70 @@ export const translations: Translations = {
     advantages_title: { id: 'Keunggulan Alfatih Dunia Wisata', en: 'Alfatih Dunia Wisata Advantages' },
     advantages_subtitle: { id: 'Nilai yang kami bawa dalam setiap perjalanan Anda.', en: 'The values we bring to every journey of yours.' },
 
+    // Hero stats
+    hero_badge: { id: 'Amanah & Profesional Sejak 2012', en: 'Trustworthy & Professional Since 2012' },
+    hero_stat_pilgrims: { id: 'Jamaah', en: 'Pilgrims' },
+    hero_stat_years: { id: 'Tahun', en: 'Years' },
+    hero_stat_satisfaction: { id: 'Kepuasan', en: 'Satisfaction' },
+
     // Why Choose Us
-    why_choose_title: { id: 'Why Choose Alfatih Dunia Wisata?', en: 'Why Choose Alfatih Dunia Wisata?' },
+    why_choose_title: { id: 'Mengapa Memilih Alfatih Dunia Wisata?', en: 'Why Choose Alfatih Dunia Wisata?' },
     why_choose_1_title: { id: 'Halal Friendly', en: 'Halal Friendly' },
-    why_choose_1_desc: { id: 'We ensure Halal meals and prayer times are prioritized in all our itineraries, regardless of destination.', en: 'We ensure Halal meals and prayer times are prioritized in all our itineraries, regardless of destination.' },
-    why_choose_2_title: { id: 'Expert Guides', en: 'Expert Guides' },
-    why_choose_2_desc: { id: 'Our Mutawwif and tour guides are experienced, knowledgeable, and fluent in local languages.', en: 'Our Mutawwif and tour guides are experienced, knowledgeable, and fluent in local languages.' },
-    why_choose_3_title: { id: 'Trusted Service', en: 'Trusted Service' },
-    why_choose_3_desc: { id: 'Official registered travel agency with years of experience in handling Umrah and International groups.', en: 'Official registered travel agency with years of experience in handling Umrah and International groups.' },
+    why_choose_1_desc: { id: 'Kami memastikan makanan halal dan waktu shalat diprioritaskan di setiap itinerary, ke mana pun tujuan perjalanan.', en: 'We ensure Halal meals and prayer times are prioritized in all our itineraries, regardless of destination.' },
+    why_choose_2_title: { id: 'Panduan Berpengalaman', en: 'Expert Guides' },
+    why_choose_2_desc: { id: 'Mutawwif dan pemandu wisata kami berpengalaman, berpengetahuan luas, dan fasih berbahasa lokal.', en: 'Our Mutawwif and tour guides are experienced, knowledgeable, and fluent in local languages.' },
+    why_choose_3_title: { id: 'Layanan Terpercaya', en: 'Trusted Service' },
+    why_choose_3_desc: { id: 'Agen perjalanan resmi terdaftar dengan pengalaman bertahun-tahun dalam menangani grup Umrah dan internasional.', en: 'Official registered travel agency with years of experience in handling Umrah and International groups.' },
+
+    // Company profile stats
+    stat_pilgrims_served: { id: 'Jamaah Terlayani', en: 'Pilgrims Served' },
+    stat_years_exp: { id: 'Tahun Pengalaman', en: 'Years of Experience' },
+    stat_satisfaction: { id: 'Tingkat Kepuasan', en: 'Satisfaction Rate' },
+    stat_hotel_partners: { id: 'Mitra Hotel', en: 'Hotel Partners' },
+    value_amanah_title: { id: 'Amanah', en: 'Trustworthy' },
+    value_amanah_desc: { id: 'Menjaga kepercayaan jamaah dengan pelayanan jujur dan transparan sesuai nilai-nilai Islam.', en: 'Maintaining pilgrim trust through honest and transparent service in accordance with Islamic values.' },
+    value_profesional_title: { id: 'Profesional', en: 'Professional' },
+    value_profesional_desc: { id: 'Memberikan layanan berkualitas tinggi melalui tim ahli yang berpengalaman di bidangnya.', en: 'Delivering high-quality service through an expert team experienced in their respective fields.' },
+    value_halal_title: { id: 'Halal Berkelas', en: 'World-Class Halal' },
+    value_halal_desc: { id: 'Menghadirkan pengalaman spiritual dan edukatif berkelas dunia untuk semua kalangan.', en: 'Presenting world-class spiritual and educational experiences accessible to everyone.' },
+    company_endorser_title: { id: 'Penyelenggara Perjalanan Ibadah Terpercaya', en: 'Trusted Hajj & Umrah Travel Organizer' },
+
+    // Gallery (PerjalananKami)
+    gallery_title: { id: 'Perjalanan Kami', en: 'Our Journeys' },
+    gallery_subtitle: { id: 'Potret perjalanan nyata jamaah kami', en: 'Real moments from our pilgrims\' journeys' },
+    gallery_photo_suffix: { id: 'foto', en: 'photos' },
+    gallery_loading: { id: 'Memuat foto...', en: 'Loading photos...' },
+
+    // TourCard
+    card_start_from: { id: 'Mulai dari', en: 'Start from' },
+    card_popular: { id: 'Popular', en: 'Popular' },
+
+    // Home page
+    loading_packages: { id: 'Memuat paket tour...', en: 'Loading tour packages...' },
+    no_packages_category: { id: 'Belum ada paket tersedia di kategori ini.', en: 'No packages available in this category.' },
+    view_all_packages: { id: 'Lihat Semua Paket', en: 'View All Packages' },
+    no_testimonials: { id: 'Belum ada testimoni.', en: 'No testimonials yet.' },
+
+    // Packages listing page
+    packages_page_title: { id: 'Semua Paket Tour & Umrah', en: 'All Tour & Umrah Packages' },
+    packages_loading: { id: 'Memuat...', en: 'Loading...' },
+    packages_count_suffix: { id: 'paket tersedia', en: 'packages available' },
+    packages_search_placeholder: { id: 'Cari paket tour...', en: 'Search tour packages...' },
+    packages_all_categories: { id: 'Semua Kategori', en: 'All Categories' },
+    packages_all_countries: { id: 'Semua Negara', en: 'All Countries' },
+    packages_all_months: { id: 'Semua Bulan', en: 'All Months' },
+    packages_reset: { id: 'Reset', en: 'Reset' },
+    packages_no_results: { id: 'Tidak ada paket yang cocok', en: 'No matching packages' },
+    packages_no_results_desc: { id: 'Coba ubah filter atau kata kunci pencarian.', en: 'Try adjusting your filters or search terms.' },
+    packages_reset_link: { id: 'Reset filter', en: 'Reset filters' },
+    packages_prev: { id: '← Sebelumnya', en: '← Previous' },
+    packages_next: { id: 'Berikutnya →', en: 'Next →' },
+    packages_showing: { id: 'Menampilkan', en: 'Showing' },
+    packages_showing_of: { id: 'dari', en: 'of' },
+    packages_showing_suffix: { id: 'paket', en: 'packages' },
 
     // Testimonials
-    testimonials_title: { id: 'What Our Pilgrims Say', en: 'What Our Pilgrims Say' },
+    testimonials_title: { id: 'Kata Jemaah Kami', en: 'What Our Pilgrims Say' },
 
     // CTA
     ready_title: { id: 'Siap untuk Perjalanan Spiritual Anda Berikutnya?', en: 'Ready for Your Next Spiritual Journey?' },
@@ -66,9 +119,17 @@ export const translations: Translations = {
 
     // Footer
     footer_desc: { id: 'Mitra terpercaya Anda untuk perjalanan Umrah dan wisata internasional ramah Muslim. Kami membuat perjalanan spiritual dan santai Anda tak terlupakan.', en: 'Your trusted partner for Umrah and Muslim-friendly international tours. We make your spiritual and leisure journeys unforgettable.' },
-    footer_quick_links: { id: 'Quick Links', en: 'Quick Links' },
-    footer_popular: { id: 'Popular Packages', en: 'Popular Packages' },
-    footer_contact: { id: 'Contact Us', en: 'Contact Us' },
+    footer_quick_links: { id: 'Tautan Cepat', en: 'Quick Links' },
+    footer_popular: { id: 'Paket Populer', en: 'Popular Packages' },
+    footer_contact: { id: 'Hubungi Kami', en: 'Contact Us' },
+    footer_nav_home: { id: 'Beranda', en: 'Home' },
+    footer_nav_tours: { id: 'Paket Tour', en: 'Tour Packages' },
+    footer_nav_private: { id: 'Private Trip', en: 'Private Trip' },
+    footer_nav_about: { id: 'Tentang Kami', en: 'About Us' },
+    footer_no_packages: { id: 'Belum ada paket tersedia.', en: 'No packages available.' },
+    footer_rights: { id: 'Hak cipta dilindungi.', en: 'All rights reserved.' },
+    footer_privacy: { id: 'Kebijakan Privasi', en: 'Privacy Policy' },
+    footer_terms: { id: 'Syarat Layanan', en: 'Terms of Service' },
 
     // Private Trip Planner – Form
     planner_subtitle: { id: 'Buat draft rencana perjalanan impian Anda dalam hitungan detik dengan kecerdasan buatan.', en: 'Create a draft travel plan for your dream trip in seconds with artificial intelligence.' },
