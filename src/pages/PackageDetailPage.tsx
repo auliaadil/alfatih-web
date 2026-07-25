@@ -27,6 +27,7 @@ const PackageDetailPage: React.FC = () => {
             .from('packages')
             .select('*')
             .eq(isUUID ? 'id' : 'slug', packageSlug)
+            .eq('is_published', true)
             .single();
 
         if (error || !pkg) {

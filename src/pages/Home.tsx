@@ -30,7 +30,7 @@ const Home: React.FC = () => {
 
     const fetchPackages = async () => {
         setLoading(true);
-        const { data: pkgs, error } = await supabase.from('packages').select('*').order('created_at', { ascending: false });
+        const { data: pkgs, error } = await supabase.from('packages').select('*').eq('is_published', true).order('created_at', { ascending: false });
         if (error || !pkgs) {
             console.error('Error fetching packages', error);
             setLoading(false);

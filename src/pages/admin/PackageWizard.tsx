@@ -20,6 +20,7 @@ export interface WizardDraft {
   image_credit: string;
   gallery: string[];
   is_popular: boolean;
+  is_published: boolean;
 
   // Step 2
   airline_ids: string[];
@@ -40,7 +41,7 @@ export interface WizardDraft {
 
 const EMPTY_DRAFT: WizardDraft = {
   title: '', category: '', departure_date: '', departure_date_hijri: '', arrival_date: '',
-  image_url: '', image_credit: '', gallery: [], is_popular: false,
+  image_url: '', image_credit: '', gallery: [], is_popular: false, is_published: true,
   airline_ids: [], hotel_ids: [], flight_routes: [],
   description: '', features: [],
   quotas: 0, room_options: [],
@@ -96,6 +97,7 @@ const PackageWizard: React.FC = () => {
           image_credit: data.image_credit ?? '',
           gallery: data.gallery ?? [],
           is_popular: data.is_popular ?? false,
+          is_published: data.is_published ?? true,
           airline_ids: data.airline_ids ?? [],
           hotel_ids: data.hotel_ids ?? [],
           flight_routes: data.flight_routes ?? [],
@@ -135,6 +137,7 @@ const PackageWizard: React.FC = () => {
       image_credit: draft.image_credit || null,
       gallery: draft.gallery,
       is_popular: draft.is_popular,
+      is_published: draft.is_published,
       airline_ids: draft.airline_ids,
       hotel_ids: draft.hotel_ids,
       flight_routes: draft.flight_routes,
