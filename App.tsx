@@ -24,6 +24,9 @@ import Airports from './src/pages/admin/Airports';
 import Categories from './src/pages/admin/Categories';
 import Users from './src/pages/admin/Users';
 import Documentations from './src/pages/admin/Documentations';
+import Agents from './src/pages/admin/Agents';
+import HotelBookings from './src/pages/admin/HotelBookings';
+import FlightBookings from './src/pages/admin/FlightBookings';
 import { SiteSettingsProvider } from './src/contexts/SiteSettingsContext';
 import { LanguageProvider } from './src/contexts/LanguageContext';
 import { AuthProvider } from './src/contexts/AuthContext';
@@ -56,6 +59,9 @@ const App: React.FC = () => {
                                     <Route path="private-trips" element={<PrivateTrips />} />
                                     <Route path="airlines" element={<Airlines />} />
                                     <Route path="hotels" element={<Hotels />} />
+                                    <Route path="agents" element={<Agents />} />
+                                    <Route path="hotel-bookings" element={<HotelBookings />} />
+                                    <Route path="flight-bookings" element={<FlightBookings />} />
                                     <Route path="poster-maker" element={<PosterMaker />} />
                                     <Route path="poster-templates" element={<PosterTemplates />} />
                                     <Route path="text-campaign" element={<TextCampaign />} />

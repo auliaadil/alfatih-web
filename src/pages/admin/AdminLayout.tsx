@@ -31,6 +31,8 @@ const NAV_GROUPS: NavGroup[] = [
       { path: '/admin/orders', icon: ShoppingCart, label: 'Orders' },
       { path: '/admin/packages', icon: Package, label: 'Packages' },
       { path: '/admin/documentations', icon: BookImage, label: 'Documentations' },
+      { path: '/admin/hotel-bookings', icon: Building2, label: 'Hotel Bookings' },
+      { path: '/admin/flight-bookings', icon: PlaneTakeoff, label: 'Flight Bookings' },
       { path: '/admin/private-trips', icon: Map, label: 'Private Trips', allowedRoles: ['admin', 'superadmin'] },
     ],
   },
@@ -42,6 +44,7 @@ const NAV_GROUPS: NavGroup[] = [
       { path: '/admin/hotels', icon: Building2, label: 'Hotels' },
       { path: '/admin/airports', icon: PlaneTakeoff, label: 'Airports' },
       { path: '/admin/categories', icon: Tag, label: 'Categories' },
+      { path: '/admin/agents', icon: Users, label: 'Agents & Vendors' },
     ],
   },
   {

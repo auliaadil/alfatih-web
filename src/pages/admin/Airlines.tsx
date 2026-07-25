@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
+import { Link as RouterLink } from 'react-router-dom';
 import { Plus, Edit2, Trash2, Plane, Upload, Link } from 'lucide-react';
 import {
     PageHeader, TableCard, THead, Th, Td, SkeletonRows, EmptyState, SlideOver,
@@ -215,6 +216,12 @@ const Airlines: React.FC = () => {
                                     </Td>
                                     <Td className="text-right">
                                         <div className="flex justify-end gap-2">
+                                            <RouterLink 
+                                                to={`/admin/flight-bookings?airline_id=${airline.id}`}
+                                                className={`${btnGhost} text-blue-600 hover:bg-blue-50 text-xs px-2 py-1`}
+                                            >
+                                                Bookings
+                                            </RouterLink>
                                             <button onClick={() => openEdit(airline)} className={`${btnGhost} text-xs px-2 py-1`}>
                                                 Edit
                                             </button>

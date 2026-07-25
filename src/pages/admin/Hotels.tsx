@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
+import { Link } from 'react-router-dom';
 import { Plus, Edit2, Trash2, Building2, Star, X } from 'lucide-react';
 import {
     PageHeader, TableCard, THead, Th, Td, SkeletonRows, EmptyState, SlideOver,
@@ -212,6 +213,12 @@ const Hotels: React.FC = () => {
                                     </Td>
                                     <Td className="text-right">
                                         <div className="flex justify-end gap-2">
+                                            <Link 
+                                                to={`/admin/hotel-bookings?hotel_id=${hotel.id}`}
+                                                className={`${btnGhost} text-blue-600 hover:bg-blue-50 text-xs px-2 py-1`}
+                                            >
+                                                Bookings
+                                            </Link>
                                             <button onClick={() => openEdit(hotel)} className={`${btnGhost} text-xs px-2 py-1`}>
                                                 Edit
                                             </button>

@@ -128,3 +128,58 @@ export interface DocumentationPhoto {
   sort_order: number;
   created_at: string;
 }
+
+export type AgentType = 'Person' | 'OTA' | 'Direct';
+export type BookingStatus = 'Planned' | 'Quoted' | 'Booked' | 'Paid' | 'Cancelled';
+export type Currency = 'IDR' | 'USD';
+
+export interface Agent {
+  id: string;
+  name: string;
+  company?: string;
+  contact_info?: string;
+  agent_type: AgentType;
+  created_at: string;
+}
+
+export interface HotelBooking {
+  id: string;
+  hotel_id: string;
+  agent_id?: string;
+  check_in_date?: string;
+  check_out_date?: string;
+  rooms: { room_type: string; paxes: number }[];
+  price?: number;
+  currency: Currency;
+  status: BookingStatus;
+  created_at: string;
+  // joined
+  hotels?: { name: string; location: string };
+  agents?: { name: string; company?: string };
+}
+
+export interface FlightBooking {
+  id: string;
+  airline_id: string;
+  agent_id?: string;
+  departure_date?: string;
+  return_date?: string;
+  flight_route?: string;
+  paxes?: number;
+  price?: number;
+  currency: Currency;
+  status: BookingStatus;
+  created_at: string;
+  // joined
+  airlines?: { name: string; logo_url?: string };
+  agents?: { name: string; company?: string };
+}
+
+export interface BookingAttachment {
+  id: string;
+  hotel_booking_id?: string;
+  flight_booking_id?: string;
+  file_url: string;
+  file_name: string;
+  created_at: string;
+}
