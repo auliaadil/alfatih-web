@@ -65,3 +65,44 @@ export async function downloadItineraryPdf(
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 }
+
+export async function generateAndSaveItineraryPdf(
+    pkg: any,
+    siteSettings: ItinerarySiteSettings,
+    dayPhotos?: { day: number; photoUrls: string[] }[],
+    termsConditions?: string,
+): Promise<string> {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) throw new Error('Not authenticated');
+
+    const logoBase64 = await getLogoBase64();
+
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/generate-itinerary-pdf`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ package: pkg, siteSettings, logoBase64, dayPhotos: dayPhotos ?? [], termsConditions: termsConditions ?? '' }),
+    });
+    if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`PDF generation failed: ${res.status} ${text}`);
+    }
+
+    const blob = await res.blob();
+
+    // Upload to persistent storage (upsert so regenerating overwrites the same file)
+    const fileName = `${pkg.id}/itinerary.pdf`;
+    const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('itinerary-pdfs')
+        .upload(fileName, blob, { upsert: true, contentType: 'application/pdf' });
+    if (uploadError) throw uploadError;
+
+    const { data: { publicUrl } } = supabase.storage.from('itinerary-pdfs').getPublicUrl(uploadData.path);
+
+    // Save URL to package record
+    await supabase.from('packages').update({ itinerary_pdf_url: publicUrl }).eq('id', pkg.id);
+
+    return publicUrl;
+}

@@ -486,14 +486,16 @@ const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
                     <MessageCircle className="w-5 h-5" />
                     {t('detail_book_wa')}
                   </button>
-                  {tour.brochure_url && (
-                    <button
-                      onClick={() => window.open(tour.brochure_url, '_blank')}
+                  {tour.itinerary_pdf_url && (
+                    <a
+                      href={tour.itinerary_pdf_url}
+                      target="_blank"
+                      rel="noreferrer"
                       className="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 text-sm"
                     >
                       <FileText className="w-4 h-4 text-secondary" />
-                      {t('detail_brochure')}
-                    </button>
+                      Lihat Itinerary
+                    </a>
                   )}
                 </div>
 

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { X, Image, FileDown, Loader2, Users } from 'lucide-react';
 import { supabase } from '@/src/lib/supabase';
 import { useSiteSettings } from '../../contexts/SiteSettingsContext';
-import { downloadItineraryPdf } from '../../../services/itineraryPdfService';
+import { downloadItineraryPdf, generateAndSaveItineraryPdf } from '../../../services/itineraryPdfService';
 import PdfPhotoPickerModal from '../../components/admin/PdfPhotoPickerModal';
 
 interface PackageDetailPanelProps {
@@ -20,6 +20,7 @@ const PackageDetailPanel: React.FC<PackageDetailPanelProps> = ({ pkg, onClose })
     const [loading, setLoading] = useState(true);
     const [isPdfLoading, setIsPdfLoading] = useState(false);
     const [pickerOpen, setPickerOpen] = useState(false);
+    const [pdfDialogOpen, setPdfDialogOpen] = useState(false);
 
     useEffect(() => {
         const load = async () => {
@@ -65,10 +66,17 @@ const PackageDetailPanel: React.FC<PackageDetailPanelProps> = ({ pkg, onClose })
     const usedQuota = totalQuota - (pkg.quotas || 0);
     const quotaPct = Math.min(Math.round((usedQuota / totalQuota) * 100), 100);
 
-    const handleDownloadPdf = () => setPickerOpen(true);
+    const handlePdfButtonClick = () => {
+        if (pkg.itinerary_pdf_url) {
+            setPdfDialogOpen(true);
+        } else {
+            setPickerOpen(true);
+        }
+    };
 
     const handleGeneratePdf = async (dayPhotos: { day: number; photoUrls: string[] }[]) => {
         setPickerOpen(false);
+        setPdfDialogOpen(false);
         setIsPdfLoading(true);
         try {
             let termsConditions = '';
@@ -81,12 +89,13 @@ const PackageDetailPanel: React.FC<PackageDetailPanelProps> = ({ pkg, onClose })
                 termsConditions = catData?.terms_conditions || '';
             }
             const fullPkg = { ...pkg, airlines, hotels };
-            await downloadItineraryPdf(
+            const pdfUrl = await generateAndSaveItineraryPdf(
                 fullPkg,
                 { whatsapp: settings.whatsapp, phone: settings.phone },
                 dayPhotos,
                 termsConditions,
             );
+            window.open(pdfUrl, '_blank');
         } catch (err) {
             console.error('PDF generation failed:', err);
             alert('Gagal mengunduh itinerary. Silakan coba lagi.');
@@ -253,7 +262,7 @@ const PackageDetailPanel: React.FC<PackageDetailPanelProps> = ({ pkg, onClose })
                         Buat Brosur
                     </button>
                     <button
-                        onClick={handleDownloadPdf}
+                        onClick={handlePdfButtonClick}
                         disabled={isPdfLoading}
                         className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl border-2 border-primary text-primary text-sm font-semibold hover:bg-blue-50 transition disabled:opacity-60"
                     >
@@ -265,6 +274,35 @@ const PackageDetailPanel: React.FC<PackageDetailPanelProps> = ({ pkg, onClose })
                 </div>
             </div>
 
+            {pdfDialogOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+                    <div className="bg-white rounded-2xl shadow-2xl p-6 w-80 space-y-4">
+                        <h3 className="font-semibold text-gray-900">Itinerary PDF</h3>
+                        <p className="text-sm text-gray-500">PDF sudah pernah dibuat. Lihat versi sebelumnya atau generate ulang dengan foto terbaru.</p>
+                        <div className="flex flex-col gap-2">
+                            <button
+                                onClick={() => { window.open(pkg.itinerary_pdf_url, '_blank'); setPdfDialogOpen(false); }}
+                                className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-primary text-white text-sm font-semibold hover:bg-blue-600 transition"
+                            >
+                                Lihat PDF
+                            </button>
+                            <button
+                                onClick={() => { setPdfDialogOpen(false); setPickerOpen(true); }}
+                                className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl border-2 border-primary text-primary text-sm font-semibold hover:bg-blue-50 transition"
+                            >
+                                Regenerate
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setPdfDialogOpen(false)}
+                                className="flex items-center justify-center py-2 px-4 rounded-xl text-gray-500 text-sm hover:bg-gray-50 transition"
+                            >
+                                Batal
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
             {pickerOpen && (
                 <PdfPhotoPickerModal
                     isOpen={pickerOpen}
