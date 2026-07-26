@@ -54,25 +54,25 @@ const App: React.FC = () => {
                                     <Route index element={<Dashboard />} />
                                     <Route path="orders" element={<Orders />} />
                                     <Route path="packages" element={<Packages />} />
-                                    <Route path="packages/new" element={<PackageWizard />} />
-                                    <Route path="packages/:id/edit" element={<PackageWizard />} />
-                                    <Route path="documentations" element={<Documentations />} />
-                                    <Route path="testimonials" element={<Testimonials />} />
-                                    <Route path="airports" element={<Airports />} />
-                                    <Route path="categories" element={<Categories />} />
-                                    <Route path="private-trips" element={<PrivateTrips />} />
-                                    <Route path="airlines" element={<Airlines />} />
-                                    <Route path="hotels" element={<Hotels />} />
-                                    <Route path="agents" element={<Agents />} />
-                                    <Route path="hotel-bookings" element={<HotelBookings />} />
-                                    <Route path="flight-bookings" element={<FlightBookings />} />
-                                    <Route path="poster-maker" element={<PosterMaker />} />
-                                    <Route path="poster-templates" element={<PosterTemplates />} />
-                                    <Route path="text-campaign" element={<TextCampaign />} />
                                     <Route element={<RoleGuard roles={['admin', 'superadmin']} />}>
-                                      <Route path="deal-hunter" element={<DealHunter />} />
+                                        <Route path="packages/new" element={<PackageWizard />} />
+                                        <Route path="packages/:id/edit" element={<PackageWizard />} />
+                                        <Route path="documentations" element={<Documentations />} />
+                                        <Route path="testimonials" element={<Testimonials />} />
+                                        <Route path="airports" element={<Airports />} />
+                                        <Route path="categories" element={<Categories />} />
+                                        <Route path="private-trips" element={<PrivateTrips />} />
+                                        <Route path="airlines" element={<Airlines />} />
+                                        <Route path="hotels" element={<Hotels />} />
+                                        <Route path="agents" element={<Agents />} />
+                                        <Route path="hotel-bookings" element={<HotelBookings />} />
+                                        <Route path="flight-bookings" element={<FlightBookings />} />
+                                        <Route path="poster-maker" element={<PosterMaker />} />
+                                        <Route path="poster-templates" element={<PosterTemplates />} />
+                                        <Route path="text-campaign" element={<TextCampaign />} />
+                                        <Route path="deal-hunter" element={<DealHunter />} />
+                                        <Route path="settings" element={<SiteSettings />} />
                                     </Route>
-                                    <Route path="settings" element={<SiteSettings />} />
                                     <Route element={<RoleGuard roles={['superadmin']} />}>
                                         <Route path="users" element={<Users />} />
                                     </Route>

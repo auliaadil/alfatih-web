@@ -13,10 +13,19 @@ interface Props {
   updateDraft: (p: Partial<WizardDraft>) => void;
   onNext: () => void;
   onBack: () => void;
+  onSave?: () => void;
+  saving?: boolean;
 }
 
-const Step3PricingRooms: React.FC<Props> = ({ draft, updateDraft, onNext, onBack }) => {
+const formatIDR = (value: number | undefined) =>
+  value && value > 0 ? value.toLocaleString('id-ID') : '';
+
+const parseIDR = (display: string) =>
+  parseInt(display.replace(/\./g, '').replace(/\D/g, ''), 10) || 0;
+
+const Step3PricingRooms: React.FC<Props> = ({ draft, updateDraft, onNext, onBack, onSave, saving }) => {
   const [roomTypes, setRoomTypes] = useState<UniqueRoomType[]>([]);
+  const [priceDisplays, setPriceDisplays] = useState<Record<string, { price: string; original_price: string }>>({});
 
   useEffect(() => {
     if (draft.hotel_ids.length === 0) {
@@ -113,6 +122,16 @@ const Step3PricingRooms: React.FC<Props> = ({ draft, updateDraft, onNext, onBack
                 {roomTypes.map((rt) => {
                   const checked = isChecked(rt.name);
                   const opt = getOption(rt.name);
+                  const disp = priceDisplays[rt.name] ?? { price: formatIDR(opt?.price), original_price: formatIDR(opt?.original_price) };
+                  const handlePriceChange = (field: 'price' | 'original_price', raw: string) => {
+                    const cleaned = raw.replace(/\./g, '').replace(/\D/g, '');
+                    const num = parseInt(cleaned, 10) || 0;
+                    setPriceDisplays((prev) => ({
+                      ...prev,
+                      [rt.name]: { ...disp, [field]: num > 0 ? num.toLocaleString('id-ID') : '' },
+                    }));
+                    updatePrice(rt.name, field, num);
+                  };
                   return (
                     <div
                       key={rt.name}
@@ -134,29 +153,25 @@ const Step3PricingRooms: React.FC<Props> = ({ draft, updateDraft, onNext, onBack
                       <div>
                         <p className="text-[10px] text-gray-500 mb-1">Harga All-In (Rp)</p>
                         <input
-                          type="number"
-                          min={0}
+                          type="text"
+                          inputMode="numeric"
                           disabled={!checked}
                           className={inputClass + ' text-sm'}
                           placeholder="0"
-                          value={opt?.price || ''}
-                          onChange={(e) =>
-                            updatePrice(rt.name, 'price', parseInt(e.target.value) || 0)
-                          }
+                          value={disp.price}
+                          onChange={(e) => handlePriceChange('price', e.target.value)}
                         />
                       </div>
                       <div>
                         <p className="text-[10px] text-gray-500 mb-1">Harga Coret (opsional)</p>
                         <input
-                          type="number"
-                          min={0}
+                          type="text"
+                          inputMode="numeric"
                           disabled={!checked}
                           className={inputClass + ' text-sm'}
                           placeholder="—"
-                          value={opt?.original_price || ''}
-                          onChange={(e) =>
-                            updatePrice(rt.name, 'original_price', parseInt(e.target.value) || 0)
-                          }
+                          value={disp.original_price}
+                          onChange={(e) => handlePriceChange('original_price', e.target.value)}
                         />
                       </div>
                     </div>
@@ -171,7 +186,14 @@ const Step3PricingRooms: React.FC<Props> = ({ draft, updateDraft, onNext, onBack
 
       <div className="flex justify-between">
         <button type="button" onClick={onBack} className={btnSecondary}>← Back</button>
-        <button type="button" onClick={onNext} className={btnPrimary}>Next: Itinerary & Terms →</button>
+        <div className="flex gap-2">
+          {onSave && (
+            <button type="button" onClick={onSave} disabled={saving} className={`${btnSecondary} disabled:opacity-50`}>
+              {saving ? 'Saving…' : 'Save'}
+            </button>
+          )}
+          <button type="button" onClick={onNext} className={btnPrimary}>Next: Itinerary & Terms →</button>
+        </div>
       </div>
     </div>
   );

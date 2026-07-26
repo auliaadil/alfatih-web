@@ -22,9 +22,11 @@ interface Props {
   updateDraft: (p: Partial<WizardDraft>) => void;
   onNext: () => void;
   onBack: () => void;
+  onSave?: () => void;
+  saving?: boolean;
 }
 
-const Step2FlightHotels: React.FC<Props> = ({ draft, updateDraft, onNext, onBack }) => {
+const Step2FlightHotels: React.FC<Props> = ({ draft, updateDraft, onNext, onBack, onSave, saving }) => {
   const [airlines, setAirlines] = useState<Airline[]>([]);
   const [hotels, setHotels] = useState<Hotel[]>([]);
   const [airports, setAirports] = useState<Airport[]>([]);
@@ -381,7 +383,14 @@ const Step2FlightHotels: React.FC<Props> = ({ draft, updateDraft, onNext, onBack
 
       <div className="flex justify-between">
         <button type="button" onClick={onBack} className={btnSecondary}>← Back</button>
-        <button type="button" onClick={onNext} className={btnPrimary}>Next: Pricing & Rooms →</button>
+        <div className="flex gap-2">
+          {onSave && (
+            <button type="button" onClick={onSave} disabled={saving} className={`${btnSecondary} disabled:opacity-50`}>
+              {saving ? 'Saving…' : 'Save'}
+            </button>
+          )}
+          <button type="button" onClick={onNext} className={btnPrimary}>Next: Pricing & Rooms →</button>
+        </div>
       </div>
 
       <SlideOver

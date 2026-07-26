@@ -126,7 +126,8 @@ const PackageWizard: React.FC = () => {
     return days > 0 ? `${days} Hari` : '';
   };
 
-  const handleSave = async () => {
+  const handleSave = async (opts?: { navigateOnSuccess?: boolean }) => {
+    const { navigateOnSuccess = true } = opts ?? {};
     setSaving(true);
     const payload = {
       title: draft.title,
@@ -163,9 +164,11 @@ const PackageWizard: React.FC = () => {
       toast('error', 'Failed to save package.');
     } else {
       toast('success', id ? 'Package updated.' : 'Package created.');
-      navigate('/admin/packages');
+      if (navigateOnSuccess) navigate('/admin/packages');
     }
   };
+
+  const handleSaveDraft = () => handleSave({ navigateOnSuccess: false });
 
   if (loading) {
     return (
@@ -184,6 +187,8 @@ const PackageWizard: React.FC = () => {
             draft={draft}
             updateDraft={updateDraft}
             onNext={() => setStep(2)}
+            onSave={handleSaveDraft}
+            saving={saving}
             categories={categories}
             onCategoryCreated={(name) => setCategories((prev) => [...prev, name].sort())}
           />
@@ -194,6 +199,8 @@ const PackageWizard: React.FC = () => {
             updateDraft={updateDraft}
             onNext={() => setStep(3)}
             onBack={() => setStep(1)}
+            onSave={handleSaveDraft}
+            saving={saving}
           />
         )}
         {step === 3 && (
@@ -202,6 +209,8 @@ const PackageWizard: React.FC = () => {
             updateDraft={updateDraft}
             onNext={() => setStep(4)}
             onBack={() => setStep(2)}
+            onSave={handleSaveDraft}
+            saving={saving}
           />
         )}
         {step === 4 && (
@@ -209,7 +218,7 @@ const PackageWizard: React.FC = () => {
             draft={draft}
             updateDraft={updateDraft}
             onBack={() => setStep(3)}
-            onSave={handleSave}
+            onSave={() => handleSave({ navigateOnSuccess: true })}
             saving={saving}
           />
         )}

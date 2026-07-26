@@ -8,12 +8,15 @@ import {
     SearchInput, Pagination, TableCard, THead, Th, Td, SkeletonRows
 } from '../../components/admin/ui';
 import PackageDetailPanel from './PackageDetailPanel';
+import { useAuth } from '../../contexts/AuthContext';
 
 const PAGE_SIZE = 12;
 
 const Packages: React.FC = () => {
     const toast = useToast();
     const navigate = useNavigate();
+    const { profile } = useAuth();
+    const isBranchAdmin = profile?.role === 'branch_admin';
     const [packages, setPackages] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -94,12 +97,14 @@ const Packages: React.FC = () => {
                 badge={packages.length}
                 subtitle="Manage Umrah and Hajj tour packages"
                 action={
-                    <button
-                        onClick={() => navigate('/admin/packages/new')}
-                        className={btnPrimary}
-                    >
-                        <Plus className="w-4 h-4" /> New Package
-                    </button>
+                    !isBranchAdmin && (
+                        <button
+                            onClick={() => navigate('/admin/packages/new')}
+                            className={btnPrimary}
+                        >
+                            <Plus className="w-4 h-4" /> New Package
+                        </button>
+                    )
                 }
             />
 
@@ -216,18 +221,22 @@ const Packages: React.FC = () => {
                                                 >
                                                     View
                                                 </button>
-                                                <button
-                                                    onClick={() => navigate(`/admin/packages/${pkg.id}/edit`)}
-                                                    className={`${btnGhost} text-xs px-2 py-1`}
-                                                >
-                                                    Edit
-                                                </button>
-                                                <button
-                                                    onClick={() => setDeleteId(pkg.id)}
-                                                    className={`${btnGhost} text-red-500 hover:bg-red-50 text-xs px-2 py-1`}
-                                                >
-                                                    Delete
-                                                </button>
+                                                {!isBranchAdmin && (
+                                                    <>
+                                                        <button
+                                                            onClick={() => navigate(`/admin/packages/${pkg.id}/edit`)}
+                                                            className={`${btnGhost} text-xs px-2 py-1`}
+                                                        >
+                                                            Edit
+                                                        </button>
+                                                        <button
+                                                            onClick={() => setDeleteId(pkg.id)}
+                                                            className={`${btnGhost} text-red-500 hover:bg-red-50 text-xs px-2 py-1`}
+                                                        >
+                                                            Delete
+                                                        </button>
+                                                    </>
+                                                )}
                                             </div>
                                         </Td>
                                     </tr>

@@ -30,9 +30,9 @@ const NAV_GROUPS: NavGroup[] = [
       { path: '/admin', icon: LayoutDashboard, label: 'Dashboard', exact: true },
       { path: '/admin/orders', icon: ShoppingCart, label: 'Orders' },
       { path: '/admin/packages', icon: Package, label: 'Packages' },
-      { path: '/admin/documentations', icon: BookImage, label: 'Documentations' },
-      { path: '/admin/hotel-bookings', icon: Building2, label: 'Hotel Bookings' },
-      { path: '/admin/flight-bookings', icon: PlaneTakeoff, label: 'Flight Bookings' },
+      { path: '/admin/documentations', icon: BookImage, label: 'Documentations', allowedRoles: ['admin', 'superadmin'] },
+      { path: '/admin/hotel-bookings', icon: Building2, label: 'Hotel Bookings', allowedRoles: ['admin', 'superadmin'] },
+      { path: '/admin/flight-bookings', icon: PlaneTakeoff, label: 'Flight Bookings', allowedRoles: ['admin', 'superadmin'] },
       { path: '/admin/private-trips', icon: Map, label: 'Private Trips', allowedRoles: ['admin', 'superadmin'] },
     ],
   },
@@ -79,6 +79,95 @@ const ROLE_COLOR: Record<UserRole, string> = {
   branch_admin: 'text-emerald-300',
 };
 
+interface SidebarProps {
+  onClose: () => void;
+  onLogout: () => void;
+  isActive: (path: string, exact?: boolean) => boolean;
+  canSee: (roles?: UserRole[]) => boolean;
+  profile: { display_name?: string; email?: string; role: UserRole } | null;
+  initials: string;
+  branchLabel: string | null;
+}
+
+const SidebarNav: React.FC<SidebarProps> = ({ onClose, onLogout, isActive, canSee, profile, initials, branchLabel }) => (
+  <div className="flex flex-col h-full bg-gray-950 text-gray-300 w-64 shrink-0">
+    <div className="px-5 py-5 flex items-center gap-3 border-b border-white/5 shrink-0">
+      <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center shrink-0">
+        <img src="/assets/alfatih_logo_only.webp" alt="Logo" className="w-5 h-5 object-contain" />
+      </div>
+      <div className="min-w-0">
+        <p className="text-white text-sm font-semibold leading-tight truncate font-jakarta">Alfatih Admin</p>
+        <p className="text-gray-500 text-xs leading-tight">Dunia Wisata</p>
+      </div>
+      <button
+        onClick={onClose}
+        className="lg:hidden ml-auto p-1.5 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors shrink-0"
+      >
+        <X className="w-4 h-4" />
+      </button>
+    </div>
+
+    <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-5">
+      {NAV_GROUPS.map((group) => {
+        if (!canSee(group.allowedRoles)) return null;
+        const visibleItems = group.items.filter((item) => canSee(item.allowedRoles));
+        if (visibleItems.length === 0) return null;
+        return (
+          <div key={group.label}>
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-gray-600 px-3 mb-1.5">
+              {group.label}
+            </p>
+            <div className="space-y-0.5">
+              {visibleItems.map((item) => {
+                const active = isActive(item.path, item.exact);
+                return (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    onClick={onClose}
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-sm font-medium group ${
+                      active ? 'bg-white/10 text-white' : 'text-gray-400 hover:bg-white/5 hover:text-gray-200'
+                    }`}
+                  >
+                    <item.icon className={`w-4 h-4 shrink-0 transition-colors ${active ? 'text-primary' : 'text-gray-500 group-hover:text-gray-300'}`} />
+                    <span className="truncate">{item.label}</span>
+                    {active && <ChevronRight className="w-3.5 h-3.5 ml-auto text-gray-500 shrink-0" />}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })}
+    </nav>
+
+    <div className="px-3 py-4 border-t border-white/5 shrink-0 space-y-2">
+      {profile && (
+        <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-white/5">
+          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 bg-white/10 ${ROLE_COLOR[profile.role]}`}>
+            {initials}
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-white text-xs font-semibold leading-tight truncate">
+              {profile.display_name || profile.email}
+            </p>
+            <p className={`text-[10px] leading-tight truncate ${ROLE_COLOR[profile.role]}`}>
+              {ROLE_LABEL[profile.role]}{branchLabel ? ` · ${branchLabel}` : ''}
+            </p>
+          </div>
+        </div>
+      )}
+      <button
+        onClick={onLogout}
+        className="flex items-center gap-3 px-3 py-2.5 w-full rounded-xl text-sm font-medium text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-all"
+      >
+        <LogOut className="w-4 h-4 shrink-0" />
+        <span>Logout</span>
+      </button>
+    </div>
+  </div>
+);
+
 const AdminLayout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -122,85 +211,15 @@ const AdminLayout: React.FC = () => {
       ? branchNames[0]
       : `${branchNames[0]} +${branchNames.length - 1}`;
 
-  const Sidebar = () => (
-    <div className="flex flex-col h-full bg-gray-950 text-gray-300 w-64 shrink-0">
-      <div className="px-5 py-5 flex items-center gap-3 border-b border-white/5 shrink-0">
-        <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center shrink-0">
-          <img src="/assets/alfatih_logo_only.webp" alt="Logo" className="w-5 h-5 object-contain" />
-        </div>
-        <div className="min-w-0">
-          <p className="text-white text-sm font-semibold leading-tight truncate font-jakarta">Alfatih Admin</p>
-          <p className="text-gray-500 text-xs leading-tight">Dunia Wisata</p>
-        </div>
-        <button
-          onClick={closeSidebar}
-          className="lg:hidden ml-auto p-1.5 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors shrink-0"
-        >
-          <X className="w-4 h-4" />
-        </button>
-      </div>
-
-      <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-5">
-        {NAV_GROUPS.map((group) => {
-          if (!canSee(group.allowedRoles)) return null;
-          const visibleItems = group.items.filter((item) => canSee(item.allowedRoles));
-          if (visibleItems.length === 0) return null;
-          return (
-            <div key={group.label}>
-              <p className="text-[10px] font-semibold uppercase tracking-widest text-gray-600 px-3 mb-1.5">
-                {group.label}
-              </p>
-              <div className="space-y-0.5">
-                {visibleItems.map((item) => {
-                  const active = isActive(item.path, item.exact);
-                  return (
-                    <Link
-                      key={item.path}
-                      to={item.path}
-                      onClick={closeSidebar}
-                      className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-sm font-medium group ${
-                        active ? 'bg-white/10 text-white' : 'text-gray-400 hover:bg-white/5 hover:text-gray-200'
-                      }`}
-                    >
-                      <item.icon className={`w-4 h-4 shrink-0 transition-colors ${active ? 'text-primary' : 'text-gray-500 group-hover:text-gray-300'}`} />
-                      <span className="truncate">{item.label}</span>
-                      {active && <ChevronRight className="w-3.5 h-3.5 ml-auto text-gray-500 shrink-0" />}
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
-          );
-        })}
-      </nav>
-
-      {/* Identity card + logout */}
-      <div className="px-3 py-4 border-t border-white/5 shrink-0 space-y-2">
-        {profile && (
-          <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-white/5">
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 bg-white/10 ${ROLE_COLOR[profile.role]}`}>
-              {initials}
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-white text-xs font-semibold leading-tight truncate">
-                {profile.display_name || profile.email}
-              </p>
-              <p className={`text-[10px] leading-tight truncate ${ROLE_COLOR[profile.role]}`}>
-                {ROLE_LABEL[profile.role]}{branchLabel ? ` · ${branchLabel}` : ''}
-              </p>
-            </div>
-          </div>
-        )}
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-3 px-3 py-2.5 w-full rounded-xl text-sm font-medium text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-all"
-        >
-          <LogOut className="w-4 h-4 shrink-0" />
-          <span>Logout</span>
-        </button>
-      </div>
-    </div>
-  );
+  const sidebarProps: SidebarProps = {
+    onClose: closeSidebar,
+    onLogout: handleLogout,
+    isActive,
+    canSee,
+    profile,
+    initials,
+    branchLabel,
+  };
 
   return (
     <ToastProvider>
@@ -222,10 +241,12 @@ const AdminLayout: React.FC = () => {
           <div className="fixed inset-0 bg-black/60 z-40 lg:hidden backdrop-blur-sm animate-fade-in" onClick={closeSidebar} />
         )}
 
-        <div className="hidden lg:flex shrink-0"><Sidebar /></div>
+        <div className="hidden lg:flex shrink-0">
+          <SidebarNav {...sidebarProps} />
+        </div>
 
         <div className={`fixed inset-y-0 left-0 z-50 lg:hidden transform transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-          <Sidebar />
+          <SidebarNav {...sidebarProps} />
         </div>
 
         <div className={`flex-1 min-w-0 ${isFullHeightPage ? 'overflow-hidden' : 'overflow-auto'} mt-[52px] lg:mt-0`}>

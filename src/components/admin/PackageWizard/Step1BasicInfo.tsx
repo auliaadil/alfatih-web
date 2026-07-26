@@ -10,11 +10,13 @@ interface Props {
   draft: WizardDraft;
   updateDraft: (p: Partial<WizardDraft>) => void;
   onNext: () => void;
+  onSave?: () => void;
+  saving?: boolean;
   categories: string[];
   onCategoryCreated: (name: string) => void;
 }
 
-const Step1BasicInfo: React.FC<Props> = ({ draft, updateDraft, onNext, categories, onCategoryCreated }) => {
+const Step1BasicInfo: React.FC<Props> = ({ draft, updateDraft, onNext, onSave, saving, categories, onCategoryCreated }) => {
   const [imageTab, setImageTab] = useState<'upload' | 'search'>('upload');
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -272,7 +274,17 @@ const Step1BasicInfo: React.FC<Props> = ({ draft, updateDraft, onNext, categorie
         </div>
       </SectionCard>
 
-      <div className="flex justify-end">
+      <div className="flex justify-between">
+        {onSave ? (
+          <button
+            type="button"
+            onClick={onSave}
+            disabled={saving}
+            className={`${btnSecondary} disabled:opacity-50`}
+          >
+            {saving ? 'Saving…' : 'Save'}
+          </button>
+        ) : <span />}
         <button
           type="button"
           disabled={!canNext}
