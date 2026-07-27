@@ -13,7 +13,7 @@ export interface WizardDraft {
   // Step 1
   title: string;
   category: string;
-  destination_country: string;
+  country_ids: string[];
   departure_date: string;
   departure_date_hijri: string;
   arrival_date: string;
@@ -41,7 +41,7 @@ export interface WizardDraft {
 }
 
 const EMPTY_DRAFT: WizardDraft = {
-  title: '', category: '', destination_country: '', departure_date: '', departure_date_hijri: '', arrival_date: '',
+  title: '', category: '', country_ids: [], departure_date: '', departure_date_hijri: '', arrival_date: '',
   image_url: '', image_credit: '', gallery: [], is_popular: false, is_published: true,
   airline_ids: [], hotel_ids: [], flight_routes: [],
   description: '', features: [],
@@ -86,12 +86,15 @@ const PackageWizard: React.FC = () => {
   useEffect(() => {
     if (!id) return;
     (async () => {
-      const { data } = await supabase.from('packages').select('*').eq('id', id).single();
+      const [{ data }, { data: pcData }] = await Promise.all([
+        supabase.from('packages').select('*').eq('id', id).single(),
+        supabase.from('package_countries').select('country_id').eq('package_id', id),
+      ]);
       if (data) {
         setDraft({
           title: data.title ?? '',
           category: data.category ?? '',
-          destination_country: data.destination_country ?? '',
+          country_ids: pcData?.map((r: any) => r.country_id) ?? [],
           departure_date: data.departure_date ?? '',
           departure_date_hijri: data.departure_date_hijri ?? '',
           arrival_date: data.arrival_date ?? '',
@@ -132,7 +135,6 @@ const PackageWizard: React.FC = () => {
     const payload = {
       title: draft.title,
       category: draft.category,
-      destination_country: draft.destination_country || null,
       departure_date: draft.departure_date,
       departure_date_hijri: draft.departure_date_hijri || null,
       arrival_date: draft.arrival_date,
@@ -155,9 +157,26 @@ const PackageWizard: React.FC = () => {
       not_included: draft.not_included,
     };
 
-    const { error } = id
-      ? await supabase.from('packages').update(payload).eq('id', id)
-      : await supabase.from('packages').insert([payload]);
+    let pkgId = id;
+    let error: any = null;
+
+    if (id) {
+      const res = await supabase.from('packages').update(payload).eq('id', id);
+      error = res.error;
+    } else {
+      const res = await supabase.from('packages').insert([payload]).select('id').single();
+      error = res.error;
+      if (!error && res.data) pkgId = res.data.id;
+    }
+
+    if (!error && pkgId) {
+      await supabase.from('package_countries').delete().eq('package_id', pkgId);
+      if (draft.country_ids.length > 0) {
+        await supabase.from('package_countries').insert(
+          draft.country_ids.map(cid => ({ package_id: pkgId, country_id: cid }))
+        );
+      }
+    }
 
     setSaving(false);
     if (error) {

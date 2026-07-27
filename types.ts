@@ -91,6 +91,7 @@ export interface TourPackage {
   itinerary_pdf_url?: string;
   gallery?: string[];
   destination_country?: string;
+  package_countries?: { country_id: string; countries: { id: string; name: string } | null }[];
 }
 
 export interface AIPlannerInput {

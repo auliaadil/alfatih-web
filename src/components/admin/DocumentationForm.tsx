@@ -141,18 +141,21 @@ export const DocumentationForm: React.FC<Props> = ({ isOpen, onClose, doc, onSav
 
   const footer = (
     <div className="flex items-center justify-between">
-      <label className="flex items-center gap-2 cursor-pointer">
+      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100 gap-4">
+        <div>
+          <p className="text-sm font-medium text-gray-700">Published</p>
+          <p className="text-xs text-gray-400 mt-0.5">Tampilkan album ini di halaman publik</p>
+        </div>
         <button
           type="button"
-          role="switch"
-          aria-checked={form.published}
           onClick={() => setForm(prev => ({ ...prev, published: !prev.published }))}
-          className={`w-9 h-5 rounded-full transition-colors flex items-center px-0.5 ${form.published ? 'bg-primary justify-end' : 'bg-gray-300 justify-start'}`}
+          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none flex-shrink-0 ${form.published ? 'bg-primary' : 'bg-gray-200'}`}
         >
-          <span className="w-4 h-4 bg-white rounded-full shadow" />
+          <span
+            className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${form.published ? 'translate-x-6' : 'translate-x-1'}`}
+          />
         </button>
-        <span className="text-sm text-gray-600">Publish</span>
-      </label>
+      </div>
       <div className="flex gap-2">
         <button type="button" className={btnSecondary} onClick={onClose}>Batal</button>
         <button type="submit" form="doc-form" className={btnPrimary} disabled={saving}>

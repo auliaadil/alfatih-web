@@ -97,6 +97,7 @@ export const translations: Translations = {
     packages_search_placeholder: { id: 'Cari paket tour...', en: 'Search tour packages...' },
     packages_all_categories: { id: 'Semua Kategori', en: 'All Categories' },
     packages_all_countries: { id: 'Semua Negara', en: 'All Countries' },
+    packages_countries_selected: { id: 'negara dipilih', en: 'countries' },
     packages_all_months: { id: 'Semua Bulan', en: 'All Months' },
     packages_reset: { id: 'Reset', en: 'Reset' },
     packages_no_results: { id: 'Tidak ada paket yang cocok', en: 'No matching packages' },

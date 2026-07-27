@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import Navbar from '../../components/Navbar';
 import TourCard from '../../components/TourCard';
 import Footer from '../../components/Footer';
 import { TourPackage } from '../../types';
 import { supabase } from '../lib/supabase';
-import { Search, SlidersHorizontal, X } from 'lucide-react';
+import { Search, SlidersHorizontal, X, ChevronDown, Globe } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { formatMonthYear } from '../lib/formatDate';
 
@@ -21,35 +21,63 @@ const PackagesPage: React.FC = () => {
     const [packages, setPackages] = useState<TourPackage[]>([]);
     const [loading, setLoading] = useState(true);
     const [categories, setCategories] = useState<string[]>([]);
-    const [countries, setCountries] = useState<string[]>([]);
+    const [countries, setCountries] = useState<{ id: string; name: string }[]>([]);
 
     const [search, setSearch] = useState('');
     const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || '');
-    const [selectedCountry, setSelectedCountry] = useState('');
+    const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
     const [selectedMonth, setSelectedMonth] = useState('');
     const [page, setPage] = useState(0);
+    const [countryDropOpen, setCountryDropOpen] = useState(false);
+    const countryDropRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         fetchAll();
     }, []);
 
+    useEffect(() => {
+        const handler = (e: MouseEvent) => {
+            if (countryDropRef.current && !countryDropRef.current.contains(e.target as Node)) {
+                setCountryDropOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
+    }, []);
+
     const fetchAll = async () => {
         setLoading(true);
         const [pkgsResult, catsResult] = await Promise.all([
-            supabase.from('packages').select('*').eq('is_published', true).order('departure_date', { ascending: true }),
+            supabase.from('packages')
+                .select('*, package_countries(country_id, countries(id, name))')
+                .eq('is_published', true)
+                .order('departure_date', { ascending: true }),
             supabase.from('categories').select('name').order('name'),
         ]);
 
         if (pkgsResult.data) {
             setPackages(pkgsResult.data as TourPackage[]);
-            const uniqueCountries = Array.from(
-                new Set(pkgsResult.data.map(p => p.destination_country).filter(Boolean))
-            ).sort() as string[];
-            setCountries(uniqueCountries);
+            const countryMap = new Map<string, string>();
+            pkgsResult.data.forEach((p: any) => {
+                p.package_countries?.forEach((pc: any) => {
+                    if (pc.countries) countryMap.set(pc.country_id, pc.countries.name);
+                });
+            });
+            const sorted = Array.from(countryMap.entries())
+                .map(([id, name]) => ({ id, name }))
+                .sort((a, b) => a.name.localeCompare(b.name));
+            setCountries(sorted);
         }
-        if (catsResult.data) setCategories(catsResult.data.map(c => c.name));
+        if (catsResult.data) setCategories(catsResult.data.map((c: any) => c.name));
 
         setLoading(false);
+    };
+
+    const toggleCountry = (id: string) => {
+        setSelectedCountries(prev =>
+            prev.includes(id) ? prev.filter(c => c !== id) : [...prev, id]
+        );
+        resetPage();
     };
 
     const availableMonths = useMemo(() =>
@@ -61,12 +89,15 @@ const PackagesPage: React.FC = () => {
         const q = search.toLowerCase();
         return packages.filter(p => {
             if (selectedCategory && p.category !== selectedCategory) return false;
-            if (selectedCountry && p.destination_country !== selectedCountry) return false;
+            if (selectedCountries.length > 0) {
+                const pkgCountryIds = p.package_countries?.map(pc => pc.country_id) ?? [];
+                if (!selectedCountries.some(cid => pkgCountryIds.includes(cid))) return false;
+            }
             if (selectedMonth && formatMonthYear(p.departure_date, dateLocale) !== selectedMonth) return false;
             if (q && !p.title.toLowerCase().includes(q) && !p.category.toLowerCase().includes(q)) return false;
             return true;
         });
-    }, [packages, search, selectedCategory, selectedCountry, selectedMonth, dateLocale]);
+    }, [packages, search, selectedCategory, selectedCountries, selectedMonth, dateLocale]);
 
     const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
     const paginated = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
@@ -76,12 +107,12 @@ const PackagesPage: React.FC = () => {
     const clearFilters = () => {
         setSearch('');
         setSelectedCategory('');
-        setSelectedCountry('');
+        setSelectedCountries([]);
         setSelectedMonth('');
         setPage(0);
     };
 
-    const hasActiveFilter = search || selectedCategory || selectedCountry || selectedMonth;
+    const hasActiveFilter = search || selectedCategory || selectedCountries.length > 0 || selectedMonth;
 
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
@@ -128,16 +159,43 @@ const PackagesPage: React.FC = () => {
                                 {categories.map(c => <option key={c} value={c}>{c}</option>)}
                             </select>
 
-                            {/* Country */}
+                            {/* Country multi-select */}
                             {countries.length > 0 && (
-                                <select
-                                    className="px-3 py-2 border border-gray-200 rounded-xl text-sm bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary/20 min-w-[140px]"
-                                    value={selectedCountry}
-                                    onChange={(e) => { setSelectedCountry(e.target.value); resetPage(); }}
-                                >
-                                    <option value="">{t('packages_all_countries')}</option>
-                                    {countries.map(c => <option key={c} value={c}>{c}</option>)}
-                                </select>
+                                <div className="relative" ref={countryDropRef}>
+                                    <button
+                                        type="button"
+                                        onClick={() => setCountryDropOpen(o => !o)}
+                                        className={`flex items-center gap-1.5 px-3 py-2 border rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 min-w-[140px] transition-colors ${selectedCountries.length > 0 ? 'border-primary text-primary font-medium' : 'border-gray-200 text-gray-700'}`}
+                                    >
+                                        <Globe className="w-3.5 h-3.5 flex-shrink-0" />
+                                        <span className="flex-1 text-left truncate">
+                                            {selectedCountries.length === 0
+                                                ? t('packages_all_countries')
+                                                : selectedCountries.length === 1
+                                                    ? countries.find(c => c.id === selectedCountries[0])?.name
+                                                    : `${selectedCountries.length} ${t('packages_countries_selected')}`}
+                                        </span>
+                                        <ChevronDown className={`w-3.5 h-3.5 flex-shrink-0 transition-transform ${countryDropOpen ? 'rotate-180' : ''}`} />
+                                    </button>
+                                    {countryDropOpen && (
+                                        <div className="absolute z-40 mt-1 left-0 bg-white border border-gray-200 rounded-xl shadow-lg min-w-[180px] max-h-60 overflow-y-auto">
+                                            {countries.map(c => (
+                                                <label
+                                                    key={c.id}
+                                                    className="flex items-center gap-2.5 px-3 py-2 hover:bg-gray-50 cursor-pointer transition-colors"
+                                                >
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={selectedCountries.includes(c.id)}
+                                                        onChange={() => toggleCountry(c.id)}
+                                                        className="w-4 h-4 accent-primary rounded"
+                                                    />
+                                                    <span className="text-sm text-gray-700">{c.name}</span>
+                                                </label>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
                             )}
 
                             {/* Month */}

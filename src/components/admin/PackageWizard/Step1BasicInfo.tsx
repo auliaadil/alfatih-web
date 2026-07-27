@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { Upload, Search as SearchIcon, Plus } from 'lucide-react';
 import { FormField, inputClass, selectClass, SectionCard, btnPrimary, btnSecondary, SlideOver, useToast } from '../ui';
 import ImagePickerModal from './ImagePickerModal';
+import CountryMultiSelect from '../CountryMultiSelect';
 import { WizardDraft } from '../../../pages/admin/PackageWizard';
 import { supabase } from '../../../lib/supabase';
 import { toHijriMonthYear } from '../../../lib/hijriUtils';
@@ -119,13 +120,10 @@ const Step1BasicInfo: React.FC<Props> = ({ draft, updateDraft, onNext, onSave, s
             </select>
           </div>
 
-          <FormField label="Destination Country" hint="e.g., Arab Saudi, Turki, Jepang. Digunakan untuk filter di halaman paket.">
-            <input
-              type="text"
-              className={inputClass}
-              placeholder="e.g., Arab Saudi"
-              value={draft.destination_country}
-              onChange={(e) => updateDraft({ destination_country: e.target.value })}
+          <FormField label="Destination Countries" hint="Select one or more countries. Used for filtering on the packages page.">
+            <CountryMultiSelect
+              value={draft.country_ids}
+              onChange={(ids) => updateDraft({ country_ids: ids })}
             />
           </FormField>
 
