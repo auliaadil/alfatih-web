@@ -170,7 +170,7 @@ const AIPlanner: React.FC = () => {
 
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-20 pb-20">
                     <div className="bg-white rounded-3xl shadow-2xl shadow-primary/10 border border-gray-100 p-8 md:p-12">
-                        <div className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-headings:font-black prose-p:text-gray-600 prose-strong:text-gray-800 prose-ul:text-gray-600 prose-li:marker:text-primary">
+                        <div className="prose prose-sm max-w-none prose-headings:text-gray-900 prose-headings:font-black prose-p:text-gray-600 prose-strong:text-gray-800 prose-ul:text-gray-600 prose-li:marker:text-primary">
                             <ReactMarkdown>{itinerary}</ReactMarkdown>
                         </div>
                     </div>
