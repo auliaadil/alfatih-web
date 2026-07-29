@@ -1,6 +1,7 @@
 import { AIPlannerInput } from '../types'
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_API_KEY
 const SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY
 
 // Singleton promise — shared across all calls so the script loads exactly once.
@@ -55,7 +56,11 @@ export const generateItinerary = async (input: AIPlannerInput): Promise<string> 
     }
     const res = await fetch(`${SUPABASE_URL}/functions/v1/ai-itinerary`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+      },
       body: JSON.stringify({ ...input, recaptchaToken }),
     })
     if (!res.ok) {
