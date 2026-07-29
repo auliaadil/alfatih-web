@@ -12,6 +12,34 @@ const formatPrice = (price?: number) =>
         ? new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(price)
         : 'Hubungi Kami';
 
+// Strip markdown syntax markers so PDF shows clean text.
+// Returns { text, bold } so callers can choose the bold font for whole-line bold.
+// List prefixes: "- item" → "• item", "1. item" → "1. item"
+function parseMarkdownLine(raw: string): { text: string; bold: boolean } {
+    const trimmed = raw.trim();
+    // Bullet list: "- item"
+    const bullet = trimmed.match(/^- (.*)$/);
+    if (bullet) {
+        const inner = parseMarkdownLine(bullet[1]);
+        return { text: `• ${inner.text}`, bold: inner.bold };
+    }
+    // Ordered list: "1. item"
+    const ordered = trimmed.match(/^(\d+)\. (.*)$/);
+    if (ordered) {
+        const inner = parseMarkdownLine(ordered[2]);
+        return { text: `${ordered[1]}. ${inner.text}`, bold: inner.bold };
+    }
+    // Whole-line bold: "**text**"
+    const wholeBold = trimmed.match(/^\*\*(.+)\*\*$/);
+    if (wholeBold) return { text: wholeBold[1], bold: true };
+    // Strip inline markers (bold, italic, underline)
+    const cleaned = trimmed
+        .replace(/\*\*(.+?)\*\*/g, '$1')
+        .replace(/\*(.+?)\*/g, '$1')
+        .replace(/__(.+?)__/g, '$1');
+    return { text: cleaned, bold: false };
+}
+
 const PAGE_W = 595.28;
 const PAGE_H = 841.89;
 const MARGIN = 48;
@@ -192,7 +220,7 @@ async function buildItineraryPdf(
     }
 
     ctx.page.drawText('ALFATIH DUNIA WISATA', { x: textX, y: PAGE_H - 30, size: 13, font: fontBold, color: COLOR_WHITE });
-    ctx.page.drawText('alfatihduniawisata.id',  { x: textX, y: PAGE_H - 48, size: 9,  font,         color: rgb(0.8, 0.9, 1) });
+    ctx.page.drawText(siteSettings.website_url || 'alfatihduniawisata.id',  { x: textX, y: PAGE_H - 48, size: 9,  font,         color: rgb(0.8, 0.9, 1) });
 
     ctx.y = PAGE_H - 84;
 
@@ -235,12 +263,14 @@ async function buildItineraryPdf(
                 ctx.page = ctx.doc.addPage([PAGE_W, PAGE_H]);
                 ctx.y = PAGE_H - MARGIN;
             }
-            drawText(ctx, dayLabel, { fontSize: 11, bold: true, color: COLOR_PRIMARY });
+            drawText(ctx, parseMarkdownLine(dayLabel).text, { fontSize: 11, bold: true, color: COLOR_PRIMARY });
             if (day.description) {
-                drawText(ctx, day.description, { fontSize: 9, color: COLOR_GRAY, indent: 8 });
+                const { text: descText, bold: descBold } = parseMarkdownLine(day.description);
+                drawText(ctx, descText, { fontSize: 9, bold: descBold, color: COLOR_GRAY, indent: 8 });
             }
             for (const act of (day.activities || []) as string[]) {
-                drawText(ctx, `• ${act}`, { fontSize: 9, color: COLOR_DARK, indent: 8 });
+                const { text: actText } = parseMarkdownLine(act);
+                drawText(ctx, `• ${actText}`, { fontSize: 9, color: COLOR_DARK, indent: 8 });
             }
             ctx.y -= 8;
 
@@ -338,7 +368,8 @@ async function buildItineraryPdf(
         drawSectionHeader(ctx, 'Sudah Termasuk');
         ctx.y -= 4;
         included.forEach((item, i) => {
-            drawText(ctx, `${i + 1}. ${item}`, { fontSize: 9, color: COLOR_DARK, indent: 4 });
+            const { text, bold } = parseMarkdownLine(item);
+            drawText(ctx, `${i + 1}. ${text}`, { fontSize: 9, bold, color: COLOR_DARK, indent: 4 });
         });
         ctx.y -= 8;
     }
@@ -347,7 +378,8 @@ async function buildItineraryPdf(
         drawSectionHeader(ctx, 'Tidak Termasuk');
         ctx.y -= 4;
         notIncluded.forEach((item, i) => {
-            drawText(ctx, `${i + 1}. ${item}`, { fontSize: 9, color: COLOR_GRAY, indent: 4 });
+            const { text, bold } = parseMarkdownLine(item);
+            drawText(ctx, `${i + 1}. ${text}`, { fontSize: 9, bold, color: COLOR_GRAY, indent: 4 });
         });
         ctx.y -= 8;
     }
@@ -358,7 +390,8 @@ async function buildItineraryPdf(
         ctx.y -= 4;
         const tncLines = termsConditions.split('\n').filter((l: string) => l.trim());
         for (const line of tncLines) {
-            drawText(ctx, line.trim(), { fontSize: 8, color: COLOR_GRAY, indent: 4, maxWidth: CONTENT_W - 8 });
+            const { text, bold } = parseMarkdownLine(line);
+            drawText(ctx, text, { fontSize: 8, color: COLOR_GRAY, bold, indent: 4, maxWidth: CONTENT_W - 8 });
         }
         ctx.y -= 8;
     }
@@ -375,7 +408,7 @@ async function buildItineraryPdf(
     if (siteSettings.phone) {
         ctx.page.drawText(`Telp: ${siteSettings.phone}`, { x: MARGIN, y: 36, size: 9, font, color: rgb(0.8, 0.9, 1) });
     }
-    ctx.page.drawText('Alfatih Dunia Wisata - alfatihduniawisata.id', {
+    ctx.page.drawText(`Alfatih Dunia Wisata - ${siteSettings.website_url || 'alfatihduniawisata.id'}`, {
         x: MARGIN, y: 18, size: 8, font, color: rgb(0.7, 0.8, 0.9),
     });
 

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Plus, X, Loader2 } from 'lucide-react';
-import { SectionCard, inputClass, btnPrimary, btnSecondary } from '../ui';
+import { SectionCard, btnPrimary, btnSecondary } from '../ui';
+import RichTextInput from '../RichTextInput';
 import { supabase } from '../../../lib/supabase';
 import { DayItinerary } from '../../../../types';
 import { WizardDraft } from '../../../pages/admin/PackageWizard';
@@ -183,11 +184,11 @@ const Step4ItineraryTerms: React.FC<Props> = ({ draft, updateDraft, onBack, onSa
                     <span className="bg-green-500 text-white text-xs font-bold px-2 py-0.5 rounded">
                       Hari {day.day}
                     </span>
-                    <input
-                      className={inputClass + ' flex-1 text-sm font-medium'}
+                    <RichTextInput
+                      className="flex-1 text-sm font-medium"
                       placeholder="Day title..."
                       value={day.title}
-                      onChange={(e) => updateDay(di, { title: e.target.value })}
+                      onChange={(v) => updateDay(di, { title: v })}
                     />
                     <button
                       type="button"
@@ -201,11 +202,11 @@ const Step4ItineraryTerms: React.FC<Props> = ({ draft, updateDraft, onBack, onSa
                     {(day.activities ?? []).map((act, ai) => (
                       <div key={ai} className="flex items-center gap-2">
                         <span className="text-gray-300 text-xs">•</span>
-                        <input
-                          className={inputClass + ' flex-1 text-sm'}
+                        <RichTextInput
+                          className="flex-1 text-sm"
                           placeholder="Activity..."
                           value={act}
-                          onChange={(e) => updateActivity(di, ai, e.target.value)}
+                          onChange={(v) => updateActivity(di, ai, v)}
                         />
                         <button
                           type="button"
@@ -249,11 +250,11 @@ const Step4ItineraryTerms: React.FC<Props> = ({ draft, updateDraft, onBack, onSa
               {draft.included.map((item, i) => (
                 <div key={i} className="flex items-center gap-2">
                   <span className="text-green-500 text-sm font-bold shrink-0">✓</span>
-                  <input
-                    className={inputClass + ' flex-1 text-sm'}
+                  <RichTextInput
+                    className="flex-1 text-sm"
                     value={item}
                     placeholder="e.g., Tiket pesawat PP"
-                    onChange={(e) => updateListItem('included', i, e.target.value)}
+                    onChange={(v) => updateListItem('included', i, v)}
                   />
                   <button
                     type="button"
@@ -287,11 +288,11 @@ const Step4ItineraryTerms: React.FC<Props> = ({ draft, updateDraft, onBack, onSa
               {draft.not_included.map((item, i) => (
                 <div key={i} className="flex items-center gap-2">
                   <span className="text-red-400 text-sm font-bold shrink-0">✗</span>
-                  <input
-                    className={inputClass + ' flex-1 text-sm'}
+                  <RichTextInput
+                    className="flex-1 text-sm"
                     value={item}
                     placeholder="e.g., Biaya pribadi"
-                    onChange={(e) => updateListItem('not_included', i, e.target.value)}
+                    onChange={(v) => updateListItem('not_included', i, v)}
                   />
                   <button
                     type="button"

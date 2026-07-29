@@ -23,6 +23,7 @@ import { TourPackage, Airport } from '../types';
 import { supabase } from '../src/lib/supabase';
 import { formatFlightRoutes } from '../src/lib/formatFlightRoutes';
 import { formatDate } from '../src/lib/formatDate';
+import MarkdownText from '../src/components/MarkdownText';
 
 interface TourDetailProps {
   tour: TourPackage;
@@ -234,18 +235,20 @@ const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
                       </div>
                       <div>
                         <h3 className="text-base md:text-lg font-bold text-gray-900 mb-3 group-hover:text-primary transition-colors font-jakarta">
-                          {day.title}
+                          <MarkdownText text={day.title} />
                         </h3>
                         <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 space-y-3">
                           {day.description && (
-                            <p className="text-gray-600 text-sm leading-relaxed">{day.description}</p>
+                            <p className="text-gray-600 text-sm leading-relaxed">
+                              <MarkdownText text={day.description} />
+                            </p>
                           )}
                           {(day.activities?.length ?? 0) > 0 && (
                             <ul className="space-y-2">
                               {day.activities!.map((activity, i) => (
                                 <li key={i} className="flex items-start gap-2.5 text-gray-600 text-sm">
                                   <div className="mt-1.5 w-1 h-1 rounded-full bg-primary flex-shrink-0" />
-                                  {activity}
+                                  <MarkdownText text={activity} />
                                 </li>
                               ))}
                             </ul>
@@ -356,7 +359,7 @@ const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
                       {(tour.included?.length ?? 0) > 0 ? tour.included!.map((item, i) => (
                         <li key={i} className="flex items-start gap-2.5">
                           <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                          <span className="text-gray-700 text-sm leading-snug">{item}</span>
+                          <MarkdownText text={item} className="text-gray-700 text-sm leading-snug" />
                         </li>
                       )) : (
                         <p className="text-gray-400 text-xs italic">{t('detail_no_data')}</p>
@@ -374,7 +377,7 @@ const TourDetail: React.FC<TourDetailProps> = ({ tour, onBack }) => {
                       {(tour.not_included?.length ?? 0) > 0 ? tour.not_included!.map((item, i) => (
                         <li key={i} className="flex items-start gap-2.5">
                           <XCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
-                          <span className="text-gray-700 text-sm leading-snug">{item}</span>
+                          <MarkdownText text={item} className="text-gray-700 text-sm leading-snug" />
                         </li>
                       )) : (
                         <p className="text-gray-400 text-xs italic">{t('detail_no_data')}</p>

@@ -3,9 +3,10 @@ import { supabase } from '../../lib/supabase';
 import { Plus, Edit2, Trash2, Tag } from 'lucide-react';
 import {
   PageHeader, TableCard, THead, Th, Td, SkeletonRows, EmptyState, SlideOver,
-  ConfirmDialog, FormField, inputClass, textareaClass, btnPrimary, btnSecondary, btnGhost, useToast,
+  ConfirmDialog, FormField, inputClass, btnPrimary, btnSecondary, btnGhost, useToast,
   SearchInput, Pagination, SortState, compareRows,
 } from '../../components/admin/ui';
+import RichTextInput from '../../components/admin/RichTextInput';
 import { Category } from '../../../types';
 
 const toSlug = (name: string) =>
@@ -143,13 +144,13 @@ const Categories: React.FC = () => {
             <input type="text" className={inputClass} placeholder="e.g., umrah-plus" value={form.slug}
               onChange={(e) => setForm({ ...form, slug: e.target.value })} />
           </FormField>
-          <FormField label="Syarat & Ketentuan" hint="Akan ditampilkan di halaman akhir itinerary PDF. Kosongkan jika tidak ada.">
-            <textarea
+          <FormField label="Syarat & Ketentuan" hint="Akan ditampilkan di halaman akhir itinerary PDF. Gunakan **teks** untuk tebal, *teks* untuk miring, __teks__ untuk garis bawah.">
+            <RichTextInput
+              multiline
               rows={8}
-              className={textareaClass}
               placeholder="Tulis syarat & ketentuan paket tour..."
               value={form.terms_conditions}
-              onChange={(e) => setForm({ ...form, terms_conditions: e.target.value })}
+              onChange={(v) => setForm({ ...form, terms_conditions: v })}
             />
           </FormField>
         </form>

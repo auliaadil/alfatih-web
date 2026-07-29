@@ -91,7 +91,7 @@ const PackageDetailPanel: React.FC<PackageDetailPanelProps> = ({ pkg, onClose })
             const fullPkg = { ...pkg, airlines, hotels };
             const pdfUrl = await generateAndSaveItineraryPdf(
                 fullPkg,
-                { whatsapp: settings.whatsapp, phone: settings.phone },
+                { whatsapp: settings.whatsapp, phone: settings.phone, website_url: settings.website_url },
                 dayPhotos,
                 termsConditions,
             );

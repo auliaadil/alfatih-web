@@ -13,6 +13,7 @@ interface SiteSettings {
     izin_bpw: string;
     siskopatuh_logo_url: string;
     pasti_umrah_logo_url: string;
+    website_url: string;
 }
 
 const defaultSettings: SiteSettings = {
@@ -27,6 +28,7 @@ const defaultSettings: SiteSettings = {
     izin_bpw: '',
     siskopatuh_logo_url: '',
     pasti_umrah_logo_url: '',
+    website_url: 'alfatihduniawisata.id',
 };
 
 const SiteSettingsContext = createContext<SiteSettings>(defaultSettings);
@@ -56,6 +58,7 @@ export const SiteSettingsProvider: React.FC<{ children: React.ReactNode }> = ({ 
                     izin_bpw: data.izin_bpw || '',
                     siskopatuh_logo_url: data.siskopatuh_logo_url || '',
                     pasti_umrah_logo_url: data.pasti_umrah_logo_url || '',
+                    website_url: data.website_url || defaultSettings.website_url,
                 });
             }
         };

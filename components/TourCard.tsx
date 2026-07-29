@@ -4,6 +4,7 @@ import { Clock, CheckCircle, Star, Calendar } from 'lucide-react';
 import { TourPackage } from '../types';
 import { useLanguage } from '../src/contexts/LanguageContext';
 import { formatDate } from '../src/lib/formatDate';
+import { stripMarkdown } from '../src/lib/markdown';
 
 
 interface TourCardProps {
@@ -62,7 +63,7 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
         </div>
 
         <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-          {tour.description}
+          {stripMarkdown(tour.description)}
         </p>
 
         <div className="space-y-1.5 mb-4">

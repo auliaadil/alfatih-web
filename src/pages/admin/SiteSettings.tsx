@@ -13,6 +13,7 @@ interface SiteSettingsData {
     planner_traveler_types: TravelerType[];
     izin_ppiu: string; izin_bpw: string;
     siskopatuh_logo_url: string; pasti_umrah_logo_url: string;
+    website_url: string;
 }
 
 const TagEditor: React.FC<{ label: string; tags: string[]; onChange: (tags: string[]) => void }> = ({ label, tags, onChange }) => {
@@ -80,6 +81,7 @@ const SiteSettings: React.FC = () => {
                 izin_bpw: data.izin_bpw || '',
                 siskopatuh_logo_url: data.siskopatuh_logo_url || '',
                 pasti_umrah_logo_url: data.pasti_umrah_logo_url || '',
+                website_url: data.website_url || 'alfatihduniawisata.id',
             } as SiteSettingsData);
         }
         setLoading(false);
@@ -100,6 +102,7 @@ const SiteSettings: React.FC = () => {
             izin_bpw: settings.izin_bpw,
             siskopatuh_logo_url: settings.siskopatuh_logo_url,
             pasti_umrah_logo_url: settings.pasti_umrah_logo_url,
+            website_url: settings.website_url,
             updated_at: new Date().toISOString(),
         }).eq('id', 1);
         setSaving(false);
@@ -171,6 +174,12 @@ const SiteSettings: React.FC = () => {
                         </div>
                         <FormField label="Email Address" required>
                             <input type="email" required className={inputClass} value={settings?.email || ''} onChange={e => set('email', e.target.value)} />
+                        </FormField>
+                        <FormField label="Website URL" hint="Used in PDF itineraries and documents (e.g. alfatihduniawisata.id)">
+                            <div className="relative">
+                                <Globe className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                <input type="text" className={`${inputClass} pl-10`} value={settings?.website_url || ''} onChange={e => set('website_url', e.target.value)} placeholder="alfatihduniawisata.id" />
+                            </div>
                         </FormField>
                         <FormField label="Office Address" required>
                             <textarea required rows={3} className={textareaClass} value={settings?.address || ''} onChange={e => set('address', e.target.value)} />

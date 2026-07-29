@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { X, Upload, Plus, Trash2, Loader2 } from 'lucide-react';
 import { toHijriMonthYear } from '../../lib/hijriUtils';
+import RichTextInput from '../../components/admin/RichTextInput';
 
 interface RoomOption {
     name: string;
@@ -305,7 +306,7 @@ const PackageForm: React.FC<PackageFormProps> = ({ airlinesData, hotelsData, ini
 
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                                <textarea required rows={3} className="w-full px-4 py-2 border rounded-md" value={description} onChange={e => setDescription(e.target.value)} />
+                                <RichTextInput multiline rows={3} required value={description} onChange={setDescription} placeholder="Deskripsi paket..." />
                             </div>
 
                             <div>
@@ -552,7 +553,7 @@ const PackageForm: React.FC<PackageFormProps> = ({ airlinesData, hotelsData, ini
                                                 <label className="block text-xs font-medium text-gray-500">Activities</label>
                                                 {(item.activities || []).map((activity, actIndex) => (
                                                     <div key={actIndex} className="flex gap-2">
-                                                        <input type="text" placeholder={`Activity ${actIndex + 1}`} className="flex-1 px-3 py-1.5 border rounded border-gray-300 text-sm" value={activity} onChange={e => handleItineraryActivityChange(index, actIndex, e.target.value)} />
+                                                        <RichTextInput placeholder={`Activity ${actIndex + 1}`} className="flex-1 text-sm" value={activity} onChange={(v) => handleItineraryActivityChange(index, actIndex, v)} />
                                                         <button type="button" onClick={() => removeItineraryActivity(index, actIndex)} className="text-red-400 hover:text-red-600">
                                                             <X className="w-4 h-4" />
                                                         </button>
@@ -585,7 +586,7 @@ const PackageForm: React.FC<PackageFormProps> = ({ airlinesData, hotelsData, ini
                                     <div className="space-y-2">
                                         {included.map((inc, index) => (
                                             <div key={index} className="flex gap-2">
-                                                <input type="text" className="flex-1 px-3 py-1.5 border rounded border-gray-300 text-sm" value={inc} onChange={e => handleListChange(setIncluded, included, index, e.target.value)} />
+                                                <RichTextInput className="flex-1 text-sm" value={inc} onChange={(v) => handleListChange(setIncluded, included, index, v)} />
                                                 <button type="button" onClick={() => setIncluded(included.filter((_, i) => i !== index))} className="text-red-400 hover:text-red-600">
                                                     <X className="w-4 h-4" />
                                                 </button>
@@ -610,7 +611,7 @@ const PackageForm: React.FC<PackageFormProps> = ({ airlinesData, hotelsData, ini
                                     <div className="space-y-2">
                                         {notIncluded.map((ninc, index) => (
                                             <div key={index} className="flex gap-2">
-                                                <input type="text" className="flex-1 px-3 py-1.5 border rounded border-gray-300 text-sm" value={ninc} onChange={e => handleListChange(setNotIncluded, notIncluded, index, e.target.value)} />
+                                                <RichTextInput className="flex-1 text-sm" value={ninc} onChange={(v) => handleListChange(setNotIncluded, notIncluded, index, v)} />
                                                 <button type="button" onClick={() => setNotIncluded(notIncluded.filter((_, i) => i !== index))} className="text-red-400 hover:text-red-600">
                                                     <X className="w-4 h-4" />
                                                 </button>
